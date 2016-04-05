@@ -5,12 +5,12 @@ using System.Linq;
 using Nop.Core;
 using Nop.Core.Data;
 using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Services.Helpers;
 
-namespace Nop.Services.Orders
+namespace Nop.Services.SubscriptionOrders
 {
     /// <summary>
     /// Order report service
@@ -19,8 +19,9 @@ namespace Nop.Services.Orders
     {
         #region Fields
 
-        private readonly IRepository<Order> _orderRepository;
+        private readonly IRepository<SubscriptionOrder> _orderRepository;
         private readonly IRepository<OrderItem> _orderItemRepository;
+        private readonly IRepository<ItemDetail> _itemDetailRepository;
         private readonly IRepository<Product> _productRepository;
         private readonly IDateTimeHelper _dateTimeHelper;
 
@@ -35,13 +36,15 @@ namespace Nop.Services.Orders
         /// <param name="orderItemRepository">Order item repository</param>
         /// <param name="productRepository">Product repository</param>
         /// <param name="dateTimeHelper">Datetime helper</param>
-        public OrderReportService(IRepository<Order> orderRepository,
+        public OrderReportService(IRepository<SubscriptionOrder> orderRepository,
             IRepository<OrderItem> orderItemRepository,
+            IRepository<ItemDetail> itemDetailRepository,
             IRepository<Product> productRepository,
             IDateTimeHelper dateTimeHelper)
         {
             this._orderRepository = orderRepository;
             this._orderItemRepository = orderItemRepository;
+            this._itemDetailRepository = itemDetailRepository;
             this._productRepository = productRepository;
             this._dateTimeHelper = dateTimeHelper;
         }
@@ -60,7 +63,7 @@ namespace Nop.Services.Orders
         /// <param name="startTimeUtc">Start date</param>
         /// <param name="endTimeUtc">End date</param>
         /// <returns>Result</returns>
-        public virtual IList<OrderByCountryReportLine> GetCountryReport(int storeId, OrderStatus? os,
+        public virtual IList<OrderByCountryReportLine> GetCountryReport(int storeId, SubscriptionOrderStatus? os,
             PaymentStatus? ps, ShippingStatus? ss, DateTime? startTimeUtc, DateTime? endTimeUtc)
         {
             int? orderStatusId = null;
@@ -80,7 +83,7 @@ namespace Nop.Services.Orders
             if (storeId > 0)
                 query = query.Where(o => o.StoreId == storeId);
             if (orderStatusId.HasValue)
-                query = query.Where(o => o.OrderStatusId == orderStatusId.Value);
+                query = query.Where(o => o.SubscriptionOrderStatusId == orderStatusId.Value);
             if (paymentStatusId.HasValue)
                 query = query.Where(o => o.PaymentStatusId == paymentStatusId.Value);
             if (shippingStatusId.HasValue)
@@ -96,7 +99,7 @@ namespace Nop.Services.Orders
                         {
                             CountryId = result.Key,
                             TotalOrders = result.Count(),
-                            SumOrders = result.Sum(o => o.OrderTotal)
+                            SumOrders = result.Sum(o => o.SubscriptionOrderTotal)
                         }
                        )
                        .OrderByDescending(x => x.SumOrders)
@@ -133,7 +136,7 @@ namespace Nop.Services.Orders
         public virtual OrderAverageReportLine GetOrderAverageReportLine(int storeId = 0,
             int vendorId = 0, int billingCountryId = 0, 
             int orderId = 0, string paymentMethodSystemName = null,
-            OrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
+            SubscriptionOrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
             DateTime? startTimeUtc = null, DateTime? endTimeUtc = null,
             string billingEmail = null, string billingLastName = "", 
             bool ignoreCancelledOrders = false, string orderNotes = null)
@@ -156,23 +159,23 @@ namespace Nop.Services.Orders
                 query = query.Where(o => o.StoreId == storeId);
             if (orderId > 0)
                 query = query.Where(o => o.Id == orderId);
-            if (vendorId > 0)
-            {
-                query = query
-                    .Where(o => o.OrderItems
-                    .Any(orderItem => orderItem.Product.VendorId == vendorId));
-            }
+            //if (vendorId > 0)
+            //{
+            //    query = query
+            //        .Where(o => o.OrderItems
+            //        .Any(orderItem => orderItem.Product.VendorId == vendorId));
+            //}
             if (billingCountryId > 0)
                 query = query.Where(o => o.BillingAddress != null && o.BillingAddress.CountryId == billingCountryId);
             if (ignoreCancelledOrders)
             {
-                var cancelledOrderStatusId = (int)OrderStatus.Cancelled;
-                query = query.Where(o => o.OrderStatusId != cancelledOrderStatusId);
+                var cancelledSubscriptionOrderStatusId = (int)SubscriptionOrderStatus.Cancelled;
+                query = query.Where(o => o.SubscriptionOrderStatusId != cancelledSubscriptionOrderStatusId);
             }
             if (!String.IsNullOrEmpty(paymentMethodSystemName))
                 query = query.Where(o => o.PaymentMethodSystemName == paymentMethodSystemName);
             if (orderStatusId.HasValue)
-                query = query.Where(o => o.OrderStatusId == orderStatusId.Value);
+                query = query.Where(o => o.SubscriptionOrderStatusId == orderStatusId.Value);
             if (paymentStatusId.HasValue)
                 query = query.Where(o => o.PaymentStatusId == paymentStatusId.Value);
             if (shippingStatusId.HasValue)
@@ -186,16 +189,16 @@ namespace Nop.Services.Orders
             if (!String.IsNullOrEmpty(billingLastName))
                 query = query.Where(o => o.BillingAddress != null && !String.IsNullOrEmpty(o.BillingAddress.LastName) && o.BillingAddress.LastName.Contains(billingLastName));
             if (!String.IsNullOrEmpty(orderNotes))
-                query = query.Where(o => o.OrderNotes.Any(on => on.Note.Contains(orderNotes)));
+                query = query.Where(o => o.SubscriptionOrderNotes.Any(on => on.Note.Contains(orderNotes)));
             
 			var item = (from oq in query
 						group oq by 1 into result
 						select new
 						           {
                                        OrderCount = result.Count(),
-                                       OrderShippingExclTaxSum = result.Sum(o => o.OrderShippingExclTax),
-                                       OrderTaxSum = result.Sum(o => o.OrderTax), 
-                                       OrderTotalSum = result.Sum(o => o.OrderTotal)
+                                       OrderShippingExclTaxSum = result.Sum(o => o.SubscriptionOrderShippingExclTax),
+                                       OrderTaxSum = result.Sum(o => o.SubscriptionOrderTax),
+                                       OrderTotalSum = result.Sum(o => o.SubscriptionOrderTotal)
 						           }
 					   ).Select(r => new OrderAverageReportLine
                        {
@@ -222,10 +225,10 @@ namespace Nop.Services.Orders
         /// <param name="storeId">Store identifier</param>
         /// <param name="os">Order status</param>
         /// <returns>Result</returns>
-        public virtual OrderAverageReportLineSummary OrderAverageReport(int storeId, OrderStatus os)
+        public virtual OrderAverageReportLineSummary OrderAverageReport(int storeId, SubscriptionOrderStatus os)
         {
             var item = new OrderAverageReportLineSummary();
-            item.OrderStatus = os;
+            item.SubscriptionOrderStatus = os;
 
             DateTime nowDt = _dateTimeHelper.ConvertToUserTime(DateTime.Now);
             TimeZoneInfo timeZone = _dateTimeHelper.CurrentTimeZone;
@@ -306,7 +309,7 @@ namespace Nop.Services.Orders
             int categoryId = 0, int manufacturerId = 0,
             int storeId = 0, int vendorId = 0,
             DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
-            OrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
+            SubscriptionOrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
             int billingCountryId = 0,
             int orderBy = 1,
             int pageIndex = 0, int pageSize = int.MaxValue, 
@@ -324,15 +327,16 @@ namespace Nop.Services.Orders
             if (ss.HasValue)
                 shippingStatusId = (int)ss.Value;
 
-            var query1 = from orderItem in _orderItemRepository.Table
-                         join o in _orderRepository.Table on orderItem.OrderId equals o.Id
-                         join p in _productRepository.Table on orderItem.ProductId equals p.Id
+            var query1 = from itemDetail in _itemDetailRepository.Table
+                         join oi in _orderItemRepository.Table on itemDetail.OrderItemId equals oi.Id
+                         join o in _orderRepository.Table on oi.SubscriptionOrderId equals o.Id
+                         join p in _productRepository.Table on itemDetail.ProductId equals p.Id
                          //join pc in _productCategoryRepository.Table on p.Id equals pc.ProductId into p_pc from pc in p_pc.DefaultIfEmpty()
                          //join pm in _productManufacturerRepository.Table on p.Id equals pm.ProductId into p_pm from pm in p_pm.DefaultIfEmpty()
                          where (storeId == 0 || storeId == o.StoreId) &&
                          (!createdFromUtc.HasValue || createdFromUtc.Value <= o.CreatedOnUtc) &&
                          (!createdToUtc.HasValue || createdToUtc.Value >= o.CreatedOnUtc) &&
-                         (!orderStatusId.HasValue || orderStatusId == o.OrderStatusId) &&
+                         (!orderStatusId.HasValue || orderStatusId == o.SubscriptionOrderStatusId) &&
                          (!paymentStatusId.HasValue || paymentStatusId == o.PaymentStatusId) &&
                          (!shippingStatusId.HasValue || shippingStatusId == o.ShippingStatusId) &&
                          (!o.Deleted) &&
@@ -344,7 +348,7 @@ namespace Nop.Services.Orders
                          (manufacturerId == 0 || p.ProductManufacturers.Count(pm => pm.ManufacturerId == manufacturerId) > 0) &&
                          (billingCountryId == 0 || o.BillingAddress.CountryId == billingCountryId) &&
                          (showHidden || p.Published)
-                         select orderItem;
+                         select itemDetail;
 
             IQueryable<BestsellersReportLine> query2 = 
                 //group by products
@@ -352,8 +356,8 @@ namespace Nop.Services.Orders
                 group orderItem by orderItem.ProductId into g
                 select new BestsellersReportLine
                 {
-                    ProductId = g.Key,
-                    TotalAmount = g.Sum(x => x.PriceExclTax),
+                    PlanId = g.Key,
+                    TotalAmount = 0,
                     TotalQuantity = g.Sum(x => x.Quantity),
                 }
                 ;
@@ -393,38 +397,40 @@ namespace Nop.Services.Orders
                 throw new ArgumentException("Product ID is not specified");
 
             //this inner query should retrieve all orders that contains a specified product ID
-            var query1 = from orderItem in _orderItemRepository.Table
-                          where orderItem.ProductId == productId
-                          select orderItem.OrderId;
+            var query1 = from itemDetail in _itemDetailRepository.Table
+                         join orderItem in _orderItemRepository.Table on itemDetail.OrderItemId equals orderItem.Id
+                         where itemDetail.ProductId == productId
+                          select orderItem.SubscriptionOrderId;
 
-            var query2 = from orderItem in _orderItemRepository.Table
-                         join p in _productRepository.Table on orderItem.ProductId equals p.Id
-                         where (query1.Contains(orderItem.OrderId)) &&
+            var query2 = from itemDetail in _itemDetailRepository.Table
+                         join orderItem in _orderItemRepository.Table on itemDetail.OrderItemId equals orderItem.Id
+                         join p in _productRepository.Table on itemDetail.ProductId equals p.Id
+                         where (query1.Contains(orderItem.SubscriptionOrderId)) &&
                          (p.Id != productId) &&
                          (showHidden || p.Published) &&
-                         (!orderItem.Order.Deleted) &&
-                         (storeId == 0 || orderItem.Order.StoreId == storeId) &&
+                         (!orderItem.SubscriptionOrder.Deleted) &&
+                         (storeId == 0 || orderItem.SubscriptionOrder.StoreId == storeId) &&
                          (!p.Deleted) &&
                          (showHidden || p.Published)
                          select new { orderItem, p };
 
-            var query3 = from orderItem_p in query2
-                         group orderItem_p by orderItem_p.p.Id into g
-                         select new
-                         {
-                             ProductId = g.Key,
-                             ProductsPurchased = g.Sum(x => x.orderItem.Quantity),
-                         };
-            query3 = query3.OrderByDescending(x => x.ProductsPurchased);
+            //var query3 = from itemDetail in query2
+            //             group itemDetail by orderItem_p.p.Id into g
+            //             select new
+            //             {
+            //                 ProductId = g.Key,
+            //                 ProductsPurchased = g.Sum(x => x.itemDetail.Quantity),
+            //             };
+            //query3 = query3.OrderByDescending(x => x.ProductsPurchased);
 
-            if (recordsToReturn > 0)
-                query3 = query3.Take(recordsToReturn);
+            //if (recordsToReturn > 0)
+            //    query3 = query3.Take(recordsToReturn);
 
-            var report = query3.ToList();
+            //var report = query3.ToList();
             
             var ids = new List<int>();
-            foreach (var reportLine in report)
-                ids.Add(reportLine.ProductId);
+            //foreach (var reportLine in report)
+            //    ids.Add(reportLine.ProductId);
 
             return ids.ToArray();
         }
@@ -443,19 +449,13 @@ namespace Nop.Services.Orders
             DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
             int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false)
         {
-            //this inner query should retrieve all purchased product identifiers
-            var query1 = (from orderItem in _orderItemRepository.Table
-                          join o in _orderRepository.Table on orderItem.OrderId equals o.Id
-                          where (!createdFromUtc.HasValue || createdFromUtc.Value <= o.CreatedOnUtc) &&
-                                (!createdToUtc.HasValue || createdToUtc.Value >= o.CreatedOnUtc) &&
-                                (!o.Deleted)
-                          select orderItem.ProductId).Distinct();
+            
 
             var simpleProductTypeId = (int)ProductType.SimpleProduct;
 
             var query2 = from p in _productRepository.Table
                          orderby p.Name
-                         where (!query1.Contains(p.Id)) &&
+                         where 
                              //include only simple products
                                (p.ProductTypeId == simpleProductTypeId) &&
                                (!p.Deleted) &&
@@ -486,7 +486,7 @@ namespace Nop.Services.Orders
         /// <returns>Result</returns>
         public virtual decimal ProfitReport(int storeId = 0, int vendorId = 0,
             int billingCountryId = 0, int orderId = 0, string paymentMethodSystemName = null,
-            OrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
+            SubscriptionOrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
             DateTime? startTimeUtc = null, DateTime? endTimeUtc = null,
             string billingEmail = null, string billingLastName = "", string orderNotes = null)
         {
@@ -509,27 +509,28 @@ namespace Nop.Services.Orders
             bool dontSearchOrderNotes = String.IsNullOrEmpty(orderNotes);
             //We cannot use String.IsNullOrEmpty() in SQL Compact
             bool dontSearchPaymentMethods = String.IsNullOrEmpty(paymentMethodSystemName);
-            var query = from orderItem in _orderItemRepository.Table
-                        join o in _orderRepository.Table on orderItem.OrderId equals o.Id
+            var query = from itemDetail in _itemDetailRepository.Table
+                        join orderItem in _orderItemRepository.Table on itemDetail.OrderItemId equals orderItem.Id
+                        join o in _orderRepository.Table on orderItem.SubscriptionOrderId equals o.Id
                         where (storeId == 0 || storeId == o.StoreId) &&
                               (orderId == 0 || orderId == o.Id) &&
                               (billingCountryId ==0 || (o.BillingAddress != null && o.BillingAddress.CountryId == billingCountryId)) &&
                               (dontSearchPaymentMethods || paymentMethodSystemName == o.PaymentMethodSystemName) &&
                               (!startTimeUtc.HasValue || startTimeUtc.Value <= o.CreatedOnUtc) &&
                               (!endTimeUtc.HasValue || endTimeUtc.Value >= o.CreatedOnUtc) &&
-                              (!orderStatusId.HasValue || orderStatusId == o.OrderStatusId) &&
+                              (!orderStatusId.HasValue || orderStatusId == o.SubscriptionOrderStatusId) &&
                               (!paymentStatusId.HasValue || paymentStatusId == o.PaymentStatusId) &&
                               (!shippingStatusId.HasValue || shippingStatusId == o.ShippingStatusId) &&
                               (!o.Deleted) &&
-                              (vendorId == 0 || orderItem.Product.VendorId == vendorId) &&
+                              (vendorId == 0 || itemDetail.Product.VendorId == vendorId) &&
                               //we do not ignore deleted products when calculating order reports
                               //(!p.Deleted)
                               (dontSearchEmail || (o.BillingAddress != null && !String.IsNullOrEmpty(o.BillingAddress.Email) && o.BillingAddress.Email.Contains(billingEmail))) &&
                               (dontSearchLastName || (o.BillingAddress != null && !String.IsNullOrEmpty(o.BillingAddress.LastName) && o.BillingAddress.LastName.Contains(billingLastName))) &&
-                              (dontSearchOrderNotes || o.OrderNotes.Any(oNote => oNote.Note.Contains(orderNotes)))
+                              (dontSearchOrderNotes || o.SubscriptionOrderNotes.Any(oNote => oNote.Note.Contains(orderNotes)))
                         select orderItem;
 
-            var productCost = Convert.ToDecimal(query.Sum(orderItem => (decimal?)orderItem.OriginalProductCost * orderItem.Quantity));
+            var productCost =decimal.Zero;
 
             var reportSummary = GetOrderAverageReportLine(
                 storeId: storeId,

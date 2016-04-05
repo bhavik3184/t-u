@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Web.Mvc;
-using Nop.Admin.Models.Orders;
+using Nop.Admin.Models.SubscriptionOrders;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Payments;
 using Nop.Services.Security;
 using Nop.Web.Framework.Controllers;
@@ -19,8 +19,8 @@ namespace Nop.Admin.Controllers
     {
         #region Fields
 
-        private readonly IOrderService _orderService;
-        private readonly IOrderProcessingService _orderProcessingService;
+        private readonly ISubscriptionOrderService _subscriptionService;
+        private readonly ISubscriptionOrderProcessingService _orderProcessingService;
         private readonly ILocalizationService _localizationService;
         private readonly IWorkContext _workContext;
         private readonly IDateTimeHelper _dateTimeHelper;
@@ -31,12 +31,12 @@ namespace Nop.Admin.Controllers
 
         #region Constructors
 
-        public RecurringPaymentController(IOrderService orderService,
-            IOrderProcessingService orderProcessingService, ILocalizationService localizationService,
+        public RecurringPaymentController(ISubscriptionOrderService subscriptionService,
+            ISubscriptionOrderProcessingService orderProcessingService, ILocalizationService localizationService,
             IWorkContext workContext, IDateTimeHelper dateTimeHelper, IPaymentService paymentService,
             IPermissionService permissionService)
         {
-            this._orderService = orderService;
+            this._subscriptionService = subscriptionService;
             this._orderProcessingService = orderProcessingService;
             this._localizationService = localizationService;
             this._workContext = workContext;
@@ -68,11 +68,11 @@ namespace Nop.Admin.Controllers
             model.IsActive = recurringPayment.IsActive;
             model.NextPaymentDate = recurringPayment.NextPaymentDate.HasValue ? _dateTimeHelper.ConvertToUserTime(recurringPayment.NextPaymentDate.Value, DateTimeKind.Utc).ToString() : "";
             model.CyclesRemaining = recurringPayment.CyclesRemaining;
-            model.InitialOrderId = recurringPayment.InitialOrder.Id;
-            var customer = recurringPayment.InitialOrder.Customer;
+            model.InitialSubscriptionOrderId = recurringPayment.InitialSubscriptionOrder.Id;
+            var customer = recurringPayment.InitialSubscriptionOrder.Customer;
             model.CustomerId = customer.Id;
             model.CustomerEmail = customer.IsRegistered() ? customer.Email : _localizationService.GetResource("Admin.Customers.Guest");
-            model.PaymentType = _paymentService.GetRecurringPaymentType(recurringPayment.InitialOrder.PaymentMethodSystemName).GetLocalizedEnum(_localizationService, _workContext);
+            model.PaymentType = _paymentService.GetRecurringPaymentType(recurringPayment.InitialSubscriptionOrder.PaymentMethodSystemName).GetLocalizedEnum(_localizationService, _workContext);
             model.CanCancelRecurringPayment = _orderProcessingService.CanCancelRecurringPayment(_workContext.CurrentCustomer, recurringPayment);
         }
 
@@ -86,12 +86,12 @@ namespace Nop.Admin.Controllers
             if (history == null)
                 throw new ArgumentNullException("history");
 
-            var order = _orderService.GetOrderById(history.OrderId);
+            var order = _subscriptionService.GetOrderById(history.SubscriptionOrderId);
 
             model.Id = history.Id;
-            model.OrderId = history.OrderId;
+            model.SubscriptionOrderId = history.SubscriptionOrderId;
             model.RecurringPaymentId = history.RecurringPaymentId;
-            model.OrderStatus = order.OrderStatus.GetLocalizedEnum(_localizationService, _workContext);
+            model.SubscriptionOrderStatus = order.SubscriptionOrderStatus.GetLocalizedEnum(_localizationService, _workContext);
             model.PaymentStatus = order.PaymentStatus.GetLocalizedEnum(_localizationService, _workContext);
             model.ShippingStatus = order.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext);
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(history.CreatedOnUtc, DateTimeKind.Utc);
@@ -121,7 +121,7 @@ namespace Nop.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageRecurringPayments))
                 return AccessDeniedView();
 
-            var payments = _orderService.SearchRecurringPayments(0, 0, 0, null, command.Page - 1, command.PageSize, true);
+            var payments = _subscriptionService.SearchRecurringPayments(0, 0, 0, null, command.Page - 1, command.PageSize, true);
             var gridModel = new DataSourceResult
             {
                 Data = payments.Select(x =>
@@ -142,7 +142,7 @@ namespace Nop.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageRecurringPayments))
                 return AccessDeniedView();
 
-            var payment = _orderService.GetRecurringPaymentById(id);
+            var payment = _subscriptionService.GetRecurringPaymentById(id);
             if (payment == null || payment.Deleted)
                 //No recurring payment found with the specified id
                 return RedirectToAction("List");
@@ -159,7 +159,7 @@ namespace Nop.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageRecurringPayments))
                 return AccessDeniedView();
 
-            var payment = _orderService.GetRecurringPaymentById(model.Id);
+            var payment = _subscriptionService.GetRecurringPaymentById(model.Id);
             if (payment == null || payment.Deleted)
                 //No recurring payment found with the specified id
                 return RedirectToAction("List");
@@ -168,7 +168,7 @@ namespace Nop.Admin.Controllers
             payment.CyclePeriodId = model.CyclePeriodId;
             payment.TotalCycles = model.TotalCycles;
             payment.IsActive = model.IsActive;
-            _orderService.UpdateRecurringPayment(payment);
+            _subscriptionService.UpdateRecurringPayment(payment);
 
             SuccessNotification(_localizationService.GetResource("Admin.RecurringPayments.Updated"));
 
@@ -189,12 +189,12 @@ namespace Nop.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageRecurringPayments))
                 return AccessDeniedView();
 
-            var payment = _orderService.GetRecurringPaymentById(id);
+            var payment = _subscriptionService.GetRecurringPaymentById(id);
             if (payment == null)
                 //No recurring payment found with the specified id
                 return RedirectToAction("List");
 
-            _orderService.DeleteRecurringPayment(payment);
+            _subscriptionService.DeleteRecurringPayment(payment);
 
             SuccessNotification(_localizationService.GetResource("Admin.RecurringPayments.Deleted"));
             return RedirectToAction("List");
@@ -210,7 +210,7 @@ namespace Nop.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageRecurringPayments))
                 return AccessDeniedView();
 
-            var payment = _orderService.GetRecurringPaymentById(recurringPaymentId);
+            var payment = _subscriptionService.GetRecurringPaymentById(recurringPaymentId);
             if (payment == null)
                 throw new ArgumentException("No recurring payment found with the specified id");
 
@@ -238,7 +238,7 @@ namespace Nop.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageRecurringPayments))
                 return AccessDeniedView();
 
-            var payment = _orderService.GetRecurringPaymentById(id);
+            var payment = _subscriptionService.GetRecurringPaymentById(id);
             if (payment == null)
                 //No recurring payment found with the specified id
                 return RedirectToAction("List");
@@ -277,7 +277,7 @@ namespace Nop.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageRecurringPayments))
                 return AccessDeniedView();
 
-            var payment = _orderService.GetRecurringPaymentById(id);
+            var payment = _subscriptionService.GetRecurringPaymentById(id);
             if (payment == null)
                 //No recurring payment found with the specified id
                 return RedirectToAction("List");

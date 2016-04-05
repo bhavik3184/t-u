@@ -14,7 +14,9 @@ namespace Nop.Admin.Models.Orders
         public override int Id { get; set; }
 
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.Order")]
-        public int OrderId { get; set; }
+        public int SubscriptionOrderId { get; set; }
+
+        public int OrderItemId { get; set; }
 
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.Customer")]
         public int CustomerId { get; set; }
@@ -35,6 +37,8 @@ namespace Nop.Admin.Models.Orders
         [AllowHtml]
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.RequestedAction")]
         public string RequestedAction { get; set; }
+
+        public DateTime AvailableDateUtc { get; set; }
 
         [AllowHtml]
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.CustomerComments")]

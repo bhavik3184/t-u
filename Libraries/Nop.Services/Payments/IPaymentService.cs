@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Services.Payments
 {
@@ -63,9 +63,9 @@ namespace Nop.Services.Payments
         /// <summary>
         /// Gets a value indicating whether customers can complete a payment after order is placed but not completed (for redirection payment methods)
         /// </summary>
-        /// <param name="order">Order</param>
+        /// <param name="order">SubscriptionOrder</param>
         /// <returns>Result</returns>
-        bool CanRePostProcessPayment(Order order);
+        bool CanRePostProcessPayment(SubscriptionOrder order);
 
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Nop.Services.Payments
         /// <param name="cart">Shoping cart</param>
         /// <param name="paymentMethodSystemName">Payment method system name</param>
         /// <returns>Additional handling fee</returns>
-        decimal GetAdditionalHandlingFee(IList<ShoppingCartItem> cart, string paymentMethodSystemName);
+        decimal GetAdditionalHandlingFee(IList<SubscriptionCartItem> cart, string paymentMethodSystemName);
 
 
 

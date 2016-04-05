@@ -13,6 +13,8 @@ namespace Nop.Services.Security
         public static readonly PermissionRecord AccessAdminPanel = new PermissionRecord { Name = "Access admin area", SystemName = "AccessAdminPanel", Category = "Standard" };
         public static readonly PermissionRecord AllowCustomerImpersonation = new PermissionRecord { Name = "Admin area. Allow Customer Impersonation", SystemName = "AllowCustomerImpersonation", Category = "Customers" };
         public static readonly PermissionRecord ManageProducts = new PermissionRecord { Name = "Admin area. Manage Products", SystemName = "ManageProducts", Category = "Catalog" };
+        public static readonly PermissionRecord ManagePlans = new PermissionRecord { Name = "Admin area. Manage Plans", SystemName = "ManagePlans", Category = "Catalog" };
+        public static readonly PermissionRecord ManageMembershipCategories = new PermissionRecord { Name = "Admin area. Manage MembershipCategories", SystemName = "ManageMembershipCategories", Category = "Catalog" };
         public static readonly PermissionRecord ManageCategories = new PermissionRecord { Name = "Admin area. Manage Categories", SystemName = "ManageCategories", Category = "Catalog" };
         public static readonly PermissionRecord ManageManufacturers = new PermissionRecord { Name = "Admin area. Manage Manufacturers", SystemName = "ManageManufacturers", Category = "Catalog" };
         public static readonly PermissionRecord ManageProductReviews = new PermissionRecord { Name = "Admin area. Manage Product Reviews", SystemName = "ManageProductReviews", Category = "Catalog" };
@@ -23,6 +25,7 @@ namespace Nop.Services.Security
         public static readonly PermissionRecord ManageCurrentCarts = new PermissionRecord { Name = "Admin area. Manage Current Carts", SystemName = "ManageCurrentCarts", Category = "Orders" };
         public static readonly PermissionRecord ManageOrders = new PermissionRecord { Name = "Admin area. Manage Orders", SystemName = "ManageOrders", Category = "Orders" };
         public static readonly PermissionRecord ManageRecurringPayments = new PermissionRecord { Name = "Admin area. Manage Recurring Payments", SystemName = "ManageRecurringPayments", Category = "Orders" };
+        public static readonly PermissionRecord ManageSubscriptionOrders = new PermissionRecord { Name = "Admin area. Manage SubscriptionOrders", SystemName = "ManageSubscriptionOrders", Category = "SubscriptionOrders" };
         public static readonly PermissionRecord ManageGiftCards = new PermissionRecord { Name = "Admin area. Manage Gift Cards", SystemName = "ManageGiftCards", Category = "Orders" };
         public static readonly PermissionRecord ManageReturnRequests = new PermissionRecord { Name = "Admin area. Manage Return Requests", SystemName = "ManageReturnRequests", Category = "Orders" };
         public static readonly PermissionRecord OrderCountryReport = new PermissionRecord { Name = "Admin area. Access order country report", SystemName = "OrderCountryReport", Category = "Orders" };
@@ -56,12 +59,14 @@ namespace Nop.Services.Security
         public static readonly PermissionRecord ManageMaintenance = new PermissionRecord { Name = "Admin area. Manage Maintenance", SystemName = "ManageMaintenance", Category = "Configuration" };
         public static readonly PermissionRecord HtmlEditorManagePictures = new PermissionRecord { Name = "Admin area. HTML Editor. Manage pictures", SystemName = "HtmlEditor.ManagePictures", Category = "Configuration" };
         public static readonly PermissionRecord ManageScheduleTasks = new PermissionRecord { Name = "Admin area. Manage Schedule Tasks", SystemName = "ManageScheduleTasks", Category = "Configuration" };
+        public static readonly PermissionRecord ManageStateProvinces = new PermissionRecord { Name = "Admin area. Manage StateProvinces", SystemName = "ManageStateProvinces", Category = "Configuration" };
+        public static readonly PermissionRecord ManageCities = new PermissionRecord { Name = "Admin area. Manage Cities", SystemName = "ManageCities", Category = "Configuration" };
         
-
+        
         //public store permissions
         public static readonly PermissionRecord DisplayPrices = new PermissionRecord { Name = "Public store. Display Prices", SystemName = "DisplayPrices", Category = "PublicStore" };
-        public static readonly PermissionRecord EnableShoppingCart = new PermissionRecord { Name = "Public store. Enable shopping cart", SystemName = "EnableShoppingCart", Category = "PublicStore" };
-        public static readonly PermissionRecord EnableWishlist = new PermissionRecord { Name = "Public store. Enable wishlist", SystemName = "EnableWishlist", Category = "PublicStore" };
+        public static readonly PermissionRecord EnableBorrowCart = new PermissionRecord { Name = "Public store. Enable shopping cart", SystemName = "EnableBorrowCart", Category = "PublicStore" };
+        public static readonly PermissionRecord EnableMyToyBox = new PermissionRecord { Name = "Public store. Enable mytoybox", SystemName = "EnableMyToyBox", Category = "PublicStore" };
         public static readonly PermissionRecord PublicStoreAllowNavigation = new PermissionRecord { Name = "Public store. Allow navigation", SystemName = "PublicStoreAllowNavigation", Category = "PublicStore" };
         public static readonly PermissionRecord AccessClosedStore = new PermissionRecord { Name = "Public store. Access a closed store", SystemName = "AccessClosedStore", Category = "PublicStore" };
 
@@ -74,6 +79,8 @@ namespace Nop.Services.Security
                 AllowCustomerImpersonation,
                 ManageProducts,
                 ManageCategories,
+                ManagePlans,
+                ManageMembershipCategories,
                 ManageManufacturers,
                 ManageProductReviews,
                 ManageProductTags,
@@ -117,10 +124,12 @@ namespace Nop.Services.Security
                 HtmlEditorManagePictures,
                 ManageScheduleTasks,
                 DisplayPrices,
-                EnableShoppingCart,
-                EnableWishlist,
+                EnableBorrowCart,
+                EnableMyToyBox,
                 PublicStoreAllowNavigation,
-                AccessClosedStore
+                AccessClosedStore,
+                ManageStateProvinces,
+                ManageCities
             };
         }
 
@@ -137,6 +146,8 @@ namespace Nop.Services.Security
                         AllowCustomerImpersonation,
                         ManageProducts,
                         ManageCategories,
+                        ManagePlans,
+                        ManageMembershipCategories,
                         ManageManufacturers,
                         ManageProductReviews,
                         ManageProductTags,
@@ -180,10 +191,12 @@ namespace Nop.Services.Security
                         HtmlEditorManagePictures,
                         ManageScheduleTasks,
                         DisplayPrices,
-                        EnableShoppingCart,
-                        EnableWishlist,
+                        EnableBorrowCart,
+                        EnableMyToyBox,
                         PublicStoreAllowNavigation,
-                        AccessClosedStore
+                        AccessClosedStore,
+                        ManageStateProvinces,
+                        ManageCities
                     }
                 },
                 new DefaultPermissionRecord 
@@ -192,8 +205,8 @@ namespace Nop.Services.Security
                     PermissionRecords = new[] 
                     {
                         DisplayPrices,
-                        EnableShoppingCart,
-                        EnableWishlist,
+                        EnableBorrowCart,
+                        EnableMyToyBox,
                         PublicStoreAllowNavigation
                     }
                 },
@@ -203,8 +216,8 @@ namespace Nop.Services.Security
                     PermissionRecords = new[] 
                     {
                         DisplayPrices,
-                        EnableShoppingCart,
-                        EnableWishlist,
+                        EnableBorrowCart,
+                        EnableMyToyBox,
                         PublicStoreAllowNavigation
                     }
                 },
@@ -214,8 +227,8 @@ namespace Nop.Services.Security
                     PermissionRecords = new[] 
                     {
                         DisplayPrices,
-                        EnableShoppingCart,
-                        EnableWishlist,
+                        EnableBorrowCart,
+                        EnableMyToyBox,
                         PublicStoreAllowNavigation
                     }
                 },

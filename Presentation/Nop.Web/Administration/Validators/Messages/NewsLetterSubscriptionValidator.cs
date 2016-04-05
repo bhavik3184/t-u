@@ -5,7 +5,7 @@ using Nop.Web.Framework.Validators;
 
 namespace Nop.Admin.Validators.Messages
 {
-    public class NewsLetterSubscriptionValidator : BaseNopValidator<NewsLetterSubscriptionModel>
+    public class NewsLetterSubscriptionValidator : BaseNopValidator<NewsLetterSubscriptionOrderModel>
     {
         public NewsLetterSubscriptionValidator(ILocalizationService localizationService)
         {

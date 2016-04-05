@@ -135,12 +135,12 @@
         </tr>
         <tr>
             <td class="adminTitle">
-                @Html.OverrideStoreCheckboxFor(model => model.TermsOfServiceOnShoppingCartPage_OverrideForStore, model => model.TermsOfServiceOnShoppingCartPage, Model.ActiveStoreScopeConfiguration)
-                @Html.NopLabelFor(model => model.TermsOfServiceOnShoppingCartPage):
+                @Html.OverrideStoreCheckboxFor(model => model.TermsOfServiceOnBorrowCartPage_OverrideForStore, model => model.TermsOfServiceOnBorrowCartPage, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.TermsOfServiceOnBorrowCartPage):
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.TermsOfServiceOnShoppingCartPage)
-                @Html.ValidationMessageFor(model => model.TermsOfServiceOnShoppingCartPage)
+                @Html.EditorFor(model => model.TermsOfServiceOnBorrowCartPage)
+                @Html.ValidationMessageFor(model => model.TermsOfServiceOnBorrowCartPage)
             </td>
         </tr>
         <tr>
@@ -225,30 +225,30 @@
         </tr>
         <tr>
             <td class="adminTitle">
-                @Html.NopLabelFor(model => model.GiftCards_Activated_OrderStatusId):
+                @Html.NopLabelFor(model => model.GiftCards_Activated_SubscriptionOrderStatusId):
             </td>
             <td class="adminData">
-                @Html.DropDownListFor(model => model.GiftCards_Activated_OrderStatusId, Model.GiftCards_Activated_OrderStatuses)
-                @Html.ValidationMessageFor(model => model.GiftCards_Activated_OrderStatusId)
+                @Html.DropDownListFor(model => model.GiftCards_Activated_SubscriptionOrderStatusId, Model.GiftCards_Activated_SubscriptionOrderStatuses)
+                @Html.ValidationMessageFor(model => model.GiftCards_Activated_SubscriptionOrderStatusId)
             </td>
         </tr>
         <tr>
             <td class="adminTitle">
-                @Html.NopLabelFor(model => model.GiftCards_Deactivated_OrderStatusId):
+                @Html.NopLabelFor(model => model.GiftCards_Deactivated_SubscriptionOrderStatusId):
             </td>
             <td class="adminData">
-                @Html.DropDownListFor(model => model.GiftCards_Deactivated_OrderStatusId, Model.GiftCards_Deactivated_OrderStatuses)
-                @Html.ValidationMessageFor(model => model.GiftCards_Deactivated_OrderStatusId)
+                @Html.DropDownListFor(model => model.GiftCards_Deactivated_SubscriptionOrderStatusId, Model.GiftCards_Deactivated_SubscriptionOrderStatuses)
+                @Html.ValidationMessageFor(model => model.GiftCards_Deactivated_SubscriptionOrderStatusId)
             </td>
         </tr>
-        @if (Model.OrderIdent.HasValue)
+        @if (Model.SubscriptionOrderIdent.HasValue)
         {
             <tr>
                 <td class="adminTitle">
-                    @Html.NopLabelFor(model => model.OrderIdent):
+                    @Html.NopLabelFor(model => model.SubscriptionOrderIdent):
                 </td>
                 <td class="adminData">
-                    @Html.EditorFor(model => model.OrderIdent)
+                    @Html.EditorFor(model => model.SubscriptionOrderIdent)
                 </td>
             </tr>
         }

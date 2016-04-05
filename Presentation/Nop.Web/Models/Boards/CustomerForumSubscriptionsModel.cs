@@ -8,19 +8,19 @@ namespace Nop.Web.Models.Boards
     {
         public CustomerForumSubscriptionsModel()
         {
-            this.ForumSubscriptions = new List<ForumSubscriptionModel>();
+            this.ForumSubscriptions = new List<ForumSubscriptionOrderModel>();
         }
 
-        public IList<ForumSubscriptionModel> ForumSubscriptions { get; set; }
+        public IList<ForumSubscriptionOrderModel> ForumSubscriptions { get; set; }
         public PagerModel PagerModel { get; set; }
 
         #region Nested classes
 
-        public partial class ForumSubscriptionModel : BaseNopEntityModel
+        public partial class ForumSubscriptionOrderModel : BaseNopEntityModel
         {
             public int ForumId { get; set; }
             public int ForumTopicId { get; set; }
-            public bool TopicSubscription { get; set; }
+            public bool TopicSubscriptionOrder { get; set; }
             public string Title { get; set; }
             public string Slug { get; set; }
         }

@@ -47,10 +47,10 @@
         </tr>
         <tr @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
             <td class="adminTitle">
-                @Html.NopLabelFor(model => model.OrderStatusId):
+                @Html.NopLabelFor(model => model.SubscriptionOrderStatusId):
             </td>
             <td class="adminData">
-                @Html.DropDownList("OrderStatusId", Model.AvailableOrderStatuses)
+                @Html.DropDownList("SubscriptionOrderStatusId", Model.AvailableSubscriptionOrderStatuses)
             </td>
         </tr>
         <tr>
@@ -172,10 +172,10 @@
         </tr>
        <tr>
             <td class="adminTitle">
-                @Html.NopLabelFor(model => model.OrderGuid):
+                @Html.NopLabelFor(model => model.SubscriptionOrderGuid):
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.OrderGuid)
+                @Html.EditorFor(model => model.SubscriptionOrderGuid)
             </td>
         </tr>
         <tr>
@@ -263,8 +263,8 @@
                                 {
                                     //a vendor does not have access to this functionality
                                     <text>{
-                                    field: "OrderStatus",
-                                title: "@T("Admin.Orders.Fields.OrderStatus")",
+                                    field: "SubscriptionOrderStatus",
+                                title: "@T("Admin.Orders.Fields.SubscriptionOrderStatus")",
                             width: 200
                         },</text>
                                 }
@@ -402,7 +402,7 @@
                         var data = {
                             StartDate: $('#@Html.FieldIdFor(model => model.StartDate)').val(),
                             EndDate: $('#@Html.FieldIdFor(model => model.EndDate)').val(),
-                            OrderStatusId: $('#@Html.FieldIdFor(model => model.OrderStatusId)').val(),
+                            SubscriptionOrderStatusId: $('#@Html.FieldIdFor(model => model.SubscriptionOrderStatusId)').val(),
                             PaymentStatusId: $('#@Html.FieldIdFor(model => model.PaymentStatusId)').val(),
                             ShippingStatusId: $('#@Html.FieldIdFor(model => model.ShippingStatusId)').val(),
                             StoreId: $('#@Html.FieldIdFor(model => model.StoreId)').val(),
@@ -414,7 +414,7 @@
                             PaymentMethodSystemName: $('#@Html.FieldIdFor(model => model.PaymentMethodSystemName)').val(),
                             ProductId: $('#@Html.FieldIdFor(model => model.ProductId)').val(),
                             OrderNotes: $('#@Html.FieldIdFor(model => model.OrderNotes)').val(),
-                            OrderGuid: $('#@Html.FieldIdFor(model => model.OrderGuid)').val()
+                            SubscriptionOrderGuid: $('#@Html.FieldIdFor(model => model.SubscriptionOrderGuid)').val()
                         };
                         addAntiForgeryToken(data);
                         return data;

@@ -5,9 +5,9 @@ using Nop.Web.Framework.Mvc;
 
 namespace Nop.Admin.Models.Messages
 {
-    public partial class NewsLetterSubscriptionListModel : BaseNopModel
+    public partial class NewsLetterSubscriptionOrderListModel : BaseNopModel
     {
-        public NewsLetterSubscriptionListModel()
+        public NewsLetterSubscriptionOrderListModel()
         {
             AvailableStores = new List<SelectListItem>();
             ActiveList = new List<SelectListItem>();

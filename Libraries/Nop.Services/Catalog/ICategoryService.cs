@@ -9,6 +9,7 @@ namespace Nop.Services.Catalog
     /// </summary>
     public partial interface ICategoryService
     {
+        void DeleteCategoryAll();
         /// <summary>
         /// Delete category
         /// </summary>
@@ -25,6 +26,9 @@ namespace Nop.Services.Catalog
         /// <returns>Categories</returns>
         IPagedList<Category> GetAllCategories(string categoryName = "",
             int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false);
+
+        IPagedList<Category> GetAllBaseCategories(string categoryName = "",
+          int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false);
 
         /// <summary>
         /// Gets all categories filtered by parent category identifier
@@ -108,10 +112,23 @@ namespace Nop.Services.Catalog
         /// <param name="productCategory">>Product category mapping</param>
         void InsertProductCategory(ProductCategory productCategory);
 
+        void DeletePlanCategory(PlanCategory planCategory);
         /// <summary>
         /// Updates the product category mapping 
         /// </summary>
         /// <param name="productCategory">>Product category mapping</param>
+        /// 
         void UpdateProductCategory(ProductCategory productCategory);
+
+
+        IPagedList<PlanCategory> GetPlanCategoriesByCategoryId(int categoryId,
+            int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false);
+        IList<PlanCategory> GetPlanCategoriesByPlanId(int planId, bool showHidden = false);
+        IList<PlanCategory> GetPlanCategoriesByPlanId(int planId, int storeId, bool showHidden = false);
+        PlanCategory GetPlanCategoryById(int planCategoryId);
+
+        void InsertPlanCategory(PlanCategory planCategory);
+
+        void UpdatePlanCategory(PlanCategory planCategory);
     }
 }

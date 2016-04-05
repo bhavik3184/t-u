@@ -1,4 +1,4 @@
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Services.Payments
 {
@@ -10,6 +10,6 @@ namespace Nop.Services.Payments
         /// <summary>
         /// Gets or sets an order. Used when order is already saved (payment gateways that redirect a customer to a third-party URL)
         /// </summary>
-        public Order Order { get; set; }
+        public SubscriptionOrder SubscriptionOrder { get; set; }
     }
 }

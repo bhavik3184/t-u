@@ -10,7 +10,7 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Media;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Seo;
 using Nop.Core.Domain.Vendors;
 using Nop.Services.Catalog;
@@ -22,7 +22,7 @@ using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Shipping;
@@ -78,7 +78,7 @@ namespace Nop.Web.Controllers
         private readonly MediaSettings _mediaSettings;
         private readonly CatalogSettings _catalogSettings;
         private readonly VendorSettings _vendorSettings;
-        private readonly ShoppingCartSettings _shoppingCartSettings;
+        private readonly BorrowCartSettings _borrowCartSettings;
         private readonly LocalizationSettings _localizationSettings;
         private readonly CustomerSettings _customerSettings;
         private readonly CaptchaSettings _captchaSettings;
@@ -123,7 +123,7 @@ namespace Nop.Web.Controllers
             MediaSettings mediaSettings,
             CatalogSettings catalogSettings,
             VendorSettings vendorSettings,
-            ShoppingCartSettings shoppingCartSettings,
+            BorrowCartSettings borrowCartSettings,
             LocalizationSettings localizationSettings, 
             CustomerSettings customerSettings, 
             CaptchaSettings captchaSettings,
@@ -164,7 +164,7 @@ namespace Nop.Web.Controllers
             this._mediaSettings = mediaSettings;
             this._catalogSettings = catalogSettings;
             this._vendorSettings = vendorSettings;
-            this._shoppingCartSettings = shoppingCartSettings;
+            this._borrowCartSettings = borrowCartSettings;
             this._localizationSettings = localizationSettings;
             this._customerSettings = customerSettings;
             this._captchaSettings = captchaSettings;
@@ -195,7 +195,7 @@ namespace Nop.Web.Controllers
 
         [NonAction]
         protected virtual ProductDetailsModel PrepareProductDetailsPageModel(Product product, 
-            ShoppingCartItem updatecartitem = null, bool isAssociatedProduct = false)
+            BorrowCartItem updatecartitem = null, bool isAssociatedProduct = false)
         {
             if (product == null)
                 throw new ArgumentNullException("product");
@@ -295,7 +295,7 @@ namespace Nop.Web.Controllers
                 product.GetTotalStockQuantity() <= 0)
             {
                 //out of stock
-                model.DisplayBackInStockSubscription = true;
+                model.DisplayBackInStockSubscriptionOrder = true;
             }
 
             #endregion
@@ -511,7 +511,7 @@ namespace Nop.Web.Controllers
             #region 'Add to cart' model
 
             model.AddToCart.ProductId = product.Id;
-            model.AddToCart.UpdatedShoppingCartItemId = updatecartitem != null ? updatecartitem.Id : 0;
+            model.AddToCart.UpdatedBorrowCartItemId = updatecartitem != null ? updatecartitem.Id : 0;
 
             //quantity
             model.AddToCart.EnteredQuantity = updatecartitem != null ? updatecartitem.Quantity : product.OrderMinimumQuantity;
@@ -532,13 +532,13 @@ namespace Nop.Web.Controllers
                 model.AddToCart.MinimumQuantityNotification = string.Format(_localizationService.GetResource("Products.MinimumQuantityNotification"), product.OrderMinimumQuantity);
             }
 
-            //'add to cart', 'add to wishlist' buttons
-            model.AddToCart.DisableBuyButton = product.DisableBuyButton || !_permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart);
-            model.AddToCart.DisableWishlistButton = product.DisableWishlistButton || !_permissionService.Authorize(StandardPermissionProvider.EnableWishlist);
+            //'add to cart', 'add to mytoybox' buttons
+            model.AddToCart.DisableBuyButton = product.DisableBuyButton || !_permissionService.Authorize(StandardPermissionProvider.EnableBorrowCart);
+            model.AddToCart.DisableMyToyBoxButton = product.DisableMyToyBoxButton || !_permissionService.Authorize(StandardPermissionProvider.EnableMyToyBox);
             if (!_permissionService.Authorize(StandardPermissionProvider.DisplayPrices))
             {
                 model.AddToCart.DisableBuyButton = true;
-                model.AddToCart.DisableWishlistButton = true;
+                model.AddToCart.DisableMyToyBoxButton = true;
             }
             //pre-order
             if (product.AvailableForPreOrder)
@@ -851,16 +851,16 @@ namespace Nop.Web.Controllers
 
             #region Rental products
 
-            if (product.IsRental)
-            {
-                model.IsRental = true;
-                //set already entered dates attributes (if we're going to update the existing shopping cart item)
-                if (updatecartitem != null)
-                {
-                    model.RentalStartDate = updatecartitem.RentalStartDateUtc;
-                    model.RentalEndDate = updatecartitem.RentalEndDateUtc;
-                }
-            }
+            //if (product.IsRental)
+            //{
+            //    model.IsRental = true;
+            //    //set already entered dates attributes (if we're going to update the existing shopping cart item)
+            //    //if (updatecartitem != null)
+            //    //{
+            //    //    model.RentalStartDate = updatecartitem.RentalStartDateUtc;
+            //    //    model.RentalEndDate = updatecartitem.RentalEndDateUtc;
+            //    //}
+            //}
 
             #endregion
             
@@ -966,11 +966,11 @@ namespace Nop.Web.Controllers
             }
 
             //update existing shopping cart item?
-            ShoppingCartItem updatecartitem = null;
-            if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
+            BorrowCartItem updatecartitem = null;
+            if (_borrowCartSettings.AllowCartItemEditing && updatecartitemid > 0)
             {
-                var cart = _workContext.CurrentCustomer.ShoppingCartItems
-                    .Where(x => x.ShoppingCartType == ShoppingCartType.ShoppingCart)
+                var cart = _workContext.CurrentCustomer.BorrowCartItems
+                    .Where(x => x.BorrowCartType == BorrowCartType.BorrowCart)
                     .LimitPerStore(_storeContext.CurrentStore.Id)
                     .ToList();
                 updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
@@ -1053,12 +1053,12 @@ namespace Nop.Web.Controllers
         [ChildActionOnly]
         public ActionResult CrossSellProducts(int? productThumbPictureSize)
         {
-            var cart = _workContext.CurrentCustomer.ShoppingCartItems
-                .Where(sci => sci.ShoppingCartType == ShoppingCartType.ShoppingCart)
+            var cart = _workContext.CurrentCustomer.BorrowCartItems
+                .Where(sci => sci.BorrowCartType == BorrowCartType.BorrowCart)
                 .LimitPerStore(_storeContext.CurrentStore.Id)
                 .ToList();
 
-            var products = _productService.GetCrosssellProductsByShoppingCart(cart, _shoppingCartSettings.CrossSellsNumber);
+            var products = _productService.GetCrosssellProductsByBorrowCart(cart, _borrowCartSettings.CrossSellsNumber);
             //ACL and store mapping
             products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
             //availability dates
@@ -1070,7 +1070,7 @@ namespace Nop.Web.Controllers
 
             //Cross-sell products are dispalyed on the shopping cart page.
             //We know that the entire shopping cart page is not refresh
-            //even if "ShoppingCartSettings.DisplayCartAfterAddingProduct" setting  is enabled.
+            //even if "BorrowCartSettings.DisplayCartAfterAddingProduct" setting  is enabled.
             //That's why we force page refresh (redirect) in this case
             var model = PrepareProductOverviewModels(products,  
                 productThumbPictureSize: productThumbPictureSize, forceRedirectionAfterAddingToCart: true)
@@ -1205,7 +1205,7 @@ namespace Nop.Web.Controllers
 
 
             //load products
-            var products = _productService.GetProductsByIds(report.Select(x => x.ProductId).ToArray());
+            var products = _productService.GetProductsByIds(report.Select(x => x.PlanId).ToArray());
             //ACL and store mapping
             products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
             //availability dates
@@ -1215,6 +1215,22 @@ namespace Nop.Web.Controllers
                 return Content("");
 
             //prepare model
+            var model = PrepareProductOverviewModels(products, true, true, productThumbPictureSize).ToList();
+            return PartialView(model);
+        }
+
+        [ChildActionOnly]
+        public ActionResult HomepageNewProducts(int? productThumbPictureSize)
+        {
+            var products = _productService.GetAllProductsDisplayedOnHomePage();
+            //ACL and store mapping
+            products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
+            //availability dates
+            products = products.Where(p => p.IsAvailable()).ToList();
+
+            if (products.Count == 0)
+                return Content("");
+
             var model = PrepareProductOverviewModels(products, true, true, productThumbPictureSize).ToList();
             return PartialView(model);
         }

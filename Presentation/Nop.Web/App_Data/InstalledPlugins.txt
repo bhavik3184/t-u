@@ -1,0 +1,15 @@
+DiscountRequirement.HadSpentAmount
+DiscountRequirement.HasAllProducts
+DiscountRequirement.HasOneProduct
+DiscountRequirement.MustBeAssignedToCustomerRole
+CurrencyExchange.ECB
+ExternalAuth.Google
+ExternalAuth.Facebook
+Payments.CheckMoneyOrder
+Payments.Manual
+Payments.Payu
+Shipping.ByTotal
+Tax.FixedRate
+Tax.CountryStateZip
+Widgets.GoogleAnalytics
+Widgets.NivoSlider

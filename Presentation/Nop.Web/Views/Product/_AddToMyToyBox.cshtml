@@ -1,0 +1,6 @@
+﻿@model ProductDetailsModel.AddToCartModel
+@using Nop.Web.Models.Catalog;
+@using Nop.Core.Domain.SubscriptionOrders;
+    <div class="add-to-mytoybox">
+        <input type="button" id="add-to-mytoybox-button-@Model.ProductId"  class=" button-1 add-to-cart-button" value="@T("BorrowCart.AddToMyToyBox")" data-productid="@Model.ProductId" onclick="AjaxCart.addproducttocart_details('@Url.RouteUrl("AddProductToCart-Details", new { productId = Model.ProductId, borrowCartTypeId = (int)BorrowCartType.MyToyBox })', '#product-details-form');return false;" />
+    </div>

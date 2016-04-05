@@ -1,0 +1,9 @@
+C:\projects\NewToys\Tests\Nop.Tests\bin\Debug\Nop.Tests.dll
+C:\projects\NewToys\Tests\Nop.Tests\bin\Debug\Nop.Tests.pdb
+C:\projects\NewToys\Tests\Nop.Tests\bin\Debug\nunit.framework.dll
+C:\projects\NewToys\Tests\Nop.Tests\bin\Debug\Rhino.Mocks.dll
+C:\projects\NewToys\Tests\Nop.Tests\bin\Debug\nunit.framework.xml
+C:\projects\NewToys\Tests\Nop.Tests\bin\Debug\Rhino.Mocks.xml
+C:\projects\NewToys\Tests\Nop.Tests\obj\Debug\Nop.Tests.csprojResolveAssemblyReference.cache
+C:\projects\NewToys\Tests\Nop.Tests\obj\Debug\Nop.Tests.dll
+C:\projects\NewToys\Tests\Nop.Tests\obj\Debug\Nop.Tests.pdb

@@ -38,7 +38,7 @@ using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Messages;
 using Nop.Services.News;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Payments;
 using Nop.Services.Polls;
 using Nop.Services.Security;
@@ -152,6 +152,17 @@ namespace Nop.Web.Framework
             //store context
             builder.RegisterType<WebStoreContext>().As<IStoreContext>().InstancePerLifetimeScope();
 
+            builder.RegisterType<SubscriptionOrderService>().As<ISubscriptionOrderService>().InstancePerLifetimeScope();
+             builder.RegisterType<PlanService>().As<IPlanService>().InstancePerLifetimeScope();
+             builder.RegisterType<SubscriptionCartService>().As<ISubscriptionCartService>().InstancePerLifetimeScope();
+             builder.RegisterType<PlanAttributeFormatter>().As<IPlanAttributeFormatter>().InstancePerLifetimeScope();
+             builder.RegisterType<SubscriptionOrderProcessingService>().As<ISubscriptionOrderProcessingService>().InstancePerLifetimeScope();
+             builder.RegisterType<SubscriptionOrderReportService>().As<ISubscriptionOrderReportService>().InstancePerLifetimeScope();
+             builder.RegisterType<SubscriptionOrderTotalCalculationService>().As<ISubscriptionOrderTotalCalculationService>().InstancePerLifetimeScope();
+             builder.RegisterType<MembershipCategoryService>().As<IMembershipCategoryService>().InstancePerLifetimeScope();
+
+           
+
             //services
             builder.RegisterType<BackInStockSubscriptionService>().As<IBackInStockSubscriptionService>().InstancePerLifetimeScope();
             builder.RegisterType<CategoryService>().As<ICategoryService>().InstancePerLifetimeScope();
@@ -174,7 +185,11 @@ namespace Nop.Web.Framework
                 .WithParameter(ResolvedParameter.ForNamed<ICacheManager>("nop_cache_static"))
                 .InstancePerLifetimeScope();
 
+
+            builder.RegisterType<Nop.Services.SubscriptionOrders.RewardPointService>().As<Nop.Services.SubscriptionOrders.IRewardPointService>().InstancePerLifetimeScope();
+            builder.RegisterType<Nop.Services.SubscriptionOrders.RewardPointService>().As<Nop.Services.SubscriptionOrders.IRewardPointService>().InstancePerLifetimeScope();
             builder.RegisterType<AddressAttributeFormatter>().As<IAddressAttributeFormatter>().InstancePerLifetimeScope();
+
             builder.RegisterType<AddressAttributeParser>().As<IAddressAttributeParser>().InstancePerLifetimeScope();
             builder.RegisterType<AddressAttributeService>().As<IAddressAttributeService>().InstancePerLifetimeScope();
             builder.RegisterType<AddressService>().As<IAddressService>().InstancePerLifetimeScope();
@@ -210,6 +225,10 @@ namespace Nop.Web.Framework
             builder.RegisterType<CurrencyService>().As<ICurrencyService>().InstancePerLifetimeScope();
             builder.RegisterType<MeasureService>().As<IMeasureService>().InstancePerLifetimeScope();
             builder.RegisterType<StateProvinceService>().As<IStateProvinceService>().InstancePerLifetimeScope();
+            builder.RegisterType<CityService>().As<ICityService>().InstancePerLifetimeScope();
+            builder.RegisterType<LocalityService>().As<ILocalityService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<ChildrenService>().As<IChildrenService>().InstancePerLifetimeScope();
 
             builder.RegisterType<StoreService>().As<IStoreService>().InstancePerLifetimeScope();
             //use static cache (between HTTP requests)
@@ -265,13 +284,11 @@ namespace Nop.Web.Framework
             builder.RegisterType<CheckoutAttributeParser>().As<ICheckoutAttributeParser>().InstancePerLifetimeScope();
             builder.RegisterType<CheckoutAttributeService>().As<ICheckoutAttributeService>().InstancePerLifetimeScope();
             builder.RegisterType<GiftCardService>().As<IGiftCardService>().InstancePerLifetimeScope();
-            builder.RegisterType<OrderService>().As<IOrderService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderReportService>().As<IOrderReportService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderProcessingService>().As<IOrderProcessingService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderTotalCalculationService>().As<IOrderTotalCalculationService>().InstancePerLifetimeScope();
             builder.RegisterType<ReturnRequestService>().As<IReturnRequestService>().InstancePerLifetimeScope();
-            builder.RegisterType<RewardPointService>().As<IRewardPointService>().InstancePerLifetimeScope();
-            builder.RegisterType<ShoppingCartService>().As<IShoppingCartService>().InstancePerLifetimeScope();
+            builder.RegisterType<BorrowCartService>().As<IBorrowCartService>().InstancePerLifetimeScope();
 
             builder.RegisterType<PaymentService>().As<IPaymentService>().InstancePerLifetimeScope();
 

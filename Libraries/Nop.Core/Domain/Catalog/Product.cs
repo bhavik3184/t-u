@@ -318,7 +318,7 @@ namespace Nop.Core.Domain.Catalog
         /// </summary>
         public string AllowedQuantities { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether we allow adding to the cart/wishlist only attribute combinations that exist and have stock greater than zero.
+        /// Gets or sets a value indicating whether we allow adding to the cart/mytoybox only attribute combinations that exist and have stock greater than zero.
         /// This option is used only when we have "manage inventory" set to "track inventory by product attributes"
         /// </summary>
         public bool AllowAddingOnlyExistingAttributeCombinations { get; set; }
@@ -328,9 +328,9 @@ namespace Nop.Core.Domain.Catalog
         /// </summary>
         public bool DisableBuyButton { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether to disable "Add to wishlist" button
+        /// Gets or sets a value indicating whether to disable "Add to mytoybox" button
         /// </summary>
-        public bool DisableWishlistButton { get; set; }
+        public bool DisableMyToyBoxButton { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether this item is available for Pre-Order
         /// </summary>

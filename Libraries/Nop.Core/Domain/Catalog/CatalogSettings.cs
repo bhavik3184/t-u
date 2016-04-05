@@ -16,7 +16,7 @@ namespace Nop.Core.Domain.Catalog
         /// </summary>
         public bool DisplayDiscontinuedMessageForUnpublishedProducts { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether "Published" or "Disable buy/wishlist buttons" flags should be updated after order cancellation (deletion).
+        /// Gets or sets a value indicating whether "Published" or "Disable buy/mytoybox buttons" flags should be updated after order cancellation (deletion).
         /// Of course, when qty > configured minimum stock level
         /// </summary>
         public bool PublishBackProductWhenCancellingOrders { get; set; }
@@ -280,11 +280,11 @@ namespace Nop.Core.Domain.Catalog
         /// <summary>
         /// Gets or sets a value indicating whether to display information about shipping and tax on shopping cart page (used in Germany)
         /// </summary>
-        public bool DisplayTaxShippingInfoShoppingCart { get; set; }
+        public bool DisplayTaxShippingInfoBorrowCart { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether to display information about shipping and tax on wishlist page (used in Germany)
+        /// Gets or sets a value indicating whether to display information about shipping and tax on mytoybox page (used in Germany)
         /// </summary>
-        public bool DisplayTaxShippingInfoWishlist { get; set; }
+        public bool DisplayTaxShippingInfoMyToyBox { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether to display information about shipping and tax on order details page (used in Germany)
         /// </summary>

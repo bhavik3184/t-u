@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Shipping;
 using Nop.Services.Payments;
+using System;
 
-namespace Nop.Services.Orders
+namespace Nop.Services.SubscriptionOrders
 {
     /// <summary>
     /// Order processing service interface
@@ -16,7 +17,7 @@ namespace Nop.Services.Orders
         /// </summary>
         /// <param name="order">Order</param>
         /// <returns>Validated order</returns>
-        void CheckOrderStatus(Order order);
+        void CheckSubscriptionOrderStatus(SubscriptionOrder order);
 
         /// <summary>
         /// Places an order
@@ -29,32 +30,10 @@ namespace Nop.Services.Orders
         /// Deletes an order
         /// </summary>
         /// <param name="order">The order</param>
-        void DeleteOrder(Order order);
+        void DeleteOrder(SubscriptionOrder order);
 
 
-        /// <summary>
-        /// Process next recurring psayment
-        /// </summary>
-        /// <param name="recurringPayment">Recurring payment</param>
-        void ProcessNextRecurringPayment(RecurringPayment recurringPayment);
-
-        /// <summary>
-        /// Cancels a recurring payment
-        /// </summary>
-        /// <param name="recurringPayment">Recurring payment</param>
-        IList<string> CancelRecurringPayment(RecurringPayment recurringPayment);
-
-        /// <summary>
-        /// Gets a value indicating whether a customer can cancel recurring payment
-        /// </summary>
-        /// <param name="customerToValidate">Customer</param>
-        /// <param name="recurringPayment">Recurring Payment</param>
-        /// <returns>value indicating whether a customer can cancel recurring payment</returns>
-        bool CanCancelRecurringPayment(Customer customerToValidate, RecurringPayment recurringPayment);
-
-
-        
-
+        int PlaceBorrowItem(List<BorrowCartItem> sc);
 
         /// <summary>
         /// Send a shipment
@@ -77,14 +56,14 @@ namespace Nop.Services.Orders
         /// </summary>
         /// <param name="order">Order</param>
         /// <returns>A value indicating whether cancel is allowed</returns>
-        bool CanCancelOrder(Order order);
+        bool CanCancelOrder(SubscriptionOrder order);
 
         /// <summary>
         /// Cancels order
         /// </summary>
         /// <param name="order">Order</param>
         /// <param name="notifyCustomer">True to notify customer</param>
-        void CancelOrder(Order order, bool notifyCustomer);
+        void CancelOrder(SubscriptionOrder order, bool notifyCustomer);
 
 
 
@@ -93,131 +72,29 @@ namespace Nop.Services.Orders
         /// </summary>
         /// <param name="order">Order</param>
         /// <returns>A value indicating whether order can be marked as authorized</returns>
-        bool CanMarkOrderAsAuthorized(Order order);
+        bool CanMarkOrderAsAuthorized(SubscriptionOrder order);
 
         /// <summary>
         /// Marks order as authorized
         /// </summary>
         /// <param name="order">Order</param>
-        void MarkAsAuthorized(Order order);
+        void MarkAsAuthorized(SubscriptionOrder order);
 
 
-
-        /// <summary>
-        /// Gets a value indicating whether capture from admin panel is allowed
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <returns>A value indicating whether capture from admin panel is allowed</returns>
-        bool CanCapture(Order order);
-
-        /// <summary>
-        /// Capture an order (from admin panel)
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <returns>A list of errors; empty list if no errors</returns>
-        IList<string> Capture(Order order);
-
-        /// <summary>
-        /// Gets a value indicating whether order can be marked as paid
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <returns>A value indicating whether order can be marked as paid</returns>
-        bool CanMarkOrderAsPaid(Order order);
-
-        /// <summary>
-        /// Marks order as paid
-        /// </summary>
-        /// <param name="order">Order</param>
-        void MarkOrderAsPaid(Order order);
-
-
-
-        /// <summary>
-        /// Gets a value indicating whether refund from admin panel is allowed
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <returns>A value indicating whether refund from admin panel is allowed</returns>
-        bool CanRefund(Order order);
-
-        /// <summary>
-        /// Refunds an order (from admin panel)
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <returns>A list of errors; empty list if no errors</returns>
-        IList<string> Refund(Order order);
-
-        /// <summary>
-        /// Gets a value indicating whether order can be marked as refunded
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <returns>A value indicating whether order can be marked as refunded</returns>
-        bool CanRefundOffline(Order order);
-
-        /// <summary>
-        /// Refunds an order (offline)
-        /// </summary>
-        /// <param name="order">Order</param>
-        void RefundOffline(Order order);
-
-        /// <summary>
-        /// Gets a value indicating whether partial refund from admin panel is allowed
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <param name="amountToRefund">Amount to refund</param>
-        /// <returns>A value indicating whether refund from admin panel is allowed</returns>
-        bool CanPartiallyRefund(Order order, decimal amountToRefund);
-
-        /// <summary>
-        /// Partially refunds an order (from admin panel)
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <param name="amountToRefund">Amount to refund</param>
-        /// <returns>A list of errors; empty list if no errors</returns>
-        IList<string> PartiallyRefund(Order order, decimal amountToRefund);
-
-        /// <summary>
-        /// Gets a value indicating whether order can be marked as partially refunded
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <param name="amountToRefund">Amount to refund</param>
-        /// <returns>A value indicating whether order can be marked as partially refunded</returns>
-        bool CanPartiallyRefundOffline(Order order, decimal amountToRefund);
-
-        /// <summary>
-        /// Partially refunds an order (offline)
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <param name="amountToRefund">Amount to refund</param>
-        void PartiallyRefundOffline(Order order, decimal amountToRefund);
-
-
-
-        /// <summary>
-        /// Gets a value indicating whether void from admin panel is allowed
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <returns>A value indicating whether void from admin panel is allowed</returns>
-        bool CanVoid(Order order);
-
-        /// <summary>
-        /// Voids order (from admin panel)
-        /// </summary>
-        /// <param name="order">Order</param>
-        /// <returns>Voided order</returns>
-        IList<string> Void(Order order);
+ 
 
         /// <summary>
         /// Gets a value indicating whether order can be marked as voided
         /// </summary>
         /// <param name="order">Order</param>
         /// <returns>A value indicating whether order can be marked as voided</returns>
-        bool CanVoidOffline(Order order);
+        bool CanVoidOffline(SubscriptionOrder order);
 
         /// <summary>
         /// Voids order (offline)
         /// </summary>
         /// <param name="order">Order</param>
-        void VoidOffline(Order order);
+        void VoidOffline(SubscriptionOrder order);
 
 
 
@@ -226,14 +103,14 @@ namespace Nop.Services.Orders
         /// Place order items in current user shopping cart.
         /// </summary>
         /// <param name="order">The order</param>
-        void ReOrder(Order order);
+        void ReOrder(SubscriptionOrder order);
         
         /// <summary>
         /// Check whether return request is allowed
         /// </summary>
         /// <param name="order">Order</param>
         /// <returns>Result</returns>
-        bool IsReturnRequestAllowed(Order order);
+        bool IsReturnRequestAllowed(SubscriptionOrder order);
 
 
 
@@ -242,13 +119,13 @@ namespace Nop.Services.Orders
         /// </summary>
         /// <param name="cart">Shopping cart</param>
         /// <returns>true - OK; false - minimum order sub-total amount is not reached</returns>
-        bool ValidateMinOrderSubtotalAmount(IList<ShoppingCartItem> cart);
+        bool ValidateMinOrderSubtotalAmount(IList<BorrowCartItem> cart);
 
         /// <summary>
         /// Valdiate minimum order total amount
         /// </summary>
         /// <param name="cart">Shopping cart</param>
         /// <returns>true - OK; false - minimum order total amount is not reached</returns>
-        bool ValidateMinOrderTotalAmount(IList<ShoppingCartItem> cart);
+        bool ValidateMinOrderTotalAmount(IList<BorrowCartItem> cart);
     }
 }

@@ -86,14 +86,14 @@
                 @Html.ValidationMessageFor(model => model.GiftCardTypeId)
             </td>
         </tr>
-        @if (Model.PurchasedWithOrderId.HasValue)
+        @if (Model.PurchasedWithSubscriptionOrderId.HasValue)
         {
             <tr>
                 <td class="adminTitle">
-                    @Html.NopLabelFor(model => model.PurchasedWithOrderId)
+                    @Html.NopLabelFor(model => model.PurchasedWithSubscriptionOrderId)
                 </td>
                 <td class="adminData">
-                    <a href="@Url.Action("Edit", "Order", new { Id = Model.PurchasedWithOrderId.Value })">@Model.PurchasedWithOrderId.Value - @T("Admin.Common.View")</a>
+                    <a href="@Url.Action("Edit", "Order", new { Id = Model.PurchasedWithSubscriptionOrderId.Value })">@Model.PurchasedWithSubscriptionOrderId.Value - @T("Admin.Common.View")</a>
                 </td>
             </tr>
         }
@@ -280,10 +280,10 @@
                     type: "date",
                     format: "{0:G}"
                 }, {
-                    field: "OrderId",
+                    field: "SubscriptionOrderId",
                     title: "@T("Admin.GiftCards.History.Order")",
                     width: 200,
-                    template: '<a href="@Url.Content("~/Admin/Order/Edit/")#=OrderId#">#=OrderId# - @T("Admin.Common.View")</a>'
+                    template: '<a href="@Url.Content("~/Admin/Order/Edit/")#=SubscriptionOrderId#">#=SubscriptionOrderId# - @T("Admin.Common.View")</a>'
                 }, {
                     field: "UsedValue",
                     title: "@T("Admin.GiftCards.History.UsedValue")",

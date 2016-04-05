@@ -493,3 +493,72 @@ var ConfirmOrder = {
         Checkout.setStepResponse(response);
     }
 };
+
+
+var ConfirmSubscriptionOrder = {
+    form: false,
+    saveUrl: false,
+    isSuccess: false,
+
+    init: function (saveUrl, successUrl) {
+        this.saveUrl = saveUrl;
+        this.successUrl = successUrl;
+    },
+
+    save: function () {
+        if (Checkout.loadWaiting != false) return;
+
+        //terms of service
+        var termOfServiceOk = true;
+        if ($('#termsofservice').length > 0) {
+            //terms of service element exists
+            if (!$('#termsofservice').is(':checked')) {
+                $("#terms-of-service-warning-box").dialog();
+                termOfServiceOk = false;
+            } else {
+                termOfServiceOk = true;
+            }
+        }
+        if (termOfServiceOk) {
+            Checkout.setLoadWaiting('confirm-subscriptionplan');
+            $.ajax({
+                cache: false,
+                url: this.saveUrl,
+                type: 'post',
+                success: this.nextStep,
+                complete: this.resetLoadWaiting,
+                error: Checkout.ajaxFailure
+            });
+        } else {
+            return false;
+        }
+    },
+
+    resetLoadWaiting: function (transport) {
+        Checkout.setLoadWaiting(false, ConfirmSubscriptionOrder.isSuccess);
+    },
+
+    nextStep: function (response) {
+        if (response.error) {
+            if ((typeof response.message) == 'string') {
+                alert(response.message);
+            } else {
+                alert(response.message.join("\n"));
+            }
+
+            return false;
+        }
+
+        if (response.redirect) {
+            ConfirmSubscriptionOrder.isSuccess = true;
+            location.href = response.redirect;
+            return;
+        }
+        if (response.success) {
+            ConfirmSubscriptionOrder.isSuccess = true;
+            window.location = ConfirmSubscriptionOrder.successUrl;
+        }
+
+        Checkout.setStepResponse(response);
+    }
+};

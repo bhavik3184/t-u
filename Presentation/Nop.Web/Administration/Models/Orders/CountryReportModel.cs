@@ -11,7 +11,7 @@ namespace Nop.Admin.Models.Orders
     {
         public CountryReportModel()
         {
-            AvailableOrderStatuses = new List<SelectListItem>();
+            AvailableSubscriptionOrderStatuses = new List<SelectListItem>();
             AvailablePaymentStatuses = new List<SelectListItem>();
         }
 
@@ -24,12 +24,12 @@ namespace Nop.Admin.Models.Orders
         public DateTime? EndDate { get; set; }
 
 
-        [NopResourceDisplayName("Admin.SalesReport.Country.OrderStatus")]
-        public int OrderStatusId { get; set; }
+        [NopResourceDisplayName("Admin.SalesReport.Country.SubscriptionOrderStatus")]
+        public int SubscriptionOrderStatusId { get; set; }
         [NopResourceDisplayName("Admin.SalesReport.Country.PaymentStatus")]
         public int PaymentStatusId { get; set; }
 
-        public IList<SelectListItem> AvailableOrderStatuses { get; set; }
+        public IList<SelectListItem> AvailableSubscriptionOrderStatuses { get; set; }
         public IList<SelectListItem> AvailablePaymentStatuses { get; set; }
     }
 }

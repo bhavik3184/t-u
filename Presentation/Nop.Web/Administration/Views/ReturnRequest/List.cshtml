@@ -76,10 +76,10 @@
                                 width: 200,
                                 template: '<a href="@Url.Content("~/Admin/Customer/Edit/")#=CustomerId#">#:CustomerInfo#</a>'
                             }, {
-                                field: "OrderId",
+                                field: "SubscriptionOrderId",
                                 title: "@T("Admin.ReturnRequests.Fields.Order")",
                                 width: 200,
-                                template: '<a href="@Url.Content("~/Admin/Order/Edit/")#=OrderId#">#=OrderId# - @T("Admin.Common.View")</a>'
+                                template: '<a href="@Url.Content("~/Admin/Order/Edit/")#=SubscriptionOrderId#">#=SubscriptionOrderId# - @T("Admin.Common.View")</a>'
                             }, {
                                 field: "ReturnRequestStatusStr",
                                 title: "@T("Admin.ReturnRequests.Fields.Status")",

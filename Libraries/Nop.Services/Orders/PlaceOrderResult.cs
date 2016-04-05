@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
-namespace Nop.Services.Orders
+namespace Nop.Services.SubscriptionOrders
 {
     /// <summary>
     /// Place order result
@@ -41,6 +41,6 @@ namespace Nop.Services.Orders
         /// <summary>
         /// Gets or sets the placed order
         /// </summary>
-        public Order PlacedOrder { get; set; }
+        public SubscriptionOrder PlacedOrder { get; set; }
     }
 }

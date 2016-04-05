@@ -5,29 +5,51 @@
 @Html.Partial("_Notifications")
 @Html.Action("JavaScriptDisabledWarning", "Common")
 @Html.Partial("OldInternetExplorerWarning")
+<link href="~/Themes/DefaultClean/Content/css/theme.css" rel="stylesheet" />
 
 <div class="master-wrapper-page">
     @Html.Action("AdminHeaderLinks", "Common")
+    <svg class="defs">
+        <defs>
+            <radialGradient id="gr-radial-lights" cx="50%" cy="50%" r="70%">
+                <stop stop-color="white" offset="5%" stop-opacity=".06"></stop>
+                <stop stop-color="white" offset="100%" stop-opacity="0"></stop>
+            </radialGradient>
+        </defs>
+    </svg>
+    <div class="ray ray-of-lights">
+        <svg viewBox="0 0 640 640">
+            <g transform="scale(1)">
+                <circle class="c-lights" r="64%" cx="50%" cy="50%" stroke-width="128%" stroke-dasharray="10%" stroke="url(#gr-radial-lights)"></circle>
+            </g>
+        </svg>
+    </div>
     @Html.Partial("Header")
     <script type="text/javascript">
-        AjaxCart.init(false, '.header-links .cart-qty', '.header-links .wishlist-qty', '#flyout-cart');
+        AjaxCart.init(false, '.header-links .cart-qty', '.header-links .mytoybox-qty', '#flyout-cart');
     </script>
-    <div class="header-menu">
-        @Html.Action("TopMenu", "Catalog")
-    </div>
-    <div class="master-wrapper-content">
-        @Html.Widget("content_before")
-
-        @if (IsSectionDefined("Breadcrumb"))
-        {
-            @RenderSection("Breadcrumb") 
-        }
-        <div class="master-column-wrapper">
-            @RenderBody()
+    <div class="header-menu" id="header">
+        
+        <div class="navcontainer hidden-xs">
+            @Html.Action("TopMenu", "Catalog")
         </div>
-        @Html.Widget("content_after")
+        <div class="headimg-left"></div>
+        <div class="headimg-right"></div>
+        <div class="row"><div class="grass col-xs-12 column"></div></div>
     </div>
-    @Html.Action("Footer", "Common")
-</div>
+        <div class="master-wrapper-content">
+            @Html.Widget("content_before")
+
+            @if (IsSectionDefined("Breadcrumb"))
+            {
+                @RenderSection("Breadcrumb")
+            }
+            <div class="master-column-wrapper">
+                @RenderBody()
+            </div>
+            @Html.Widget("content_after")
+        </div>
+        @Html.Action("Footer", "Common")
+    </div>
 @Html.Action("EuCookieLaw", "Common")
 @Html.Widget("body_end_html_tag_before")

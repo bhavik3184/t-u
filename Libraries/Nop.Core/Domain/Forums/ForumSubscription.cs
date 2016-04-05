@@ -11,7 +11,7 @@ namespace Nop.Core.Domain.Forums
         /// <summary>
         /// Gets or sets the forum subscription identifier
         /// </summary>
-        public Guid SubscriptionGuid { get; set; }
+        public Guid SubscriptionOrderGuid { get; set; }
 
         /// <summary>
         /// Gets or sets the customer identifier

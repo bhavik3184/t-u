@@ -13,7 +13,7 @@
     @Html.Action("BlogTags", "Blog")
     @Html.Widget("left_side_column_blog_after")
 }
-<div class="page blog-page">
+<div class="page blog-page  article">
     <div class="page-title">
         <a href="@Url.RouteUrl("BlogRSS", new { languageId = Model.WorkingLanguageId })" class="link-rss" title="@T("Blog.RSS.Hint")">@T("Blog.RSS")</a>
         <h1>
@@ -21,11 +21,11 @@
             {
                 if (Model.PagingFilteringContext.GetParsedMonth().HasValue)
                 {
-                @String.Format(T("Blog.FilteredByMonth").Text, Model.PagingFilteringContext.GetParsedMonth().Value.Year, Model.PagingFilteringContext.GetParsedMonth().Value.ToString("MMMM"))
+                    @String.Format(T("Blog.FilteredByMonth").Text, Model.PagingFilteringContext.GetParsedMonth().Value.Year, Model.PagingFilteringContext.GetParsedMonth().Value.ToString("MMMM"))
                 }
                 else
                 {
-                @T("Blog")
+                    @T("Blog")
                 }
             }
             else

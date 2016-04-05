@@ -1,79 +1,142 @@
 ﻿@model TopMenuModel
 @using Nop.Web.Models.Catalog;
 
+
+<style>
+    .dropdown .dropdown-menu .caret {
+        border: 4px solid transparent;
+        border-left-color: #C36800;
+        float: right;
+        margin-top: 6px;
+    }
+</style>
+<script src="/Scripts/bootstrap-dropdownhover.js" type="text/javascript"></script>
 @helper RenderCategoryLine(CategorySimpleModel category, int level, bool responsiveMobileMenu)
 {
-    <li>
-        <a href="@Url.RouteUrl("Category", new { SeName = category.SeName })">@category.Name
-        @if (category.NumberOfProducts.HasValue)
-        {
-            <text> </text>@T("Categories.TotalProducts", category.NumberOfProducts.Value)
-        }
-        </a>
-        @{
-            //subcategories
-            var subCategories = responsiveMobileMenu ?
-                //responsive (all categories)
-                category.SubCategories :
-                //standard design (only categories with "IncludeInTopMenu")
-                category.SubCategories.Where(x => x.IncludeInTopMenu).ToList();
 
-            var levelClass = "";
-            if (level == 0)
-            {
-                levelClass = "first-level";
-            }
+
+    //subcategories
+    var subCategories = responsiveMobileMenu ?
+        //responsive (all categories)
+        category.SubCategories :
+        //standard design (only categories with "IncludeInTopMenu")
+        category.SubCategories.Where(x => x.IncludeInTopMenu).ToList();
+
+        
             if (subCategories.Count > 0)
-            {
-                <div class="sublist-toggle"></div>
-                <ul class="sublist @levelClass">
+            {  <li class="dropdown">
+                <a   href="@Url.RouteUrl("Category", new { SeName = category.SeName })">
+                    @category.Name
+                    <span class="caret"></span>
+                    @if (category.NumberOfProducts.HasValue)
+                    {
+                        <text> </text>@T("Categories.TotalProducts", category.NumberOfProducts.Value)
+                    }
+                </a>
+                @{
+                var levelClass = "";
+                if (level == 0)
+                {
+                    levelClass = "first-level";
+                }
+                
+                <ul  class="dropdown-menu">
                     @foreach (var subCategory in subCategories)
                     {
                         @RenderCategoryLine(subCategory, level + 1, responsiveMobileMenu)
                     }
                 </ul>
             }
-        }
-    </li>
+        </li>
+            }
+            else
+            {
+                <li>
+                <a href="@Url.RouteUrl("Category", new { SeName = category.SeName })">
+                    @category.Name
+                    @if (category.NumberOfProducts.HasValue)
+                    {
+                        <text> </text>@T("Categories.TotalProducts", category.NumberOfProducts.Value)
+                    }
+                </a>
+           
+             
+        </li>
+            }
 }
-
-<ul class="top-menu">
-    @Html.Widget("header_menu_before")
-    @{
-        var rootCategories = Model.Categories.Where(x => x.IncludeInTopMenu).ToList();
-    }
-    @foreach (var category in rootCategories)
-    {
-        @RenderCategoryLine(category, 0, false)
-    }
-    @foreach (var topic in Model.Topics)
-    {
-        <li><a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })">@topic.Name</a></li>
-    }
-    @if (rootCategories.Count == 0 && Model.Topics.Count == 0)
-    {
-        //no categories or topis to display? in this case let's diplay some default menu items (should we?)
+<nav>
+    <ul class="top-menu nav main-menu" id="menu-main-menu">
+        @Html.Widget("header_menu_before")
         <li><a href="@Url.RouteUrl("HomePage")">@T("HomePage")</a></li>
-        if (Model.NewProductsEnabled)
+        <li><a href="@Url.RouteUrl("Topic", new { SeName = "how-it-works" })">How It Works</a></li>
+        <li class="dropdown">
+            <a data-hover="dropdown" class="dropdown-toggle" data-toggle="dropdown"  aria-haspopup="true">
+                Catalogue
+                <span class="caret"></span>
+            </a>
+            <ul  class="dropdown-menu">
+                @{ var rootCategories = Model.Categories.Where(x => x.IncludeInTopMenu).ToList(); }
+                @foreach (var category in rootCategories)
+                { @RenderCategoryLine(category, 0, false)  }
+           </ul>
+        </li>
+        <li>
+            <a href="/subscriptioncart">
+                Membership
+            </a>
+        </li>
+        <li><a href="@Url.RouteUrl("Topic", new { SeName = "testimonials" })">Testimonials</a></li>
+        <li id="menu-item-224" class="dropdown1 menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-224 dropdown" style="display:table-cell; position:relative;">
+            <a title="Extras" href="#" data-hover="dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">Know Us <span class="caret"></span></a>
+            <ul role="menu" class=" dropdown-menu">
+                <li id="menu-item-227" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-227">
+                    <a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a>
+                </li>
+                <li id="menu-item-263" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-263">
+                    <a href="@Url.RouteUrl("Topic", new { SeName = "About" })">About</a>
+                </li>
+                <li id="menu-item-265" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-265">
+                    <a title="Full Width Page" href="#">
+                        FAQ
+                    </a>
+                </li>
+                <!--<li id="menu-item-225" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-225"><a title="Contact" href="contact-us/">Contact</a></li>
+            <li id="menu-item-226" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-226"><a title="Shop" href="shop/">Shop</a></li>
+            <li id="menu-item-229" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-229"><a title="Blog" href="blog/">Blog</a></li>
+            <li id="menu-item-228" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-228"><a title="Shortcodes" href="2015/03/03/new-toddlers-shortcodes/">Shortcodes</a></li>-->
+            </ul>
+        </li>
+        @foreach (var topic in Model.Topics)
         {
-            <li><a href="@Url.RouteUrl("NewProducts")">@T("Products.NewProducts")</a>
-            </li>
+            <li><a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })">@topic.Name</a></li>
         }
-        <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a></li>
-        <li><a href="@Url.RouteUrl("CustomerInfo")">@T("Account.MyAccount")</a></li>
-        if (Model.BlogEnabled)
+       
+        @if (rootCategories.Count == 0 && Model.Topics.Count == 0)
         {
-            <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+            //no categories or topis to display? in this case let's diplay some default menu items (should we?)
+            <li><a href="@Url.RouteUrl("HomePage")">@T("HomePage")</a></li>
+            if (Model.NewProductsEnabled)
+            {
+                <li>
+                    <a href="@Url.RouteUrl("NewProducts")">@T("Products.NewProducts")</a>
+                </li>
+            }
+            <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a></li>
+            <li><a href="@Url.RouteUrl("CustomerInfo")">@T("Account.MyAccount")</a></li>
+            if (Model.BlogEnabled)
+            {
+                <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+            }
+            if (Model.ForumEnabled)
+            {
+                <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
+            }
+            <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
         }
-        if (Model.ForumEnabled)
-        {
-            <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
-        }
-        <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
-    }
-    @Html.Widget("header_menu_after")
-</ul>
+        @Html.Widget("header_menu_after")
 
+    </ul>
+</nav>
 @{
     var rootCategoriesResponsive = Model.Categories.ToList();
     //name it "Categories" if we have only categories. Otherwise, "Menu"
@@ -110,12 +173,15 @@
                 <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
             }
             <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
+            
         }
         @Html.Widget("mob_header_menu_after")
     </ul>
-    
+
     <script type="text/javascript">
         $(document).ready(function () {
+            
+
             $('.menu-toggle').click(function () {
                 $(this).siblings('.top-menu.mobile').slideToggle('slow');
             });

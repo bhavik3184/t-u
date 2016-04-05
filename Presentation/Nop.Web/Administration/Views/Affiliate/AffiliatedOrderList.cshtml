@@ -23,10 +23,10 @@
     </tr>
     <tr>
         <td class="adminTitle">
-            @Html.NopLabelFor(model => model.OrderStatusId):
+            @Html.NopLabelFor(model => model.SubscriptionOrderStatusId):
         </td>
         <td class="adminData">
-            @Html.DropDownList("OrderStatusId", Model.AvailableOrderStatuses)
+            @Html.DropDownList("SubscriptionOrderStatusId", Model.AvailableSubscriptionOrderStatuses)
         </td>
     </tr>
     <tr>
@@ -96,8 +96,8 @@
                 title: "@T("Admin.Affiliates.Orders.Order")",
                 width: 50
             }, {
-                field: "OrderStatus",
-                title: "@T("Admin.Affiliates.Orders.OrderStatus")"
+                field: "SubscriptionOrderStatus",
+                title: "@T("Admin.Affiliates.Orders.SubscriptionOrderStatus")"
             }, {
                 field: "PaymentStatus",
                 title: "@T("Admin.Affiliates.Orders.PaymentStatus")"
@@ -144,7 +144,7 @@
             AffliateId: @(Model.AffliateId),
             StartDate: $('#@Html.FieldIdFor(model => model.StartDate)').val(),
             EndDate: $('#@Html.FieldIdFor(model => model.EndDate)').val(),
-            OrderStatusId: $('#@Html.FieldIdFor(model => model.OrderStatusId)').val(),
+            SubscriptionOrderStatusId: $('#@Html.FieldIdFor(model => model.SubscriptionOrderStatusId)').val(),
             PaymentStatusId: $('#@Html.FieldIdFor(model => model.PaymentStatusId)').val(),
             ShippingStatusId: $('#@Html.FieldIdFor(model => model.ShippingStatusId)').val()
         };

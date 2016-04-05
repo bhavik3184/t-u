@@ -8,7 +8,7 @@ namespace Nop.Core.Domain.Discounts
         /// <summary>
         /// Assigned to order total 
         /// </summary>
-        AssignedToOrderTotal = 1,
+        AssignedToSubscriptionOrderTotal = 1,
         /// <summary>
         /// Assigned to products (SKUs)
         /// </summary>
@@ -28,6 +28,10 @@ namespace Nop.Core.Domain.Discounts
         /// <summary>
         /// Assigned to order subtotal
         /// </summary>
-        AssignedToOrderSubTotal = 20,
+        AssignedToSubscriptionOrderSubTotal = 20,
+
+        AssignedToOrderSubTotal = 40,
+
+        AssignedToOrderTotal = 30,
     }
 }

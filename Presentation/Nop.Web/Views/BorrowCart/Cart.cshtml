@@ -1,0 +1,76 @@
+﻿@model BorrowCartModel
+@using Nop.Web.Models.Checkout
+@using Nop.Web.Models.Customer
+@using Nop.Web.Models.BorrowCart;
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.BorrowCart").Text);
+}
+@section left
+{
+    @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.DeliveredItems })
+}
+
+@if (!Model.OnePageCheckoutEnabled)
+{
+    @Html.Action("CheckoutProgress", "Checkout", new {step = CheckoutProgressStep.Cart})
+}
+<div class="page borrow-cart-page" id="content">
+    
+    <div class="page-body article">
+        <div class="page-title">
+            <h1>Borrow List</h1>
+            <div class="col-sm-12">
+                
+                <h5>
+                    Maximum number of allowed transactions = @Model.AllowedTransaction
+                    Your number of transactions for the last 30 days is @Model.UsedTransaction
+                </h5>
+            </div>
+        </div>
+       
+        @Html.Partial("OrderSummary", Model)
+        <div class="table-wrapper">
+            <table class="cart">
+                <colgroup>
+                    <col width="1" />
+                    <col width="1" />
+                    <col width="1" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="subtotal">
+                            Category Name
+                        </th>
+                        <th class="subtotal">
+                            Allowed Quantity
+                        </th>
+                        <th class="subtotal">
+                            Used Quantity
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.PlanCategoryModels)
+                    {
+                        <tr>
+                            <td class="quantity">
+                                <span class="product-quantity">@item.CategoryName</span>
+                            </td>
+                            <td class="quantity">
+                                <span class="product-quantity">@item.Quantity</span>
+                            </td>
+
+                            <td class="quantity">
+                                <span class="product-quantity">@item.UsedQuantity</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>

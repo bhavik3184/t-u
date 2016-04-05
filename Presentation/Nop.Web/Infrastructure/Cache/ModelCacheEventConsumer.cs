@@ -6,8 +6,9 @@ using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Polls;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Topics;
 using Nop.Core.Domain.Vendors;
 using Nop.Core.Events;
@@ -83,10 +84,12 @@ namespace Nop.Web.Infrastructure.Cache
         IConsumer<EntityInserted<Topic>>,
         IConsumer<EntityUpdated<Topic>>,
         IConsumer<EntityDeleted<Topic>>,
-        //Orders
-        IConsumer<EntityInserted<Order>>,
-        IConsumer<EntityUpdated<Order>>,
-        IConsumer<EntityDeleted<Order>>,
+        
+
+              //SubscriptionOrder
+        IConsumer<EntityInserted<SubscriptionOrder>>,
+        IConsumer<EntityUpdated<SubscriptionOrder>>,
+        IConsumer<EntityDeleted<SubscriptionOrder>>,
         //Picture
         IConsumer<EntityInserted<Picture>>,
         IConsumer<EntityUpdated<Picture>>,
@@ -136,7 +139,7 @@ namespace Nop.Web.Infrastructure.Cache
         IConsumer<EntityUpdated<CheckoutAttribute>>,
         IConsumer<EntityDeleted<CheckoutAttribute>>,
         //shopping cart items
-        IConsumer<EntityUpdated<ShoppingCartItem>>
+        IConsumer<EntityUpdated<BorrowCartItem>>
     {
         /// <summary>
         /// Key for categories on the search page
@@ -611,6 +614,13 @@ namespace Nop.Web.Infrastructure.Cache
         public const string STATEPROVINCES_BY_COUNTRY_MODEL_KEY = "Nop.pres.stateprovinces.bycountry-{0}-{1}-{2}";
         public const string STATEPROVINCES_PATTERN_KEY = "Nop.pres.stateprovinces";
 
+
+        public const string CITIES_BY_COUNTRY_MODEL_KEY = "Nop.pres.cities.bystateprovince-{0}-{1}-{2}";
+        public const string CITIES_PATTERN_KEY = "Nop.pres.cities";
+
+        public const string LOCALITIES_BY_COUNTRY_MODEL_KEY = "Nop.pres.localities.bycity-{0}-{1}-{2}";
+        public const string LOCALITIES_PATTERN_KEY = "Nop.pres.localities";
+
         /// <summary>
         /// Key for return request reasons
         /// </summary>
@@ -1029,18 +1039,20 @@ namespace Nop.Web.Infrastructure.Cache
             _cacheManager.RemoveByPattern(SITEMAP_PATTERN_KEY);
         }
         
-        //Orders
-        public void HandleEvent(EntityInserted<Order> eventMessage)
+        
+
+        //SubscriptionOrder
+        public void HandleEvent(EntityInserted<SubscriptionOrder> eventMessage)
         {
             _cacheManager.RemoveByPattern(HOMEPAGE_BESTSELLERS_IDS_PATTERN_KEY);
             _cacheManager.RemoveByPattern(PRODUCTS_ALSO_PURCHASED_IDS_PATTERN_KEY);
         }
-        public void HandleEvent(EntityUpdated<Order> eventMessage)
+        public void HandleEvent(EntityUpdated<SubscriptionOrder> eventMessage)
         {
             _cacheManager.RemoveByPattern(HOMEPAGE_BESTSELLERS_IDS_PATTERN_KEY);
             _cacheManager.RemoveByPattern(PRODUCTS_ALSO_PURCHASED_IDS_PATTERN_KEY);
         }
-        public void HandleEvent(EntityDeleted<Order> eventMessage)
+        public void HandleEvent(EntityDeleted<SubscriptionOrder> eventMessage)
         {
             _cacheManager.RemoveByPattern(HOMEPAGE_BESTSELLERS_IDS_PATTERN_KEY);
             _cacheManager.RemoveByPattern(PRODUCTS_ALSO_PURCHASED_IDS_PATTERN_KEY);
@@ -1254,7 +1266,7 @@ namespace Nop.Web.Infrastructure.Cache
         }
 
         //shopping cart items
-        public void HandleEvent(EntityUpdated<ShoppingCartItem> eventMessage)
+        public void HandleEvent(EntityUpdated<BorrowCartItem> eventMessage)
         {
             _cacheManager.RemoveByPattern(CART_PICTURE_PATTERN_KEY);
         }

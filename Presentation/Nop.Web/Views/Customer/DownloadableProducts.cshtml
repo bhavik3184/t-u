@@ -10,7 +10,7 @@
 {
     @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.DownloadableProducts })
 }
-<div class="page account-page downloadable-products-page">
+<div class="page account-page downloadable-products-page  article">
     <div class="page-title">
         <h1>@T("Account.MyAccount") - @T("Account.DownloadableProducts")</h1>
     </div>
@@ -47,7 +47,7 @@
                             var item = Model.Items[i];
                             <tr @(i % 2 == 0 ? Html.Raw(" class=\"odd\"") : Html.Raw(" class=\"even\""))>
                                 <td class="order">
-                                    <a href="@Url.RouteUrl("OrderDetails", new { orderId = item.OrderId })">@item.OrderId</a>
+                                    <a href="@Url.RouteUrl("OrderDetails", new { orderId = item.SubscriptionOrderId })">@item.SubscriptionOrderId</a>
                                 </td>
                                 <td class="date">
                                     @item.CreatedOn.ToString("d")

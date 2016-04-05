@@ -20,7 +20,7 @@
             </h1>
         </div>
         <div class="page-body">
-            @if (!Model.SubscriptionAllowed)
+            @if (!Model.SubscriptionOrderAllowed)
             {
                 <div>
                     @T("BackInStockSubscriptions.NotAllowed")</div>
@@ -33,7 +33,7 @@
             else if (!Model.AlreadySubscribed && Model.CurrentNumberOfBackInStockSubscriptions >= Model.MaximumBackInStockSubscriptions)
             {
                 <div>
-                    @string.Format(T("BackInStockSubscriptions.MaxSubscriptions").Text, Model.MaximumBackInStockSubscriptions)</div>
+                    @string.Format(T("BackInStockSubscriptions.MaxSubscriptionOrders").Text, Model.MaximumBackInStockSubscriptions)</div>
             }
             else
             {

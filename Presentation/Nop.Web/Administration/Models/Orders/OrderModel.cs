@@ -26,8 +26,8 @@ namespace Nop.Admin.Models.Orders
         //identifiers
         [NopResourceDisplayName("Admin.Orders.Fields.ID")]
         public override int Id { get; set; }
-        [NopResourceDisplayName("Admin.Orders.Fields.OrderGuid")]
-        public Guid OrderGuid { get; set; }
+        [NopResourceDisplayName("Admin.Orders.Fields.SubscriptionOrderGuid")]
+        public Guid SubscriptionOrderGuid { get; set; }
 
         //store
         [NopResourceDisplayName("Admin.Orders.Fields.Store")]
@@ -124,10 +124,10 @@ namespace Nop.Admin.Models.Orders
         public int RecurringPaymentId { get; set; }
 
         //order status
-        [NopResourceDisplayName("Admin.Orders.Fields.OrderStatus")]
-        public string OrderStatus { get; set; }
-        [NopResourceDisplayName("Admin.Orders.Fields.OrderStatus")]
-        public int OrderStatusId { get; set; }
+        [NopResourceDisplayName("Admin.Orders.Fields.SubscriptionOrderStatus")]
+        public string SubscriptionOrderStatus { get; set; }
+        [NopResourceDisplayName("Admin.Orders.Fields.SubscriptionOrderStatus")]
+        public int SubscriptionOrderStatusId { get; set; }
 
         //payment info
         [NopResourceDisplayName("Admin.Orders.Fields.PaymentStatus")]
@@ -161,7 +161,7 @@ namespace Nop.Admin.Models.Orders
         public string AuthorizationTransactionId { get; set; }
         [NopResourceDisplayName("Admin.Orders.Fields.CaptureTransactionID")]
         public string CaptureTransactionId { get; set; }
-        [NopResourceDisplayName("Admin.Orders.Fields.SubscriptionTransactionID")]
+        [NopResourceDisplayName("Admin.Orders.Fields.SubscriptionOrderTransactionID")]
         public string SubscriptionTransactionId { get; set; }
 
         //shipping info
@@ -231,15 +231,12 @@ namespace Nop.Admin.Models.Orders
         {
             public OrderItemModel()
             {
+                ItemDetails = new List<ItemDetailModel>();
                 ReturnRequestIds = new List<int>();
                 PurchasedGiftCardIds = new List<int>();
             }
-            public int ProductId { get; set; }
-            public string ProductName { get; set; }
             public string VendorName { get; set; }
             public string Sku { get; set; }
-
-            public string PictureThumbnailUrl { get; set; }
 
             public string UnitPriceInclTax { get; set; }
             public string UnitPriceExclTax { get; set; }
@@ -269,6 +266,30 @@ namespace Nop.Admin.Models.Orders
             public DownloadActivationType DownloadActivationType { get; set; }
             public bool IsDownloadActivated { get; set; }
             public Guid LicenseDownloadGuid { get; set; }
+            public IList<ItemDetailModel> ItemDetails { get; set; }
+            public partial class ItemDetailModel : BaseNopEntityModel
+            {
+                public ItemDetailModel()
+                {
+                    ReturnRequestIds = new List<int>();
+                    PurchasedGiftCardIds = new List<int>();
+                }
+                public int ProductId { get; set; }
+                public string ProductName { get; set; }
+                public string VendorName { get; set; }
+                public string Sku { get; set; }
+
+                public string PictureThumbnailUrl { get; set; }
+
+                public int Quantity { get; set; }
+
+                public string AttributeInfo { get; set; }
+                public string RecurringInfo { get; set; }
+                public string RentalInfo { get; set; }
+                public IList<int> ReturnRequestIds { get; set; }
+                public IList<int> PurchasedGiftCardIds { get; set; }
+
+            }
         }
 
         public partial class TaxRate : BaseNopModel
@@ -286,7 +307,7 @@ namespace Nop.Admin.Models.Orders
 
         public partial class OrderNote : BaseNopEntityModel
         {
-            public int OrderId { get; set; }
+            public int SubscriptionOrderId { get; set; }
             [NopResourceDisplayName("Admin.Orders.OrderNotes.Fields.DisplayToCustomer")]
             public bool DisplayToCustomer { get; set; }
             [NopResourceDisplayName("Admin.Orders.OrderNotes.Fields.Note")]
@@ -301,7 +322,7 @@ namespace Nop.Admin.Models.Orders
 
         public partial class UploadLicenseModel : BaseNopModel
         {
-            public int OrderId { get; set; }
+            public int SubscriptionOrderId { get; set; }
 
             public int OrderItemId { get; set; }
 
@@ -333,7 +354,7 @@ namespace Nop.Admin.Models.Orders
             public IList<SelectListItem> AvailableManufacturers { get; set; }
             public IList<SelectListItem> AvailableProductTypes { get; set; }
 
-            public int OrderId { get; set; }
+            public int SubscriptionOrderId { get; set; }
 
             #region Nested classes
             
@@ -359,7 +380,7 @@ namespace Nop.Admin.Models.Orders
 
                 public int ProductId { get; set; }
 
-                public int OrderId { get; set; }
+                public int SubscriptionOrderId { get; set; }
 
                 public ProductType ProductType { get; set; }
 

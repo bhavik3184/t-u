@@ -1,0 +1,2 @@
+DataProvider: sqlserver
+DataConnectionString: Data Source=SQL5012.Smarterasp.net;Initial Catalog=DB_9F3B81_toysandus;Integrated Security=False;Persist Security Info=False;User ID=DB_9F3B81_toysandus_admin;Password=ToysUs@3214

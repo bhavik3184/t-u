@@ -1,5 +1,5 @@
 ﻿@model CustomerModel
-@using Nop.Core.Domain.Orders;
+@using Nop.Core.Domain.SubscriptionOrders;
 @Html.ValidationSummary(false)
 @Html.HiddenFor(model => model.Id)
 
@@ -32,10 +32,10 @@
                 @T("Admin.Customers.Customers.Addresses")
             </li>
             <li @Html.RenderSelectedTabIndex(4, GetSelectedTabIndex())>
-                @T("Admin.Customers.Customers.CurrentShoppingCart")
+                @T("Admin.Customers.Customers.CurrentBorrowCart")
             </li>
             <li @Html.RenderSelectedTabIndex(5, GetSelectedTabIndex())>
-                @T("Admin.Customers.Customers.CurrentWishlist")
+                @T("Admin.Customers.Customers.CurrentMyToyBox")
             </li>
             <li @Html.RenderSelectedTabIndex(6, GetSelectedTabIndex())>
                 @T("Admin.Customers.Customers.ActivityLog")
@@ -47,12 +47,7 @@
                 @T("Admin.Customers.Customers.BackInStockSubscriptions")
             </li>
         }
-        @if (Model.DisplayRewardPointsHistory)
-        {
-            <li>
-                @T("Admin.Customers.Customers.RewardPoints")
-            </li>
-        }
+        
     </ul>
     <div>
         @TabInfo()
@@ -69,10 +64,10 @@
             @TabAddresses()
         </div>
         <div>
-            @TabCurrentShoppingCart()
+            @TabCurrentBorrowCart()
         </div>
         <div>
-            @TabCurrentWishlist()
+            @TabCurrentMyToyBox()
         </div>
         <div>
             @TabActivityLog()
@@ -84,12 +79,7 @@
             @TabBackInStockSubscriptions()
         </div>
     }
-    @if (Model.DisplayRewardPointsHistory)
-    {
-       <div>
-            @TabRewardPoints()
-        </div>
-    }
+    
 </div>
 
 @{
@@ -434,6 +424,24 @@
                 </td>
             </tr>
         }
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.RegistrationChargeBalance):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.RegistrationChargeBalance)
+                @Html.ValidationMessageFor(model => model.RegistrationChargeBalance)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.SecurityDepositBalance):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.SecurityDepositBalance)
+                @Html.ValidationMessageFor(model => model.SecurityDepositBalance)
+            </td>
+        </tr>
         @if (Model.CustomerAttributes.Count > 0)
         {
             @Html.Partial("_CustomerAttributes", Model.CustomerAttributes)
@@ -495,17 +503,17 @@
                 </td>
             </tr>
         }
-        @if (Model.AvailableNewsletterSubscriptionStores != null && Model.AvailableNewsletterSubscriptionStores.Count > 0)
+        @if (Model.AvailableNewsletterSubscriptionOrderStores != null && Model.AvailableNewsletterSubscriptionOrderStores.Count > 0)
         {
             <tr>
                 <td class="adminTitle">
-                    @Html.NopLabelFor(model => model.SelectedNewsletterSubscriptionStoreIds):
+                    @Html.NopLabelFor(model => model.SelectedNewsletterSubscriptionOrderStoreIds):
                 </td>
                 <td class="adminData">
-                    @foreach (var store in Model.AvailableNewsletterSubscriptionStores)
+                    @foreach (var store in Model.AvailableNewsletterSubscriptionOrderStores)
                     {
                         <div>
-                            <input type="checkbox" name="SelectedNewsletterSubscriptionStoreIds" value="@store.Id" checked="@(Model.SelectedNewsletterSubscriptionStoreIds != null && Model.SelectedNewsletterSubscriptionStoreIds.Contains(store.Id))" />(@(store.Name))    
+                            <input type="checkbox" name="SelectedNewsletterSubscriptionOrderStoreIds" value="@store.Id" checked="@(Model.SelectedNewsletterSubscriptionOrderStoreIds != null && Model.SelectedNewsletterSubscriptionOrderStoreIds.Contains(store.Id))" />(@(store.Name))    
                         </div>
                         
                     }
@@ -640,8 +648,8 @@
                     title: "@T("Admin.Customers.Customers.Orders.OrderTotal")",
                     width: 200
                 }, {
-                    field: "OrderStatus",
-                    title: "@T("Admin.Customers.Customers.Orders.OrderStatus")",
+                    field: "SubscriptionOrderStatus",
+                    title: "@T("Admin.Customers.Customers.Orders.SubscriptionOrderStatus")",
                     width: 200
                 }, {
                     field: "PaymentStatus",
@@ -671,145 +679,7 @@
         });
     </script>
 }
-@helper TabRewardPoints()
-    {
-    <div id="customer-rewardpoints-grid"></div>
-        
-    <script>
-        $(document).ready(function () {
-            $("#customer-rewardpoints-grid").kendoGrid({
-                dataSource: {
-                    type: "json",
-                    transport: {
-                        read: {
-                            url: "@Html.Raw(Url.Action("RewardPointsHistorySelect", "Customer", new { customerId = Model.Id }))",
-                            type: "POST",
-                            dataType: "json",
-                            data: addAntiForgeryToken
-                        }
-                    },
-                    schema: {
-                        data: "Data",
-                        total: "Total",
-                        errors: "Errors"
-                    },
-                    error: function(e) {
-                        display_kendoui_grid_error(e);
-                        // Cancel the changes
-                        this.cancelChanges();
-                    },
-                    serverPaging: true,
-                    serverFiltering: true,
-                    serverSorting: true
-                },
-                pageable: {
-                    refresh: true,
-                    numeric: false,
-                    previousNext: false,
-                    info: false
-                },
-                editable: {
-                    confirmation: false,
-                    mode: "inline"
-                },
-                scrollable: false,
-                columns: [{
-                    field: "StoreName",
-                    title: "@T("Admin.Customers.Customers.RewardPoints.Fields.Store")"
-                },{
-                    field: "Points",
-                    title: "@T("Admin.Customers.Customers.RewardPoints.Fields.Points")"
-                }, {
-                    field: "PointsBalance",
-                    title: "@T("Admin.Customers.Customers.RewardPoints.Fields.PointsBalance")"
-                },{
-                    field: "Message",
-                    title: "@T("Admin.Customers.Customers.RewardPoints.Fields.Message")"
-                },{
-                    field: "CreatedOn",
-                    title: "@T("Admin.Promotions.Campaigns.Fields.CreatedOn")",
-                    width: 200,
-                    type: "date",
-                    format: "{0:G}"
-                }]
-            });
-        });
-    </script>
-    <p>
-        <strong>
-            @T("Admin.Customers.Customers.RewardPoints.AddTitle")
-        </strong>
-    </p>
-    <table class="adminContent">
-        <tr>
-            <td class="adminTitle">
-                @Html.NopLabelFor(model => model.AddRewardPointsValue)
-            </td>
-            <td class="adminData">
-                @Html.EditorFor(model => model.AddRewardPointsValue)
-                @Html.ValidationMessageFor(model => model.AddRewardPointsValue)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.NopLabelFor(model => model.AddRewardPointsMessage)
-            </td>
-            <td class="adminData">
-                @Html.EditorFor(model => model.AddRewardPointsMessage)
-                @Html.ValidationMessageFor(model => model.AddRewardPointsMessage)
-            </td>
-        </tr>
-        <tr>
-            <td class="adminTitle">
-                @Html.NopLabelFor(model => model.AddRewardPointsStoreId)
-            </td>
-            <td class="adminData">
-                @Html.DropDownListFor(model => model.AddRewardPointsStoreId, Model.RewardPointsAvailableStores)
-                @Html.ValidationMessageFor(model => model.AddRewardPointsStoreId)
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2" align="left">
-                <input type="button" id="addRewardPoints" class="k-button" value="@T("Admin.Customers.Customers.RewardPoints.AddButton")" />
-            </td>
-        </tr>
-    </table>
-    
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#addRewardPoints').click(function () {
-                var rewardPointsValue = $("#@Html.FieldIdFor(model => model.AddRewardPointsValue)").val();
-                var rewardPointsMessage = $("#@Html.FieldIdFor(model => model.AddRewardPointsMessage)").val();
-                var rewardPointsStoreId = $("#@Html.FieldIdFor(model => model.AddRewardPointsStoreId)").val();
-                $('#addRewardPoints').attr('disabled', true);
-                
-                var postData = {
-                    addRewardPointsValue: rewardPointsValue,
-                    addRewardPointsMessage: rewardPointsMessage,
-                    storeId: rewardPointsStoreId,
-                    customerId: @Model.Id
-                };
-                addAntiForgeryToken(postData);
-
-                $.ajax({
-                    cache:false,
-                    type: "POST",
-                    url: "@(Url.Action("RewardPointsHistoryAdd", "Customer"))",
-                    data: postData,
-                    success: function (data) {
-                        var grid = $("#customer-rewardpoints-grid").data('kendoGrid');
-                        grid.dataSource.read();
-                        $('#addRewardPoints').attr('disabled', false);
-                    },
-                    error:function (xhr, ajaxOptions, thrownError){
-                        alert('Failed to add reward points.');
-                        $('#addRewardPoints').attr('disabled', false);
-                    }  
-                });
-            });
-        });
-    </script>
-}
+ 
 @helper TabAddresses()
     {
     <div id="customer-addresses-grid"></div>
@@ -897,21 +767,21 @@
         <input type="button" class="k-button" onclick="location.href='@Url.Action("AddressCreate", new { customerId = Model.Id })'" value='@T("Admin.Customers.Customers.Addresses.AddButton")' />
     </p>
 }
-@helper TabCurrentShoppingCart()
+@helper TabCurrentBorrowCart()
     {
     <table class="adminContent">
         <tr>
             <td>
-                <div id="currentshoppingcart-grid"></div>
+                <div id="currentborrowcart-grid"></div>
 
                 <script>
                     $(document).ready(function () {
-                        $("#currentshoppingcart-grid").kendoGrid({
+                        $("#currentborrowcart-grid").kendoGrid({
                             dataSource: {
                                 type: "json",
                                 transport: {
                                     read: {
-                                        url: "@Html.Raw(Url.Action("GetCartList", "Customer", new { customerId = Model.Id, cartTypeId = (int)ShoppingCartType.ShoppingCart }))",
+                                        url: "@Html.Raw(Url.Action("GetCartList", "Customer", new { customerId = Model.Id, cartTypeId = (int)BorrowCartType.BorrowCart }))",
                                         type: "POST",
                                         dataType: "json",
                                         data: addAntiForgeryToken
@@ -978,21 +848,21 @@
         </tr>
     </table>
 }
-@helper TabCurrentWishlist()
+@helper TabCurrentMyToyBox()
     {
     <table class="adminContent">
         <tr>
             <td>
-                <div id="currentwishlist-grid"></div>
+                <div id="currentmytoybox-grid"></div>
 
                 <script>
                     $(document).ready(function () {
-                        $("#currentwishlist-grid").kendoGrid({
+                        $("#currentmytoybox-grid").kendoGrid({
                             dataSource: {
                                 type: "json",
                                 transport: {
                                     read: {
-                                        url: "@Html.Raw(Url.Action("GetCartList", "Customer", new { customerId = Model.Id, cartTypeId = (int)ShoppingCartType.Wishlist }))",
+                                        url: "@Html.Raw(Url.Action("GetCartList", "Customer", new { customerId = Model.Id, cartTypeId = (int)BorrowCartType.MyToyBox }))",
                                         type: "POST",
                                         dataType: "json",
                                         data: addAntiForgeryToken
@@ -1159,7 +1029,7 @@
                                 type: "json",
                                 transport: {
                                     read: {
-                                        url: "@Html.Raw(Url.Action("BackInStockSubscriptionList", "Customer", new { customerId = Model.Id }))",
+                                        url: "@Html.Raw(Url.Action("BackInStockSubscriptionOrderList", "Customer", new { customerId = Model.Id }))",
                                         type: "POST",
                                         dataType: "json",
                                         data: addAntiForgeryToken

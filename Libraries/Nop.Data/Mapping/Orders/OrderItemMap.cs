@@ -1,4 +1,4 @@
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Data.Mapping.Orders
 {
@@ -9,23 +9,15 @@ namespace Nop.Data.Mapping.Orders
             this.ToTable("OrderItem");
             this.HasKey(orderItem => orderItem.Id);
 
-            this.Property(orderItem => orderItem.UnitPriceInclTax).HasPrecision(18, 4);
-            this.Property(orderItem => orderItem.UnitPriceExclTax).HasPrecision(18, 4);
-            this.Property(orderItem => orderItem.PriceInclTax).HasPrecision(18, 4);
-            this.Property(orderItem => orderItem.PriceExclTax).HasPrecision(18, 4);
-            this.Property(orderItem => orderItem.DiscountAmountInclTax).HasPrecision(18, 4);
-            this.Property(orderItem => orderItem.DiscountAmountExclTax).HasPrecision(18, 4);
-            this.Property(orderItem => orderItem.OriginalProductCost).HasPrecision(18, 4);
-            this.Property(orderItem => orderItem.ItemWeight).HasPrecision(18, 4);
+         
 
+            this.Ignore(o => o.ShippingStatus);
 
-            this.HasRequired(orderItem => orderItem.Order)
+            this.HasRequired(orderItem => orderItem.SubscriptionOrder)
                 .WithMany(o => o.OrderItems)
-                .HasForeignKey(orderItem => orderItem.OrderId);
+                .HasForeignKey(orderItem => orderItem.SubscriptionOrderId);
 
-            this.HasRequired(orderItem => orderItem.Product)
-                .WithMany()
-                .HasForeignKey(orderItem => orderItem.ProductId);
+            
         }
     }
 }

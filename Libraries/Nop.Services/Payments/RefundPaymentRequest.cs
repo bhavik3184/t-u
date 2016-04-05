@@ -1,4 +1,4 @@
-﻿using Nop.Core.Domain.Orders;
+﻿using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Services.Payments
 {
@@ -10,7 +10,7 @@ namespace Nop.Services.Payments
         /// <summary>
         /// Gets or sets an order
         /// </summary>
-        public Order Order { get; set; }
+        public SubscriptionOrder SubscriptionOrder { get; set; }
 
         /// <summary>
         /// Gets or sets an amount

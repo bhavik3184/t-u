@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Shipping;
 
 namespace Nop.Services.Common
@@ -14,10 +14,25 @@ namespace Nop.Services.Common
         /// <summary>
         /// Print an order to PDF
         /// </summary>
+        /// <param name="order">SubscriptionOrder</param>
+        /// <param name="languageId">Language identifier; 0 to use a language used when placing an order</param>
+        /// <returns>A path of generated file</returns>
+        string PrintSubscriptionOrderToPdf(SubscriptionOrder order, int languageId);
+
+        /// <summary>
+        /// Print orders to PDF
+        /// </summary>
+        /// <param name="stream">Stream</param>
+        /// <param name="orders">SubscriptionOrders</param>
+        /// <param name="languageId">Language identifier; 0 to use a language used when placing an order</param>
+        void PrintSubscriptionOrdersToPdf(Stream stream, IList<SubscriptionOrder> orders, int languageId = 0);
+        /// <summary>
+        /// Print an order to PDF
+        /// </summary>
         /// <param name="order">Order</param>
         /// <param name="languageId">Language identifier; 0 to use a language used when placing an order</param>
         /// <returns>A path of generated file</returns>
-        string PrintOrderToPdf(Order order, int languageId);
+        string PrintOrderToPdf(SubscriptionOrder order, int languageId);
 
         /// <summary>
         /// Print orders to PDF
@@ -25,7 +40,7 @@ namespace Nop.Services.Common
         /// <param name="stream">Stream</param>
         /// <param name="orders">Orders</param>
         /// <param name="languageId">Language identifier; 0 to use a language used when placing an order</param>
-        void PrintOrdersToPdf(Stream stream, IList<Order> orders, int languageId = 0);
+        void PrintOrdersToPdf(Stream stream, IList<SubscriptionOrder> orders, int languageId = 0);
 
         /// <summary>
         /// Print packaging slips to PDF

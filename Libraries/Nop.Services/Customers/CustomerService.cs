@@ -13,7 +13,7 @@ using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Polls;
 using Nop.Core.Domain.Shipping;
 using Nop.Data;
@@ -55,7 +55,7 @@ namespace Nop.Services.Customers
         private readonly IRepository<Customer> _customerRepository;
         private readonly IRepository<CustomerRole> _customerRoleRepository;
         private readonly IRepository<GenericAttribute> _gaRepository;
-        private readonly IRepository<Order> _orderRepository;
+        private readonly IRepository<SubscriptionOrder> _orderRepository;
         private readonly IRepository<ForumPost> _forumPostRepository;
         private readonly IRepository<ForumTopic> _forumTopicRepository;
         private readonly IRepository<BlogComment> _blogCommentRepository;
@@ -79,7 +79,7 @@ namespace Nop.Services.Customers
             IRepository<Customer> customerRepository,
             IRepository<CustomerRole> customerRoleRepository,
             IRepository<GenericAttribute> gaRepository,
-            IRepository<Order> orderRepository,
+            IRepository<SubscriptionOrder> orderRepository,
             IRepository<ForumPost> forumPostRepository,
             IRepository<ForumTopic> forumTopicRepository,
             IRepository<BlogComment> blogCommentRepository,
@@ -137,8 +137,8 @@ namespace Nop.Services.Customers
         /// <param name="company">Company; null to load all customers</param>
         /// <param name="phone">Phone; null to load all customers</param>
         /// <param name="zipPostalCode">Phone; null to load all customers</param>
-        /// <param name="loadOnlyWithShoppingCart">Value indicating whether to load customers only with shopping cart</param>
-        /// <param name="sct">Value indicating what shopping cart type to filter; userd when 'loadOnlyWithShoppingCart' param is 'true'</param>
+        /// <param name="loadOnlyWithBorrowCart">Value indicating whether to load customers only with shopping cart</param>
+        /// <param name="sct">Value indicating what shopping cart type to filter; userd when 'loadOnlyWithBorrowCart' param is 'true'</param>
         /// <param name="pageIndex">Page index</param>
         /// <param name="pageSize">Page size</param>
         /// <returns>Customers</returns>
@@ -148,7 +148,7 @@ namespace Nop.Services.Customers
             string firstName = null, string lastName = null,
             int dayOfBirth = 0, int monthOfBirth = 0,
             string company = null, string phone = null, string zipPostalCode = null,
-            bool loadOnlyWithShoppingCart = false, ShoppingCartType? sct = null,
+            bool loadOnlyWithBorrowCart = false, BorrowCartType? sct = null,
             int pageIndex = 0, int pageSize = 2147483647)
         {
             var query = _customerRepository.Table;
@@ -264,15 +264,15 @@ namespace Nop.Services.Customers
                     .Select(z => z.Customer);
             }
 
-            if (loadOnlyWithShoppingCart)
+            if (loadOnlyWithBorrowCart)
             {
                 int? sctId = null;
                 if (sct.HasValue)
                     sctId = (int)sct.Value;
 
                 query = sct.HasValue ?
-                    query.Where(c => c.ShoppingCartItems.Any(x => x.ShoppingCartTypeId == sctId)) :
-                    query.Where(c => c.ShoppingCartItems.Any());
+                    query.Where(c => c.BorrowCartItems.Any(x => x.BorrowCartTypeId == sctId)) :
+                    query.Where(c => c.BorrowCartItems.Any());
             }
             
             query = query.OrderByDescending(c => c.CreatedOnUtc);
@@ -568,9 +568,9 @@ namespace Nop.Services.Customers
         /// </summary>
         /// <param name="createdFromUtc">Created date from (UTC); null to load all records</param>
         /// <param name="createdToUtc">Created date to (UTC); null to load all records</param>
-        /// <param name="onlyWithoutShoppingCart">A value indicating whether to delete customers only without shopping cart</param>
+        /// <param name="onlyWithoutBorrowCart">A value indicating whether to delete customers only without shopping cart</param>
         /// <returns>Number of deleted customers</returns>
-        public virtual int DeleteGuestCustomers(DateTime? createdFromUtc, DateTime? createdToUtc, bool onlyWithoutShoppingCart)
+        public virtual int DeleteGuestCustomers(DateTime? createdFromUtc, DateTime? createdToUtc, bool onlyWithoutBorrowCart)
         {
             if (_commonSettings.UseStoredProceduresIfSupported && _dataProvider.StoredProceduredSupported)
             {
@@ -580,10 +580,10 @@ namespace Nop.Services.Customers
                 #region Stored procedure
 
                 //prepare parameters
-                var pOnlyWithoutShoppingCart = _dataProvider.GetParameter();
-                pOnlyWithoutShoppingCart.ParameterName = "OnlyWithoutShoppingCart";
-                pOnlyWithoutShoppingCart.Value = onlyWithoutShoppingCart;
-                pOnlyWithoutShoppingCart.DbType = DbType.Boolean;
+                var pOnlyWithoutBorrowCart = _dataProvider.GetParameter();
+                pOnlyWithoutBorrowCart.ParameterName = "OnlyWithoutBorrowCart";
+                pOnlyWithoutBorrowCart.Value = onlyWithoutBorrowCart;
+                pOnlyWithoutBorrowCart.DbType = DbType.Boolean;
 
                 var pCreatedFromUtc = _dataProvider.GetParameter();
                 pCreatedFromUtc.ParameterName = "CreatedFromUtc";
@@ -602,9 +602,9 @@ namespace Nop.Services.Customers
 
                 //invoke stored procedure
                 _dbContext.ExecuteSqlCommand(
-                    "EXEC [DeleteGuests] @OnlyWithoutShoppingCart, @CreatedFromUtc, @CreatedToUtc, @TotalRecordsDeleted OUTPUT",
+                    "EXEC [DeleteGuests] @OnlyWithoutBorrowCart, @CreatedFromUtc, @CreatedToUtc, @TotalRecordsDeleted OUTPUT",
                     false, null,
-                    pOnlyWithoutShoppingCart,
+                    pOnlyWithoutBorrowCart,
                     pCreatedFromUtc,
                     pCreatedToUtc,
                     pTotalRecordsDeleted);
@@ -630,8 +630,8 @@ namespace Nop.Services.Customers
                 if (createdToUtc.HasValue)
                     query = query.Where(c => createdToUtc.Value >= c.CreatedOnUtc);
                 query = query.Where(c => c.CustomerRoles.Select(cr => cr.Id).Contains(guestRole.Id));
-                if (onlyWithoutShoppingCart)
-                    query = query.Where(c => !c.ShoppingCartItems.Any());
+                if (onlyWithoutBorrowCart)
+                    query = query.Where(c => !c.BorrowCartItems.Any());
                 //no orders
                 query = from c in query
                         join o in _orderRepository.Table on c.Id equals o.CustomerId into c_o

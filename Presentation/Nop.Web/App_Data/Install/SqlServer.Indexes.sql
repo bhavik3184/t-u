@@ -34,7 +34,7 @@ GO
 CREATE NONCLUSTERED INDEX [IX_QueuedEmail_CreatedOnUtc] ON [QueuedEmail] ([CreatedOnUtc] ASC)
 GO
 
-CREATE NONCLUSTERED INDEX [IX_Order_CustomerId] ON [Order] ([CustomerId] ASC)
+CREATE NONCLUSTERED INDEX [IX_SubscriptionOrder_CustomerId] ON [SubscriptionOrder] ([CustomerId] ASC)
 GO
 
 CREATE NONCLUSTERED INDEX [IX_Language_DisplayOrder] ON [Language] ([DisplayOrder] ASC)
@@ -61,16 +61,22 @@ GO
 CREATE NONCLUSTERED INDEX [IX_ProductReview_ProductId] ON [ProductReview] ([ProductId] ASC)
 GO
 
-CREATE NONCLUSTERED INDEX [IX_OrderItem_OrderId] ON [OrderItem] ([OrderId] ASC)
+CREATE NONCLUSTERED INDEX [IX_SubscriptionOrderItem_SubscriptionOrderId] ON [SubscriptionOrderItem] ([SubscriptionOrderId] ASC)
 GO
 
-CREATE NONCLUSTERED INDEX [IX_OrderNote_OrderId] ON [OrderNote] ([OrderId] ASC)
+CREATE NONCLUSTERED INDEX [IX_SubscriptionOrderNote_SubscriptionOrderId] ON [SubscriptionOrderNote] ([SubscriptionOrderId] ASC)
 GO
 
-CREATE NONCLUSTERED INDEX [IX_TierPrice_ProductId] ON [TierPrice] ([ProductId] ASC)
+CREATE NONCLUSTERED INDEX [IX_OrderItem_SubscriptionOrderId] ON [OrderItem] ([SubscriptionOrderId] ASC)
 GO
 
-CREATE NONCLUSTERED INDEX [IX_ShoppingCartItem_ShoppingCartTypeId_CustomerId] ON [ShoppingCartItem] ([ShoppingCartTypeId] ASC, [CustomerId] ASC)
+CREATE NONCLUSTERED INDEX [IX_TierPrice_PlanId] ON [TierPrice] ([PlanId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX [IX_BorrowCartItem_BorrowCartTypeId_CustomerId] ON [BorrowCartItem] ([BorrowCartTypeId] ASC, [CustomerId] ASC)
+GO
+
+CREATE NONCLUSTERED INDEX [IX_SubscriptionCartItem_SubscriptionCartTypeId_CustomerId] ON [SubscriptionCartItem] ([SubscriptionCartTypeId] ASC, [CustomerId] ASC)
 GO
 
 CREATE NONCLUSTERED INDEX [IX_RelatedProduct_ProductId1] ON [RelatedProduct] ([ProductId1] ASC)

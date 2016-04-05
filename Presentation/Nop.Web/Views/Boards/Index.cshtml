@@ -5,7 +5,7 @@
 
     Html.AddTitleParts(T("Forum.PageTitle.Default").Text);
 }
-<div class="page forums-main-page">
+<div class="page forums-main-page article">
     @Html.Action("TopicBlock", "Topic", new { systemName = "ForumWelcomeMessage" })
     @Html.Partial("_ForumHeader")
     @foreach (var forumGroup in Model.ForumGroups)

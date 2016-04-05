@@ -24,9 +24,9 @@ namespace Nop.Web.Framework.Security.Captcha
         /// </summary>
         public bool ShowOnContactUsPage { get; set; }
         /// <summary>
-        /// A value indicating whether CAPTCHA should be displayed on the wishlist page
+        /// A value indicating whether CAPTCHA should be displayed on the mytoybox page
         /// </summary>
-        public bool ShowOnEmailWishlistToFriendPage { get; set; }
+        public bool ShowOnEmailMyToyBoxToFriendPage { get; set; }
         /// <summary>
         /// A value indicating whether CAPTCHA should be displayed on the "email a friend" page
         /// </summary>

@@ -60,6 +60,23 @@ namespace Nop.Services.Catalog
         }
 
         /// <summary>
+        /// Returns a ProductCategory that has the specified values
+        /// </summary>
+        /// <param name="source">Source</param>
+        /// <param name="productId">Product identifier</param>
+        /// <param name="categoryId">Category identifier</param>
+        /// <returns>A ProductCategory that has the specified values; otherwise null</returns>
+        public static PlanCategory FindPlanCategory(this IList<PlanCategory> source,
+            int planId, int categoryId)
+        {
+            foreach (var planCategory in source)
+                if (planCategory.PlanId == planId && planCategory.CategoryId == categoryId)
+                    return planCategory;
+
+            return null;
+        }
+
+        /// <summary>
         /// Get formatted category breadcrumb 
         /// Note: ACL and store mapping is ignored
         /// </summary>

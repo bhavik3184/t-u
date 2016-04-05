@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 
-namespace Nop.Services.Orders
+namespace Nop.Services.SubscriptionOrders
 {
     /// <summary>
     /// Order report service interface
@@ -23,7 +23,7 @@ namespace Nop.Services.Orders
         /// <param name="startTimeUtc">Start date</param>
         /// <param name="endTimeUtc">End date</param>
         /// <returns>Result</returns>
-        IList<OrderByCountryReportLine> GetCountryReport(int storeId = 0, OrderStatus? os = null,
+        IList<OrderByCountryReportLine> GetCountryReport(int storeId = 0, SubscriptionOrderStatus? os = null,
             PaymentStatus? ps = null, ShippingStatus? ss = null,
             DateTime? startTimeUtc = null, DateTime? endTimeUtc = null);
 
@@ -47,7 +47,7 @@ namespace Nop.Services.Orders
         /// <returns>Result</returns>
         OrderAverageReportLine GetOrderAverageReportLine(int storeId = 0, int vendorId = 0,
             int billingCountryId = 0, int orderId = 0, string paymentMethodSystemName = null,
-            OrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
+            SubscriptionOrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
             DateTime? startTimeUtc = null, DateTime? endTimeUtc = null,
             string billingEmail = null, string billingLastName = "", 
             bool ignoreCancelledOrders = false, string orderNotes = null);
@@ -58,7 +58,7 @@ namespace Nop.Services.Orders
         /// <param name="storeId">Store identifier</param>
         /// <param name="os">Order status</param>
         /// <returns>Result</returns>
-        OrderAverageReportLineSummary OrderAverageReport(int storeId, OrderStatus os);
+        OrderAverageReportLineSummary OrderAverageReport(int storeId, SubscriptionOrderStatus os);
 
         /// <summary>
         /// Get best sellers report
@@ -82,7 +82,7 @@ namespace Nop.Services.Orders
             int categoryId = 0, int manufacturerId = 0, 
             int storeId = 0, int vendorId = 0,
             DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
-            OrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
+            SubscriptionOrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
             int billingCountryId = 0,
             int orderBy = 1,
             int pageIndex = 0, int pageSize = int.MaxValue,
@@ -132,7 +132,7 @@ namespace Nop.Services.Orders
         /// <returns>Result</returns>
         decimal ProfitReport(int storeId = 0, int vendorId = 0,
             int billingCountryId = 0, int orderId = 0, string paymentMethodSystemName = null,
-            OrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
+            SubscriptionOrderStatus? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null,
             DateTime? startTimeUtc = null, DateTime? endTimeUtc = null,
             string billingEmail = null, string billingLastName = "", string orderNotes = null);
     }

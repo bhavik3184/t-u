@@ -4,13 +4,13 @@
     var gridPageSizes = EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>().GridPageSizes;
 
     //page title
-    ViewBag.Title = string.Format(T("Admin.Orders.Products.AddNew.Title1").Text, Model.OrderId);
+    ViewBag.Title = string.Format(T("Admin.Orders.Products.AddNew.Title1").Text, Model.SubscriptionOrderId);
 }
 @Html.AntiForgeryToken()
 <div class="section-header">
     <div class="title">
         <img src="@Url.Content("~/Administration/Content/images/ico-sales.png")" alt="" />
-        @string.Format(T("Admin.Orders.Products.AddNew.Title1").Text, Model.OrderId) @Html.ActionLink("(" + T("Admin.Orders.Products.AddNew.BackToOrder") + ")", "Edit", new { id = Model.OrderId })
+        @string.Format(T("Admin.Orders.Products.AddNew.Title1").Text, Model.SubscriptionOrderId) @Html.ActionLink("(" + T("Admin.Orders.Products.AddNew.BackToOrder") + ")", "Edit", new { id = Model.SubscriptionOrderId })
     </div>
     <div class="options">
     </div>
@@ -153,7 +153,7 @@
                     var selectedItem = grid.dataItem(grid.select());
                     var productId = selectedItem.Id;
                     //load "product details page" block
-                    var productDetailsActionUrl = '@Html.Raw(Url.Action("AddProductToOrderDetails", "Order", new { orderId = Model.OrderId, productId = "productidplaceholder" }))';
+                    var productDetailsActionUrl = '@Html.Raw(Url.Action("AddProductToOrderDetails", "Order", new { orderId = Model.SubscriptionOrderId, productId = "productidplaceholder" }))';
                     productDetailsActionUrl = productDetailsActionUrl.replace("productidplaceholder", productId);
                     setLocation(productDetailsActionUrl);
                 }
@@ -163,4 +163,4 @@
 </table>
 <div id="productdetails">
 </div>
-@Html.HiddenFor(model => model.OrderId)
+@Html.HiddenFor(model => model.SubscriptionOrderId)

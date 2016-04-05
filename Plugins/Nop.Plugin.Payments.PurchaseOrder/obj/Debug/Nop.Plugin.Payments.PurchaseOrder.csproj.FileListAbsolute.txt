@@ -1,0 +1,11 @@
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PurchaseOrder\Views\PaymentPurchaseOrder\Configure.cshtml
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PurchaseOrder\Views\PaymentPurchaseOrder\PaymentInfo.cshtml
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PurchaseOrder\web.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PurchaseOrder\Description.txt
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PurchaseOrder\logo.jpg
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PurchaseOrder\Nop.Plugin.Payments.PurchaseOrder.dll.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PurchaseOrder\Nop.Plugin.Payments.PurchaseOrder.dll
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PurchaseOrder\Nop.Plugin.Payments.PurchaseOrder.pdb
+C:\projects\NewToys\Plugins\Nop.Plugin.Payments.PurchaseOrder\obj\Debug\Nop.Plugin.Payments.PurchaseOrder.csprojResolveAssemblyReference.cache
+C:\projects\NewToys\Plugins\Nop.Plugin.Payments.PurchaseOrder\obj\Debug\Nop.Plugin.Payments.PurchaseOrder.dll
+C:\projects\NewToys\Plugins\Nop.Plugin.Payments.PurchaseOrder\obj\Debug\Nop.Plugin.Payments.PurchaseOrder.pdb

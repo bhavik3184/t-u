@@ -103,7 +103,7 @@ namespace Nop.Services.Discounts
         /// </summary>
         /// <param name="discountId">Discount identifier; null to load all records</param>
         /// <param name="customerId">Customer identifier; null to load all records</param>
-        /// <param name="orderId">Order identifier; null to load all records</param>
+        /// <param name="orderId">SubscriptionOrder identifier; null to load all records</param>
         /// <param name="pageIndex">Page index</param>
         /// <param name="pageSize">Page size</param>
         /// <returns>Discount usage history records</returns>

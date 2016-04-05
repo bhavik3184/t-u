@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nop.Core;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Plugins;
 using Nop.Services.Catalog;
@@ -20,7 +20,7 @@ namespace Nop.Services.Payments
         private readonly PaymentSettings _paymentSettings;
         private readonly IPluginFinder _pluginFinder;
         private readonly ISettingService _settingService;
-        private readonly ShoppingCartSettings _shoppingCartSettings;
+        private readonly SubscriptionCartSettings _borrowCartSettings;
         #endregion
 
         #region Ctor
@@ -31,16 +31,16 @@ namespace Nop.Services.Payments
         /// <param name="paymentSettings">Payment settings</param>
         /// <param name="pluginFinder">Plugin finder</param>
         /// <param name="settingService">Setting service</param>
-        /// <param name="shoppingCartSettings">Shopping cart settings</param>
+        /// <param name="borrowCartSettings">Shopping cart settings</param>
         public PaymentService(PaymentSettings paymentSettings, 
             IPluginFinder pluginFinder,
             ISettingService settingService,
-            ShoppingCartSettings shoppingCartSettings)
+            SubscriptionCartSettings borrowCartSettings)
         {
             this._paymentSettings = paymentSettings;
             this._pluginFinder = pluginFinder;
             this._settingService = settingService;
-            this._shoppingCartSettings = shoppingCartSettings;
+            this._borrowCartSettings = borrowCartSettings;
         }
 
         #endregion
@@ -140,7 +140,7 @@ namespace Nop.Services.Payments
         /// <returns>Process payment result</returns>
         public virtual ProcessPaymentResult ProcessPayment(ProcessPaymentRequest processPaymentRequest)
         {
-            if (processPaymentRequest.OrderTotal == decimal.Zero)
+            if (processPaymentRequest.SubscriptionOrderTotal == decimal.Zero)
             {
                 var result = new ProcessPaymentResult
                 {
@@ -167,11 +167,11 @@ namespace Nop.Services.Payments
         /// <param name="postProcessPaymentRequest">Payment info required for an order processing</param>
         public virtual void PostProcessPayment(PostProcessPaymentRequest postProcessPaymentRequest)
         {
-            //already paid or order.OrderTotal == decimal.Zero
-            if (postProcessPaymentRequest.Order.PaymentStatus == PaymentStatus.Paid)
+            //already paid or order.SubscriptionOrderTotal == decimal.Zero
+            if (postProcessPaymentRequest.SubscriptionOrder.PaymentStatus == PaymentStatus.Paid)
                 return;
 
-            var paymentMethod = LoadPaymentMethodBySystemName(postProcessPaymentRequest.Order.PaymentMethodSystemName);
+            var paymentMethod = LoadPaymentMethodBySystemName(postProcessPaymentRequest.SubscriptionOrder.PaymentMethodSystemName);
             if (paymentMethod == null)
                 throw new NopException("Payment method couldn't be loaded");
             paymentMethod.PostProcessPayment(postProcessPaymentRequest);
@@ -180,9 +180,9 @@ namespace Nop.Services.Payments
         /// <summary>
         /// Gets a value indicating whether customers can complete a payment after order is placed but not completed (for redirection payment methods)
         /// </summary>
-        /// <param name="order">Order</param>
+        /// <param name="order">SubscriptionOrder</param>
         /// <returns>Result</returns>
-        public virtual bool CanRePostProcessPayment(Order order)
+        public virtual bool CanRePostProcessPayment(SubscriptionOrder order)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
@@ -200,7 +200,7 @@ namespace Nop.Services.Payments
             if (order.Deleted)
                 return false;  //do not allow for deleted orders
 
-            if (order.OrderStatus == OrderStatus.Cancelled)
+            if (order.SubscriptionOrderStatus == SubscriptionOrderStatus.Cancelled)
                 return false;  //do not allow for cancelled orders
 
             if (order.PaymentStatus != PaymentStatus.Pending)
@@ -217,7 +217,7 @@ namespace Nop.Services.Payments
         /// <param name="cart">Shoping cart</param>
         /// <param name="paymentMethodSystemName">Payment method system name</param>
         /// <returns>Additional handling fee</returns>
-        public virtual decimal GetAdditionalHandlingFee(IList<ShoppingCartItem> cart, string paymentMethodSystemName)
+        public virtual decimal GetAdditionalHandlingFee(IList<SubscriptionCartItem> cart, string paymentMethodSystemName)
         {
             if (String.IsNullOrEmpty(paymentMethodSystemName))
                 return decimal.Zero;
@@ -229,7 +229,7 @@ namespace Nop.Services.Payments
             decimal result = paymentMethod.GetAdditionalHandlingFee(cart);
             if (result < decimal.Zero)
                 result = decimal.Zero;
-            if (_shoppingCartSettings.RoundPricesDuringCalculation)
+            if (_borrowCartSettings.RoundPricesDuringCalculation)
             {
                 result = RoundingHelper.RoundPrice(result);
             }
@@ -258,7 +258,7 @@ namespace Nop.Services.Payments
         /// <returns>Capture payment result</returns>
         public virtual CapturePaymentResult Capture(CapturePaymentRequest capturePaymentRequest)
         {
-            var paymentMethod = LoadPaymentMethodBySystemName(capturePaymentRequest.Order.PaymentMethodSystemName);
+            var paymentMethod = LoadPaymentMethodBySystemName(capturePaymentRequest.SubscriptionOrder.PaymentMethodSystemName);
             if (paymentMethod == null)
                 throw new NopException("Payment method couldn't be loaded");
             return paymentMethod.Capture(capturePaymentRequest);
@@ -299,7 +299,7 @@ namespace Nop.Services.Payments
         /// <returns>Result</returns>
         public virtual RefundPaymentResult Refund(RefundPaymentRequest refundPaymentRequest)
         {
-            var paymentMethod = LoadPaymentMethodBySystemName(refundPaymentRequest.Order.PaymentMethodSystemName);
+            var paymentMethod = LoadPaymentMethodBySystemName(refundPaymentRequest.SubscriptionOrder.PaymentMethodSystemName);
             if (paymentMethod == null)
                 throw new NopException("Payment method couldn't be loaded");
             return paymentMethod.Refund(refundPaymentRequest);
@@ -327,7 +327,7 @@ namespace Nop.Services.Payments
         /// <returns>Result</returns>
         public virtual VoidPaymentResult Void(VoidPaymentRequest voidPaymentRequest)
         {
-            var paymentMethod = LoadPaymentMethodBySystemName(voidPaymentRequest.Order.PaymentMethodSystemName);
+            var paymentMethod = LoadPaymentMethodBySystemName(voidPaymentRequest.SubscriptionOrder.PaymentMethodSystemName);
             if (paymentMethod == null)
                 throw new NopException("Payment method couldn't be loaded");
             return paymentMethod.Void(voidPaymentRequest);
@@ -355,7 +355,7 @@ namespace Nop.Services.Payments
         /// <returns>Process payment result</returns>
         public virtual ProcessPaymentResult ProcessRecurringPayment(ProcessPaymentRequest processPaymentRequest)
         {
-            if (processPaymentRequest.OrderTotal == decimal.Zero)
+            if (processPaymentRequest.SubscriptionOrderTotal == decimal.Zero)
             {
                 var result = new ProcessPaymentResult
                 {
@@ -377,10 +377,10 @@ namespace Nop.Services.Payments
         /// <returns>Result</returns>
         public virtual CancelRecurringPaymentResult CancelRecurringPayment(CancelRecurringPaymentRequest cancelPaymentRequest)
         {
-            if (cancelPaymentRequest.Order.OrderTotal == decimal.Zero)
+            if (cancelPaymentRequest.SubscriptionOrder.SubscriptionOrderTotal == decimal.Zero)
                 return new CancelRecurringPaymentResult();
 
-            var paymentMethod = LoadPaymentMethodBySystemName(cancelPaymentRequest.Order.PaymentMethodSystemName);
+            var paymentMethod = LoadPaymentMethodBySystemName(cancelPaymentRequest.SubscriptionOrder.PaymentMethodSystemName);
             if (paymentMethod == null)
                 throw new NopException("Payment method couldn't be loaded");
             return paymentMethod.CancelRecurringPayment(cancelPaymentRequest);

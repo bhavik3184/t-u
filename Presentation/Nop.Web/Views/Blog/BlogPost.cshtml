@@ -15,7 +15,7 @@
     @Html.Action("BlogTags", "Blog")
     @Html.Widget("left_side_column_blog_after")
 }
-<div class="page blogpost-page">
+<div class="page blogpost-page  article">
     @Html.Widget("blogpost_page_top", Model.Id)
     <div class="page-title">
         <h1>@Model.Title</h1>
@@ -53,7 +53,7 @@
                     <strong>@T("Blog.Comments.LeaveYourComment")</strong>
                 </div>
                 @{
-                    var validationSummary = Html.ValidationSummary(true);
+            var validationSummary = Html.ValidationSummary(true);
                 }
                 <div class="notifications">
                     @if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
@@ -62,7 +62,7 @@
                     }
 
                     @{
-                        var result = TempData["nop.blog.addcomment.result"] as string;
+            var result = TempData["nop.blog.addcomment.result"] as string;
                     }
                     @if (!String.IsNullOrEmpty(result))
                     {
@@ -74,8 +74,8 @@
                     @Html.AntiForgeryToken()
                     <div class="form-fields">
                         <div class="inputs">
-                            @Html.LabelFor(model => model.AddNewComment.CommentText, new {}, ":")
-                            @Html.TextAreaFor(model => model.AddNewComment.CommentText, new {@class = "enter-comment-text"})
+                            @Html.LabelFor(model => model.AddNewComment.CommentText, new { }, ":")
+                            @Html.TextAreaFor(model => model.AddNewComment.CommentText, new { @class = "enter-comment-text" })
                             @Html.ValidationMessageFor(model => model.AddNewComment.CommentText)
                         </div>
                         @if (Model.AddNewComment.DisplayCaptcha)
@@ -86,7 +86,7 @@
                         }
                     </div>
                     <div class="buttons">
-                        <input type="submit" name="add-comment" class="button-1 blog-post-add-comment-button" value="@T("Blog.Comments.SubmitButton")"/>
+                        <input type="submit" name="add-comment" class="button-1 blog-post-add-comment-button" value="@T("Blog.Comments.SubmitButton")" />
                     </div>
                 }
             </div>
@@ -117,12 +117,12 @@
                                                 @if (comment.AllowViewingProfiles)
                                                 {
                                                     <a href="@Url.RouteUrl("CustomerProfile", new {id = comment.CustomerId})" class="avatar-img-link">
-                                                        <img src="@(comment.CustomerAvatarUrl)" class="avatar-img" alt="avatar"/>
+                                                        <img src="@(comment.CustomerAvatarUrl)" class="avatar-img" alt="avatar" />
                                                     </a>
                                                 }
                                                 else
                                                 {
-                                                    <img src="@(comment.CustomerAvatarUrl)" class="avatar-img" alt="avatar"/>
+                                                    <img src="@(comment.CustomerAvatarUrl)" class="avatar-img" alt="avatar" />
                                                 }
                                             </div>
                                         }
@@ -148,3 +148,4 @@
     </div>
     @Html.Widget("blogpost_page_bottom", Model.Id)
 </div>
+

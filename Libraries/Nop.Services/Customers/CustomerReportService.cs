@@ -3,7 +3,7 @@ using System.Linq;
 using Nop.Core;
 using Nop.Core.Data;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Services.Helpers;
@@ -18,7 +18,7 @@ namespace Nop.Services.Customers
         #region Fields
 
         private readonly IRepository<Customer> _customerRepository;
-        private readonly IRepository<Order> _orderRepository;
+        private readonly IRepository<SubscriptionOrder> _orderRepository;
         private readonly ICustomerService _customerService;
         private readonly IDateTimeHelper _dateTimeHelper;
         
@@ -34,7 +34,7 @@ namespace Nop.Services.Customers
         /// <param name="customerService">Customer service</param>
         /// <param name="dateTimeHelper">Date time helper</param>
         public CustomerReportService(IRepository<Customer> customerRepository,
-            IRepository<Order> orderRepository, ICustomerService customerService,
+            IRepository<SubscriptionOrder> orderRepository, ICustomerService customerService,
             IDateTimeHelper dateTimeHelper)
         {
             this._customerRepository = customerRepository;
@@ -60,7 +60,7 @@ namespace Nop.Services.Customers
         /// <param name="pageSize">Page size</param>
         /// <returns>Report</returns>
         public virtual IPagedList<BestCustomerReportLine> GetBestCustomersReport(DateTime? createdFromUtc,
-            DateTime? createdToUtc, OrderStatus? os, PaymentStatus? ps, ShippingStatus? ss, int orderBy,
+            DateTime? createdToUtc, SubscriptionOrderStatus? os, PaymentStatus? ps, ShippingStatus? ss, int orderBy,
             int pageIndex = 0, int pageSize = 214748364)
         {
             int? orderStatusId = null;
@@ -78,7 +78,7 @@ namespace Nop.Services.Customers
                          join o in _orderRepository.Table on c.Id equals o.CustomerId
                          where (!createdFromUtc.HasValue || createdFromUtc.Value <= o.CreatedOnUtc) &&
                          (!createdToUtc.HasValue || createdToUtc.Value >= o.CreatedOnUtc) &&
-                         (!orderStatusId.HasValue || orderStatusId == o.OrderStatusId) &&
+                         (!orderStatusId.HasValue || orderStatusId == o.SubscriptionOrderStatusId) &&
                          (!paymentStatusId.HasValue || paymentStatusId == o.PaymentStatusId) &&
                          (!shippingStatusId.HasValue || shippingStatusId == o.ShippingStatusId) &&
                          (!o.Deleted) &&
@@ -90,7 +90,7 @@ namespace Nop.Services.Customers
                          select new
                          {
                              CustomerId = g.Key,
-                             OrderTotal = g.Sum(x => x.o.OrderTotal),
+                             OrderTotal = g.Sum(x => x.o.SubscriptionOrderTotal),
                              OrderCount = g.Count()
                          };
             switch (orderBy)

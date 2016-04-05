@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Nop.Core;
 using Nop.Core.Data;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Services.Events;
 
-namespace Nop.Services.Orders
+namespace Nop.Services.SubscriptionOrders
 {
     /// <summary>
     /// Return request service
@@ -85,7 +85,7 @@ namespace Nop.Services.Orders
         /// <param name="pageSize">Page size</param>
         /// <returns>Return requests</returns>
         public virtual IPagedList<ReturnRequest> SearchReturnRequests(int storeId = 0, int customerId = 0,
-            int orderItemId = 0, ReturnRequestStatus? rs = null,
+            int itemDetailId = 0, ReturnRequestStatus? rs = null,
             int pageIndex = 0, int pageSize = int.MaxValue)
         {
             var query = _returnRequestRepository.Table;
@@ -98,8 +98,8 @@ namespace Nop.Services.Orders
                 var returnStatusId = (int)rs.Value;
                 query = query.Where(rr => rr.ReturnRequestStatusId == returnStatusId);
             }
-            if (orderItemId > 0)
-                query = query.Where(rr => rr.OrderItemId == orderItemId);
+            if (itemDetailId > 0)
+                query = query.Where(rr => rr.ItemDetailId == itemDetailId);
 
             query = query.OrderByDescending(rr => rr.CreatedOnUtc).ThenByDescending(rr=>rr.Id);
 

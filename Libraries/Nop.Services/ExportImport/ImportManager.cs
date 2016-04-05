@@ -31,6 +31,9 @@ namespace Nop.Services.ExportImport
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
         private readonly ICountryService _countryService;
         private readonly IStateProvinceService _stateProvinceService;
+        private readonly ICityService _cityService;
+        private readonly ILocalityService _localityService;
+        
 
         #endregion
 
@@ -44,7 +47,9 @@ namespace Nop.Services.ExportImport
             IStoreContext storeContext,
             INewsLetterSubscriptionService newsLetterSubscriptionService,
             ICountryService countryService,
-            IStateProvinceService stateProvinceService)
+            IStateProvinceService stateProvinceService,
+            ICityService cityService,
+            ILocalityService localityService)
         {
             this._productService = productService;
             this._categoryService = categoryService;
@@ -55,6 +60,8 @@ namespace Nop.Services.ExportImport
             this._newsLetterSubscriptionService = newsLetterSubscriptionService;
             this._countryService = countryService;
             this._stateProvinceService = stateProvinceService;
+            this._cityService = cityService;
+            this._localityService = localityService;
         }
 
         #endregion
@@ -97,6 +104,145 @@ namespace Nop.Services.ExportImport
         #endregion
 
         #region Methods
+
+        public virtual void ImportCategoriesFromXlsx(Stream stream)
+        {
+            // ok, we can run the real code of the sample now
+            using (var xlPackage = new ExcelPackage(stream))
+            {
+                // get the first worksheet in the workbook
+                var worksheet = xlPackage.Workbook.Worksheets.FirstOrDefault();
+                if (worksheet == null)
+                    throw new NopException("No worksheet found");
+               // _categoryService.DeleteCategoryAll();
+
+                //the columns
+                var properties = new[]
+                {
+                    "Id",
+                    "Name",
+                    "Description",
+                    "CategoryTemplateId",
+                    "MetaKeywords",
+                    "MetaDescription",
+                    "MetaTitle",
+                    "seourl",
+                    "ParentCategoryId",
+                    "PictureId",
+                    "PageSize",
+                    "AllowCustomersToSelectPageSize",
+                    "PageSizeOptions",
+                    "PriceRanges",
+                    "ShowOnHomePage",
+                    "IncludeInTopMenu",
+                    "HasDiscountsApplied",
+                    "SubjectToAcl",
+                    "LimitedToStores",
+                    "Published",
+                    "Deleted",
+                    "DisplayOrder",
+                    "CreatedOnUtc",
+                    "Picture1"
+                };
+
+
+                int iRow = 2;
+                while (true)
+                {
+
+                    bool allColumnsAreEmpty = true;
+                    for (var i = 1; i <= properties.Length; i++)
+                        if (worksheet.Cells[iRow, i].Value != null && !String.IsNullOrEmpty(worksheet.Cells[iRow, i].Value.ToString()))
+                        {
+                            allColumnsAreEmpty = false;
+                            break;
+                        }
+                    if (allColumnsAreEmpty)
+                        break;
+
+                    int Id = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "Id")].Value);
+                    string name = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Name")].Value);
+                    string Description = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Description")].Value);
+                    int CategoryTemplateId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "CategoryTemplateId")].Value);
+                    string metaKeywords = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaKeywords")].Value);
+                    string metaDescription = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaDescription")].Value);
+                    string metaTitle = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaTitle")].Value);
+                    string seourl = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "seourl")].Value);
+                    int ParentCategoryId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "ParentCategoryId")].Value);
+                    int PictureId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "PictureId")].Value);
+                    int PageSize = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "PageSize")].Value);
+                    bool AllowCustomersToSelectPageSize = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "AllowCustomersToSelectPageSize")].Value);
+                    string PageSizeOptions = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "PageSizeOptions")].Value);
+                    string PriceRanges = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "PriceRanges")].Value);
+                    bool showOnHomePage = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "ShowOnHomePage")].Value);
+                    bool IncludeInTopMenu = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "IncludeInTopMenu")].Value);
+                    bool HasDiscountsApplied = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "HasDiscountsApplied")].Value);
+                    bool SubjectToAcl = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "SubjectToAcl")].Value);
+                    bool LimitedToStores = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "LimitedToStores")].Value);
+                    bool published = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "Published")].Value);
+                    bool Deleted = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "Deleted")].Value);
+                    int DisplayOrder = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "DisplayOrder")].Value);
+
+                    //DateTime createdOnUtc = DateTime.FromOADate(Convert.ToDouble(worksheet.Cells[iRow, GetColumnIndex(properties, "CreatedOnUtc")].Value));
+
+
+                    var category = _categoryService.GetCategoryById(Id);
+
+                    bool newProduct = false;
+                    if (category == null)
+                    {
+                        category = new Category();
+                        newProduct = true;
+                    }
+                    category.Name = name;
+                    category.Description = Description;
+                    category.CategoryTemplateId = CategoryTemplateId;
+                    category.MetaKeywords = metaKeywords;
+                    category.MetaDescription = metaDescription;
+                    category.MetaTitle = metaTitle;
+                    category.ParentCategoryId = ParentCategoryId;
+                    category.PictureId = PictureId;
+                    category.PageSize = PageSize;
+                    category.AllowCustomersToSelectPageSize = AllowCustomersToSelectPageSize;
+                    category.PageSizeOptions = PageSizeOptions;
+                    category.PriceRanges = PriceRanges;
+                    category.ShowOnHomePage = showOnHomePage;
+                    category.IncludeInTopMenu = IncludeInTopMenu;
+                    //category.HasDiscountsApplied = HasDiscountsApplied;
+                    category.SubjectToAcl = SubjectToAcl;
+                    category.LimitedToStores = LimitedToStores;
+                    category.LimitedToStores = LimitedToStores;
+                    category.Published = published;
+                    category.UpdatedOnUtc = DateTime.Now;
+                    category.CreatedOnUtc = DateTime.Now;
+                    category.DisplayOrder = DisplayOrder;
+
+                    if (newProduct)
+                    {
+                        _categoryService.InsertCategory(category);
+                    }
+                    else
+                    {
+                        _categoryService.UpdateCategory(category);
+                    }
+
+                    seourl = category.ValidateSeName(seourl, category.Name, true);
+
+                    _urlRecordService.SaveSlug(category, seourl, 0);
+
+                    //search engine name
+                    //    _urlRecordService.SaveSlug(product, product.ValidateSeName(seName, product.Name, true), 0);
+
+
+                    //update "HasTierPrices" and "HasDiscountsApplied" properties
+                    //  _productService.UpdateHasTierPricesProperty(product);
+                    // _productService.UpdateHasDiscountsApplied(product);
+
+                    //next product
+                    iRow++;
+                }
+            }
+        }
 
         /// <summary>
         /// Import products from XLSX file
@@ -179,7 +325,7 @@ namespace Nop.Services.ExportImport
                     "AllowedQuantities",
                     "AllowAddingOnlyExistingAttributeCombinations",
                     "DisableBuyButton",
-                    "DisableWishlistButton",
+                    "DisableMyToyBoxButton",
                     "AvailableForPreOrder",
                     "PreOrderAvailabilityStartDateTimeUtc",
                     "CallForPrice",
@@ -293,7 +439,7 @@ namespace Nop.Services.ExportImport
                     string allowedQuantities = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "AllowedQuantities")].Value);
                     bool allowAddingOnlyExistingAttributeCombinations = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "AllowAddingOnlyExistingAttributeCombinations")].Value);
                     bool disableBuyButton = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "DisableBuyButton")].Value);
-                    bool disableWishlistButton = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "DisableWishlistButton")].Value);
+                    bool disableMyToyBoxButton = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "DisableMyToyBoxButton")].Value);
                     bool availableForPreOrder = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "AvailableForPreOrder")].Value);
                     DateTime? preOrderAvailabilityStartDateTimeUtc = null;
                     var preOrderAvailabilityStartDateTimeUtcExcel = worksheet.Cells[iRow, GetColumnIndex(properties, "PreOrderAvailabilityStartDateTimeUtc")].Value;
@@ -415,7 +561,7 @@ namespace Nop.Services.ExportImport
                     product.AllowedQuantities = allowedQuantities;
                     product.AllowAddingOnlyExistingAttributeCombinations = allowAddingOnlyExistingAttributeCombinations;
                     product.DisableBuyButton = disableBuyButton;
-                    product.DisableWishlistButton = disableWishlistButton;
+                    product.DisableMyToyBoxButton = disableMyToyBoxButton;
                     product.AvailableForPreOrder = availableForPreOrder;
                     product.PreOrderAvailabilityStartDateTimeUtc = preOrderAvailabilityStartDateTimeUtc;
                     product.CallForPrice = callForPrice;
@@ -682,6 +828,130 @@ namespace Nop.Services.ExportImport
                             DisplayOrder = displayOrder,
                         };
                         _stateProvinceService.InsertStateProvince(state);
+                    }
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public virtual int ImportCitiesFromTxt(Stream stream)
+        {
+            int count = 0;
+            using (var reader = new StreamReader(stream))
+            {
+                while (!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+                    if (String.IsNullOrWhiteSpace(line))
+                        continue;
+                    string[] tmp = line.Split(',');
+
+                    if (tmp.Length != 5)
+                        throw new NopException("Wrong file format");
+
+                    //parse
+                    var countryTwoLetterIsoCode = tmp[0].Trim();
+                    var name = tmp[1].Trim();
+                    var abbreviation = tmp[2].Trim();
+                    bool published = Boolean.Parse(tmp[3].Trim());
+                    int displayOrder = Int32.Parse(tmp[4].Trim());
+
+                    var state = _stateProvinceService.GetStateProvinceByAbbreviation(countryTwoLetterIsoCode);
+                    if (state == null)
+                    {
+                        //country cannot be loaded. skip
+                        continue;
+                    }
+
+                    //import
+                    var cities = _cityService.GetCitysByStateProvinceId(state.Id, showHidden: true);
+                    var city = cities.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (city != null)
+                    {
+                        city.Abbreviation = abbreviation;
+                        city.Published = published;
+                        city.DisplayOrder = displayOrder;
+                        _cityService.UpdateCity(city);
+                    }
+                    else
+                    {
+                        city = new City
+                        {
+                            StateProvinceId = state.Id,
+                            Name = name,
+                            Abbreviation = abbreviation,
+                            Published = published,
+                            DisplayOrder = displayOrder,
+                        };
+                        _cityService.InsertCity(city);
+                    }
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public virtual int ImportLocalitiesFromTxt(Stream stream)
+        {
+            int count = 0;
+            using (var reader = new StreamReader(stream))
+            {
+                while (!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+                    if (String.IsNullOrWhiteSpace(line))
+                        continue;
+                    string[] tmp = line.Split(',');
+
+                    if (tmp.Length != 7)
+                        throw new NopException("Wrong file format");
+
+                    //parse
+                    var countryTwoLetterIsoCode = tmp[0].Trim();
+                    var name = tmp[1].Trim();
+                    var abbreviation = tmp[2].Trim();
+                    var zipcode = tmp[3].Trim();
+                    var areaname = tmp[4].Trim();
+                    bool published = Boolean.Parse(tmp[5].Trim());
+                    int displayOrder = Int32.Parse(tmp[6].Trim());
+
+                    var city = _cityService.GetCityByAbbreviation(countryTwoLetterIsoCode);
+                    if (city == null)
+                    {
+                        //country cannot be loaded. skip
+                        continue;
+                    }
+
+                    //import
+                    var localities = _localityService.GetLocalitysByCityId(city.Id, showHidden: true);
+                    var locality = localities.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (locality != null)
+                    {
+                        locality.Abbreviation = abbreviation;
+                        locality.AreaName = areaname;
+                        locality.Pincode = zipcode;
+                        locality.Published = published;
+                        locality.DisplayOrder = displayOrder;
+                        _localityService.UpdateLocality(locality);
+                    }
+                    else
+                    {
+                        locality = new Locality
+                        {
+                            CityId = city.Id,
+                            Name = name,
+                            Pincode = zipcode,
+                            AreaName = areaname,
+                            Abbreviation = abbreviation,
+                            Published = published,
+                            DisplayOrder = displayOrder,
+                        };
+                        _localityService.InsertLocality(locality);
                     }
                     count++;
                 }

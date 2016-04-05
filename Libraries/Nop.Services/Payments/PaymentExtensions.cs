@@ -4,9 +4,9 @@ using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Payments;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 
 namespace Nop.Services.Payments
 {
@@ -42,13 +42,13 @@ namespace Nop.Services.Payments
         /// Calculate payment method fee
         /// </summary>
         /// <param name="paymentMethod">Payment method</param>
-        /// <param name="orderTotalCalculationService">Order total calculation service</param>
+        /// <param name="orderTotalCalculationService">SubscriptionOrder total calculation service</param>
         /// <param name="cart">Shopping cart</param>
         /// <param name="fee">Fee value</param>
         /// <param name="usePercentage">Is fee amount specified as percentage or fixed value?</param>
         /// <returns>Result</returns>
         public static decimal CalculateAdditionalFee(this IPaymentMethod paymentMethod, 
-            IOrderTotalCalculationService orderTotalCalculationService, IList<ShoppingCartItem> cart,
+            ISubscriptionOrderTotalCalculationService orderTotalCalculationService, IList<SubscriptionCartItem> cart,
             decimal fee, bool usePercentage)
         {
             if (paymentMethod == null)
@@ -60,7 +60,7 @@ namespace Nop.Services.Payments
             if (usePercentage)
             {
                 //percentage
-                var orderTotalWithoutPaymentFee = orderTotalCalculationService.GetShoppingCartTotal(cart, usePaymentMethodAdditionalFee: false);
+                var orderTotalWithoutPaymentFee = orderTotalCalculationService.GetSubscriptionCartTotal(cart, usePaymentMethodAdditionalFee: false);
                 result = (decimal)((((float)orderTotalWithoutPaymentFee) * ((float)fee)) / 100f);
             }
             else
@@ -104,11 +104,11 @@ namespace Nop.Services.Payments
             }
         }
         /// <summary>
-        /// Deerialize CustomValues of Order
+        /// Deerialize CustomValues of SubscriptionOrder
         /// </summary>
-        /// <param name="order">Order</param>
+        /// <param name="order">SubscriptionOrder</param>
         /// <returns>Serialized CustomValues CustomValues</returns>
-        public static Dictionary<string, object> DeserializeCustomValues(this Order order)
+        public static Dictionary<string, object> DeserializeCustomValues(this SubscriptionOrder order)
         {
             if (order == null)
                 throw new ArgumentNullException("order");

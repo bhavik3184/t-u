@@ -1,0 +1,10 @@
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.Fedex\Views\ShippingFedex\Configure.cshtml
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.Fedex\web.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.Fedex\Description.txt
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.Fedex\logo.jpg
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.Fedex\Nop.Plugin.Shipping.Fedex.dll.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.Fedex\Nop.Plugin.Shipping.Fedex.dll
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.Fedex\Nop.Plugin.Shipping.Fedex.pdb
+C:\projects\NewToys\Plugins\Nop.Plugin.Shipping.Fedex\obj\Debug\Nop.Plugin.Shipping.Fedex.csprojResolveAssemblyReference.cache
+C:\projects\NewToys\Plugins\Nop.Plugin.Shipping.Fedex\obj\Debug\Nop.Plugin.Shipping.Fedex.dll
+C:\projects\NewToys\Plugins\Nop.Plugin.Shipping.Fedex\obj\Debug\Nop.Plugin.Shipping.Fedex.pdb

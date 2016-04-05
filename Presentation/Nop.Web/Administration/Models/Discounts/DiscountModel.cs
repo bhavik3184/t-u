@@ -95,21 +95,21 @@ namespace Nop.Admin.Models.Discounts
         {
             public int DiscountId { get; set; }
 
-            [NopResourceDisplayName("Admin.Promotions.Discounts.History.Order")]
-            public int OrderId { get; set; }
+            [NopResourceDisplayName("Admin.Promotions.Discounts.History.SubscriptionOrder")]
+            public int SubscriptionOrderId { get; set; }
 
-            [NopResourceDisplayName("Admin.Promotions.Discounts.History.OrderTotal")]
-            public string OrderTotal { get; set; }
+            [NopResourceDisplayName("Admin.Promotions.Discounts.History.SubscriptionOrderTotal")]
+            public string SubscriptionOrderTotal { get; set; }
 
             [NopResourceDisplayName("Admin.Promotions.Discounts.History.CreatedOn")]
             public DateTime CreatedOn { get; set; }
         }
 
-        public partial class AppliedToCategoryModel : BaseNopModel
+        public partial class AppliedToMembershipCategoryModel : BaseNopModel
         {
-            public int CategoryId { get; set; }
+            public int MembershipCategoryId { get; set; }
 
-            public string CategoryName { get; set; }
+            public string MembershipCategoryName { get; set; }
         }
         public partial class AddCategoryToDiscountModel : BaseNopModel
         {
@@ -141,46 +141,46 @@ namespace Nop.Admin.Models.Discounts
         }
 
 
-        public partial class AppliedToProductModel : BaseNopModel
+        public partial class AppliedToPlanModel : BaseNopModel
         {
-            public int ProductId { get; set; }
+            public int PlanId { get; set; }
 
-            public string ProductName { get; set; }
+            public string PlanName { get; set; }
         }
-        public partial class AddProductToDiscountModel : BaseNopModel
+        public partial class AddPlanToDiscountModel : BaseNopModel
         {
-            public AddProductToDiscountModel()
+            public AddPlanToDiscountModel()
             {
                 AvailableCategories = new List<SelectListItem>();
                 AvailableManufacturers = new List<SelectListItem>();
                 AvailableStores = new List<SelectListItem>();
                 AvailableVendors = new List<SelectListItem>();
-                AvailableProductTypes = new List<SelectListItem>();
+                AvailablePlanTypes = new List<SelectListItem>();
             }
 
-            [NopResourceDisplayName("Admin.Catalog.Products.List.SearchProductName")]
+            [NopResourceDisplayName("Admin.Catalog.Plans.List.SearchPlanName")]
             [AllowHtml]
-            public string SearchProductName { get; set; }
-            [NopResourceDisplayName("Admin.Catalog.Products.List.SearchCategory")]
+            public string SearchPlanName { get; set; }
+            [NopResourceDisplayName("Admin.Catalog.Plans.List.SearchCategory")]
             public int SearchCategoryId { get; set; }
-            [NopResourceDisplayName("Admin.Catalog.Products.List.SearchManufacturer")]
+            [NopResourceDisplayName("Admin.Catalog.Plans.List.SearchManufacturer")]
             public int SearchManufacturerId { get; set; }
-            [NopResourceDisplayName("Admin.Catalog.Products.List.SearchStore")]
+            [NopResourceDisplayName("Admin.Catalog.Plans.List.SearchStore")]
             public int SearchStoreId { get; set; }
-            [NopResourceDisplayName("Admin.Catalog.Products.List.SearchVendor")]
+            [NopResourceDisplayName("Admin.Catalog.Plans.List.SearchVendor")]
             public int SearchVendorId { get; set; }
-            [NopResourceDisplayName("Admin.Catalog.Products.List.SearchProductType")]
-            public int SearchProductTypeId { get; set; }
+            [NopResourceDisplayName("Admin.Catalog.Plans.List.SearchPlanType")]
+            public int SearchPlanTypeId { get; set; }
 
             public IList<SelectListItem> AvailableCategories { get; set; }
             public IList<SelectListItem> AvailableManufacturers { get; set; }
             public IList<SelectListItem> AvailableStores { get; set; }
             public IList<SelectListItem> AvailableVendors { get; set; }
-            public IList<SelectListItem> AvailableProductTypes { get; set; }
+            public IList<SelectListItem> AvailablePlanTypes { get; set; }
 
             public int DiscountId { get; set; }
 
-            public int[] SelectedProductIds { get; set; }
+            public int[] SelectedPlanIds { get; set; }
         }
 
         #endregion

@@ -42,14 +42,14 @@ namespace Nop.Web.Infrastructure
                             new[] { "Nop.Web.Controllers" });
 
             //shopping cart
-            routes.MapLocalizedRoute("ShoppingCart",
+            routes.MapLocalizedRoute("BorrowCart",
                             "cart/",
-                            new { controller = "ShoppingCart", action = "Cart" },
+                            new { controller = "BorrowCart", action = "Cart" },
                             new[] { "Nop.Web.Controllers" });
-            //wishlist
-            routes.MapLocalizedRoute("Wishlist",
-                            "wishlist/{customerGuid}",
-                            new { controller = "ShoppingCart", action = "Wishlist", customerGuid = UrlParameter.Optional },
+            //mytoybox
+            routes.MapLocalizedRoute("MyToyBox",
+                            "mytoybox/{customerGuid}",
+                            new { controller = "BorrowCart", action = "MyToyBox", customerGuid = UrlParameter.Optional },
                             new[] { "Nop.Web.Controllers" });
 
             //customer account links
@@ -66,6 +66,10 @@ namespace Nop.Web.Infrastructure
                             new { controller = "Order", action = "CustomerOrders" },
                             new[] { "Nop.Web.Controllers" });
 
+            routes.MapLocalizedRoute("CustomerSubscriptionOrders",
+                           "subscriptionorder/history",
+                           new { controller = "SubscriptionOrder", action = "CustomerSubscriptionOrders" },
+                           new[] { "Nop.Web.Controllers" });
             //contact us
             routes.MapLocalizedRoute("ContactUs",
                             "contactus",
@@ -76,6 +80,26 @@ namespace Nop.Web.Infrastructure
                             "sitemap",
                             new { controller = "Common", action = "Sitemap" },
                             new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("removeproducttocart",
+                  "removeproducttocart/",
+                  new { controller = "BorrowCart", action = "RemoveProductToCart_Catalog" },
+                  new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("borrowproduct",
+                 "borrowproduct/",
+                 new { controller = "BorrowCart", action = "borrowproduct_Catalog" },
+                 new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("removeproducttobox",
+                "removeproducttobox/",
+                new { controller = "BorrowCart", action = "RemoveProductToBox_Catalog" },
+                new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("borrowmytoyboxproduct",
+                 "borrowmytoyboxproduct/",
+                 new { controller = "BorrowCart", action = "borrowmytoyboxproduct_Catalog" },
+                 new[] { "Nop.Web.Controllers" });
 
             //product search
             routes.MapLocalizedRoute("ProductSearch",
@@ -159,16 +183,36 @@ namespace Nop.Web.Infrastructure
 
             //add product to cart (without any attributes and options). used on catalog pages.
             routes.MapLocalizedRoute("AddProductToCart-Catalog",
-                            "addproducttocart/catalog/{productId}/{shoppingCartTypeId}/{quantity}",
-                            new { controller = "ShoppingCart", action = "AddProductToCart_Catalog" },
-                            new { productId = @"\d+", shoppingCartTypeId = @"\d+", quantity = @"\d+" },
+                            "addproducttocart/catalog/{productId}/{borrowCartTypeId}/{quantity}",
+                            new { controller = "BorrowCart", action = "AddProductToCart_Catalog" },
+                            new { productId = @"\d+", borrowCartTypeId = @"\d+", quantity = @"\d+" },
                             new[] { "Nop.Web.Controllers" });
             //add product to cart (with attributes and options). used on the product details pages.
             routes.MapLocalizedRoute("AddProductToCart-Details",
-                            "addproducttocart/details/{productId}/{shoppingCartTypeId}",
-                            new { controller = "ShoppingCart", action = "AddProductToCart_Details" },
-                            new { productId = @"\d+", shoppingCartTypeId = @"\d+" },
+                            "addproducttocart/details/{productId}/{borrowCartTypeId}",
+                            new { controller = "BorrowCart", action = "AddProductToCart_Details" },
+                            new { productId = @"\d+", borrowCartTypeId = @"\d+" },
                             new[] { "Nop.Web.Controllers" });
+
+
+            //add product to cart (without any attributes and options). used on catalog pages.
+            routes.MapLocalizedRoute("AddPlanToCart-Catalog",
+                            "addplantocart/catalog/{planId}/{borrowCartTypeId}/{quantity}",
+                            new { controller = "SubscriptionCart", action = "AddPlanToCart_Catalog" },
+                            new { planId = @"\d+", borrowCartTypeId = @"\d+", quantity = @"\d+" },
+                            new[] { "Nop.Web.Controllers" });
+
+            //add product to cart (with attributes and options). used on the product details pages.
+            routes.MapLocalizedRoute("AddPlanToCart-Details",
+                            "addplantocart/details/{planId}/{borrowCartTypeId}",
+                            new { controller = "SubscriptionCart", action = "AddPlanToCart_Details" },
+                            new { planId = @"\d+", borrowCartTypeId = @"\d+" },
+                            new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("SubscriptionCart",
+                "subscriptioncart/",
+                new { controller = "SubscriptionCart", action = "Cart" },
+                new[] { "Nop.Web.Controllers" });
 
             //product tags
             routes.MapLocalizedRoute("ProductsByTag",
@@ -249,6 +293,11 @@ namespace Nop.Web.Infrastructure
                             "checkout/confirm",
                             new { controller = "Checkout", action = "Confirm" },
                             new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("CartConfirm",
+                       "cart/confirm",
+                       new { controller = "SubscriptionCart", action = "Confirm" },
+                       new[] { "Nop.Web.Controllers" });
             routes.MapLocalizedRoute("CheckoutCompleted",
                             "checkout/completed/{orderId}",
                             new { controller = "Checkout", action = "Completed", orderId = UrlParameter.Optional },
@@ -261,10 +310,10 @@ namespace Nop.Web.Infrastructure
                             new { controller = "Newsletter", action = "SubscribeNewsletter" },
                             new[] { "Nop.Web.Controllers" });
 
-            //email wishlist
-            routes.MapLocalizedRoute("EmailWishlist",
-                            "emailwishlist",
-                            new { controller = "ShoppingCart", action = "EmailWishlist" },
+            //email mytoybox
+            routes.MapLocalizedRoute("EmailMyToyBox",
+                            "emailmytoybox",
+                            new { controller = "BorrowCart", action = "EmailMyToyBox" },
                             new[] { "Nop.Web.Controllers" });
 
             //login page for checkout as guest
@@ -332,9 +381,25 @@ namespace Nop.Web.Infrastructure
 
             //customer account links
             routes.MapLocalizedRoute("CustomerReturnRequests",
-                            "returnrequest/history",
+                            "returnrequest/pending",
                             new { controller = "ReturnRequest", action = "CustomerReturnRequests" },
                             new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("CustomerReturnedItems",
+                       "returneditems/",
+                       new { controller = "ReturnRequest", action = "CustomerReturnedItems" },
+                       new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("CustomerPendingDeliveryItems",
+                   "pendingdelivery/",
+                   new { controller = "ReturnRequest", action = "CustomerPendingDeliveryItems" },
+                   new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("CustomerDeliveredItems",
+                   "delivereditems/",
+                   new { controller = "ReturnRequest", action = "CustomerDeliveredItems" },
+                   new[] { "Nop.Web.Controllers" });
+
             routes.MapLocalizedRoute("CustomerDownloadableProducts",
                             "customer/downloadableproducts",
                             new { controller = "Customer", action = "DownloadableProducts" },
@@ -352,6 +417,12 @@ namespace Nop.Web.Infrastructure
                             "rewardpoints/history",
                             new { controller = "Order", action = "CustomerRewardPoints" },
                             new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("Dashboard",
+                            "customer/dashboard",
+                            new { controller = "Customer", action = "Dashboard" },
+                            new[] { "Nop.Web.Controllers" });
+
             routes.MapLocalizedRoute("CustomerChangePassword",
                             "customer/changepassword",
                             new { controller = "Customer", action = "ChangePassword" },
@@ -399,6 +470,32 @@ namespace Nop.Web.Infrastructure
                             new { id = @"\d+", page = @"\d+" },
                             new[] { "Nop.Web.Controllers" });
 
+            //Subscription
+            routes.MapLocalizedRoute("SubscriptionOrderDetails",
+                          "subscriptionplandetails/{orderId}",
+                          new { controller = "SubscriptionOrder", action = "Details" },
+                          new { orderId = @"\d+" },
+                          new[] { "Nop.Web.Controllers" });
+
+         
+           
+
+            routes.MapLocalizedRoute("ReSubscriptionOrder",
+                            "resubscriptionplan/{orderId}",
+                            new { controller = "SubscriptionOrder", action = "ReSubscriptionOrder" },
+                            new { orderId = @"\d+" },
+                            new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("GetSubscriptionOrderPdfInvoice",
+                            "subscriptionplandetails/pdf/{orderId}",
+                            new { controller = "SubscriptionOrder", action = "GetPdfInvoice" },
+                            new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("PrintSubscriptionOrderDetails",
+                            "subscriptionplandetails/print/{orderId}",
+                            new { controller = "SubscriptionOrder", action = "PrintSubscriptionOrderDetails" },
+                            new[] { "Nop.Web.Controllers" });
+
             //orders
             routes.MapLocalizedRoute("OrderDetails",
                             "orderdetails/{orderId}",
@@ -409,6 +506,13 @@ namespace Nop.Web.Infrastructure
                             "orderdetails/shipment/{shipmentId}",
                             new { controller = "Order", action = "ShipmentDetails" },
                             new[] { "Nop.Web.Controllers" });
+
+             routes.MapLocalizedRoute("ReturnItems",
+                            "returnitems/{orderItemId}",
+                            new { controller = "ReturnRequest", action = "ReturnItems" },
+                            new { orderItemId = @"\d+" },
+                             new[] { "Nop.Web.Controllers" });
+
             routes.MapLocalizedRoute("ReturnRequest",
                             "returnrequest/{orderId}",
                             new { controller = "ReturnRequest", action = "ReturnRequest" },
@@ -488,6 +592,17 @@ namespace Nop.Web.Infrastructure
                             new { controller = "Country", action = "GetStatesByCountryId" },
                             new[] { "Nop.Web.Controllers" });
 
+            routes.MapRoute("GetCitiesByStateProvinceId",
+                           "country/getcitiesbystateprovinceid/",
+                           new { controller = "Country", action = "GetCitiesByStateProvinceId" },
+                           new[] { "Nop.Web.Controllers" });
+
+            routes.MapRoute("GetLocalitiesByCityId",
+                          "country/getlocalitiesbycityid/",
+                          new { controller = "Country", action = "GetLocalitiesByCityId" },
+                          new[] { "Nop.Web.Controllers" });
+
+
             //EU Cookie law accept button handler (AJAX link)
             routes.MapRoute("EuCookieLawAccept",
                             "eucookielawaccept",
@@ -503,13 +618,13 @@ namespace Nop.Web.Infrastructure
             //product attributes with "upload file" type
             routes.MapLocalizedRoute("UploadFileProductAttribute",
                             "uploadfileproductattribute/{attributeId}",
-                            new { controller = "ShoppingCart", action = "UploadFileProductAttribute" },
+                            new { controller = "BorrowCart", action = "UploadFileProductAttribute" },
                             new { attributeId = @"\d+" },
                             new[] { "Nop.Web.Controllers" });
             //checkout attributes with "upload file" type
             routes.MapLocalizedRoute("UploadFileCheckoutAttribute",
                             "uploadfilecheckoutattribute/{attributeId}",
-                            new { controller = "ShoppingCart", action = "UploadFileCheckoutAttribute" },
+                            new { controller = "BorrowCart", action = "UploadFileCheckoutAttribute" },
                             new { attributeId = @"\d+" },
                             new[] { "Nop.Web.Controllers" });
             

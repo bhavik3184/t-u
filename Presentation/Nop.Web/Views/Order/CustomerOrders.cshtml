@@ -11,7 +11,7 @@
 {
     @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.Orders })
 }
-<div class="page account-page order-list-page">
+<div class="page account-page order-list-page article">
     <div class="page-title">
         <h1>@T("Account.MyAccount") - @T("Account.CustomerOrders")</h1>
     </div>
@@ -81,7 +81,7 @@
                                             @item.CyclesRemaining
                                         </td>
                                         <td class="initial-order">
-                                            <a href="@Url.RouteUrl("OrderDetails", new { orderId = item.InitialOrderId })">@string.Format(T("Account.CustomerOrders.RecurringOrders.ViewInitialOrder").Text, item.InitialOrderId)</a>
+                                            <a href="@Url.RouteUrl("OrderDetails", new { orderId = item.InitialSubscriptionOrderId })">@string.Format(T("Account.CustomerOrders.RecurringOrders.ViewInitialOrder").Text, item.InitialSubscriptionOrderId)</a>
                                         </td>
                                         <td class="cancel">
                                             @if (item.CanCancel)
@@ -98,39 +98,39 @@
             </div>
             if (Model.CancelRecurringPaymentErrors.Count > 0)
             {
-            <div class="message-error">
-                <ul>
-                    @foreach (var error in Model.CancelRecurringPaymentErrors)
-                    {
-                        <li>@error</li>
-                    }
-                </ul>
-            </div>
+                <div class="message-error">
+                    <ul>
+                        @foreach (var error in Model.CancelRecurringPaymentErrors)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                </div>
             }
         }
-        
+
         @if (Model.Orders.Count > 0)
         {
             <div class="order-list">
                 @foreach (var order in Model.Orders)
                 {
-                <div class="section order-item">
-                    <div class="title">
-                        <strong>@T("Account.CustomerOrders.OrderNumber"): @order.Id</strong>
+                    <div class="section order-item">
+                        <div class="title">
+                            <strong>@T("Account.CustomerOrders.OrderNumber"): @order.Id</strong>
+                        </div>
+                        <ul class="info">
+                            <li>@T("Account.CustomerOrders.SubscriptionOrderStatus"): <span class="order-status @order.SubscriptionOrderStatusEnum.ToString().ToLowerInvariant()">@order.SubscriptionOrderStatus</span></li>
+                            <li>@T("Account.CustomerOrders.OrderDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
+                            <li>@T("Account.CustomerOrders.OrderTotal"): <span class="order-total">@order.OrderTotal</span></li>
+                        </ul>
+                        <div class="buttons">
+                            @if (order.IsReturnRequestAllowed)
+                            {
+                                <input type="button" value="@T("Account.CustomerOrders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
+                            }
+                            <input type="button" value="@T("Account.CustomerOrders.OrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("OrderDetails", new { orderId = order.Id })')" />
+                        </div>
                     </div>
-                    <ul class="info">
-                        <li>@T("Account.CustomerOrders.OrderStatus"): <span class="order-status @order.OrderStatusEnum.ToString().ToLowerInvariant()">@order.OrderStatus</span></li>
-                        <li>@T("Account.CustomerOrders.OrderDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
-                        <li>@T("Account.CustomerOrders.OrderTotal"): <span class="order-total">@order.OrderTotal</span></li>
-                    </ul>
-                    <div class="buttons">
-                        @if (order.IsReturnRequestAllowed)
-                        {
-                            <input type="button" value="@T("Account.CustomerOrders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
-                        }
-                        <input type="button" value="@T("Account.CustomerOrders.OrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("OrderDetails", new { orderId = order.Id })')" />
-                    </div>
-                </div>
                 }
             </div>
         }

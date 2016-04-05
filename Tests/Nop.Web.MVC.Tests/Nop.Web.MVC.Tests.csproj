@@ -156,10 +156,6 @@
       <Project>{4F1F649C-1020-45BE-A487-F416D9297FF3}</Project>
       <Name>Nop.Web</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Nop.Tests\Nop.Tests.csproj">
-      <Project>{1D9EB579-3630-468A-BE94-49E7DF4F6E1D}</Project>
-      <Name>Nop.Tests</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

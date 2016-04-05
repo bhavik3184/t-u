@@ -37,9 +37,9 @@ namespace Nop.Admin.Models.Settings
         public bool AllowCustomersToDeletePosts { get; set; }
         public bool AllowCustomersToDeletePosts_OverrideForStore { get; set; }
 
-        [NopResourceDisplayName("Admin.Configuration.Settings.Forums.AllowCustomersToManageSubscriptions")]
-        public bool AllowCustomersToManageSubscriptions { get; set; }
-        public bool AllowCustomersToManageSubscriptions_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Admin.Configuration.Settings.Forums.AllowCustomersToManageSubscriptionOrders")]
+        public bool AllowCustomersToManageSubscriptionOrders { get; set; }
+        public bool AllowCustomersToManageSubscriptionOrders_OverrideForStore { get; set; }
 
         [NopResourceDisplayName("Admin.Configuration.Settings.Forums.TopicsPageSize")]
         public int TopicsPageSize { get; set; }

@@ -159,7 +159,7 @@ namespace Nop.Services.Catalog
         /// Updates subscription
         /// </summary>
         /// <param name="subscription">Subscription</param>
-        public virtual void UpdateSubscription(BackInStockSubscription subscription)
+        public virtual void UpdateSubscriptionOrder(BackInStockSubscription subscription)
         {
             if (subscription == null)
                 throw new ArgumentNullException("subscription");

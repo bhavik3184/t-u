@@ -45,6 +45,8 @@ namespace Nop.Core.Domain.Tax
         /// </summary>
         public bool AllowCustomersToSelectTaxDisplayType { get; set; }
 
+        public bool ForceTaxExclusionFromSubscriptionOrderSubtotal { get; set; }
+        
         /// <summary>
         /// Gets or sets a value indicating whether to hide zero tax
         /// </summary>
@@ -54,7 +56,7 @@ namespace Nop.Core.Domain.Tax
         /// Gets or sets a value indicating whether to hide tax in order summary when prices are shown tax inclusive
         /// </summary>
         public bool HideTaxInOrderSummary { get; set; }
-
+        public bool HideTaxInSubscriptionOrderSummary { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether we should always exclude tax from order subtotal (no matter of selected tax dispay type)
         /// </summary>

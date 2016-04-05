@@ -1,0 +1,10 @@
+﻿@using Nop.Web.Framework.UI
+@{
+    Layout = "";
+
+    Html.AddCssFileParts("~/Plugins/ExternalAuth.Google/Content/googlestyles.css");    
+}
+<fieldset class="google-login-block">
+    <legend>@T("Plugins.ExternalAuth.Google.Login")</legend>
+    <a href="@Url.RouteUrl("Plugin.ExternalAuth.Google.Login", new { ReturnUrl = HttpContext.Current.Request.QueryString["ReturnUrl"] })" class="google-btn">&nbsp;</a>
+</fieldset>

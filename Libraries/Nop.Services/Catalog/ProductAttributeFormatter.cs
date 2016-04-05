@@ -4,7 +4,7 @@ using System.Web;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Html;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
@@ -28,7 +28,7 @@ namespace Nop.Services.Catalog
         private readonly IDownloadService _downloadService;
         private readonly IWebHelper _webHelper;
         private readonly IPriceCalculationService _priceCalculationService;
-        private readonly ShoppingCartSettings _shoppingCartSettings;
+        private readonly BorrowCartSettings _borrowCartSettings;
 
         public ProductAttributeFormatter(IWorkContext workContext,
             IProductAttributeService productAttributeService,
@@ -40,7 +40,7 @@ namespace Nop.Services.Catalog
             IDownloadService downloadService,
             IWebHelper webHelper,
             IPriceCalculationService priceCalculationService,
-            ShoppingCartSettings shoppingCartSettings)
+            BorrowCartSettings borrowCartSettings)
         {
             this._workContext = workContext;
             this._productAttributeService = productAttributeService;
@@ -52,7 +52,7 @@ namespace Nop.Services.Catalog
             this._downloadService = downloadService;
             this._webHelper = webHelper;
             this._priceCalculationService = priceCalculationService;
-            this._shoppingCartSettings = shoppingCartSettings;
+            this._borrowCartSettings = borrowCartSettings;
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace Nop.Services.Catalog
                                     }
 
                                     //display quantity
-                                    if (_shoppingCartSettings.RenderAssociatedAttributeValueQuantity &&
+                                    if (_borrowCartSettings.RenderAssociatedAttributeValueQuantity &&
                                         attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct)
                                     {
                                         //render only when more than 1

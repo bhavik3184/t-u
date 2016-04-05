@@ -62,7 +62,7 @@ namespace Nop.Services.Catalog
         /// Updates subscription
         /// </summary>
         /// <param name="subscription">Subscription</param>
-        void UpdateSubscription(BackInStockSubscription subscription);
+        void UpdateSubscriptionOrder(BackInStockSubscription subscription);
 
         /// <summary>
         /// Send notification to subscribers

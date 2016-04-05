@@ -13,13 +13,13 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    <div class="page account-page address-edit-page">
+    <div class="page account-page address-edit-page  article">
         <div class="page-title">
             <h1>@T("Account.MyAccount") - @T("Account.CustomerAddresses.AddNew")</h1>
         </div>
         <div class="page-body">
             @{
-                var validationSummary = Html.ValidationSummary(true);
+    var validationSummary = Html.ValidationSummary(true);
             }
             @if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
             {

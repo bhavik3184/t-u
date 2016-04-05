@@ -1,4 +1,4 @@
-namespace Nop.Core.Domain.Orders
+namespace Nop.Core.Domain.SubscriptionOrders
 {
     /// <summary>
     /// Represents an "order by country" report line

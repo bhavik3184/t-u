@@ -5,8 +5,8 @@ namespace Nop.Admin.Models.Orders
 {
     public partial class OrderAverageReportLineSummaryModel : BaseNopModel
     {
-        [NopResourceDisplayName("Admin.SalesReport.Average.OrderStatus")]
-        public string OrderStatus { get; set; }
+        [NopResourceDisplayName("Admin.SalesReport.Average.SubscriptionOrderStatus")]
+        public string SubscriptionOrderStatus { get; set; }
 
         [NopResourceDisplayName("Admin.SalesReport.Average.SumTodayOrders")]
         public string SumTodayOrders { get; set; }

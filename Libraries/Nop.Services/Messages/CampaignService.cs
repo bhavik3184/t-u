@@ -126,7 +126,7 @@ namespace Nop.Services.Messages
         /// </summary>
         /// <param name="campaign">Campaign</param>
         /// <param name="emailAccount">Email account</param>
-        /// <param name="subscriptions">Subscriptions</param>
+        /// <param name="subscriptions">SubscriptionOrders</param>
         /// <returns>Total emails sent</returns>
         public virtual int SendCampaign(Campaign campaign, EmailAccount emailAccount,
             IEnumerable<NewsLetterSubscription> subscriptions)

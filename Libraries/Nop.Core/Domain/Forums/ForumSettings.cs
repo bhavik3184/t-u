@@ -22,7 +22,7 @@ namespace Nop.Core.Domain.Forums
         /// <summary>
         /// Gets or sets a value indicating whether customers are allowed to manage their subscriptions
         /// </summary>
-        public bool AllowCustomersToManageSubscriptions { get; set; }
+        public bool AllowCustomersToManageSubscriptionOrders { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether guests are allowed to create posts

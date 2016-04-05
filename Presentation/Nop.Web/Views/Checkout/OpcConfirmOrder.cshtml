@@ -23,7 +23,7 @@
     </div>
     @Html.Widget("op_checkout_confirm_bottom")
     <div class="section order-summary">
-        @Html.Action("OrderSummary", "ShoppingCart", new { prepareAndDisplayOrderReviewData = true })
+        @Html.Action("OrderSummary", "BorrowCart", new { prepareAndDisplayOrderReviewData = true })
     </div>    
     @if (String.IsNullOrEmpty(Model.MinOrderTotalWarning) && Model.TermsOfServiceOnOrderConfirmPage)
     {

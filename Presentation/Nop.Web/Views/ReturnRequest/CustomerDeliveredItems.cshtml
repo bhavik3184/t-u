@@ -1,0 +1,157 @@
+﻿@using Nop.Web.Models.Catalog;
+@model DeliveryBatchListModel
+
+@using Nop.Web.Models.Customer
+@using Nop.Web.Models.Order
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+}
+@section left
+{
+    @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.DeliveredItems })
+}
+<script type="text/javascript">
+    $(function () {
+        $("[data-toggle=popover]").popover({
+            html: true,
+            content: function () {
+                var content = $(this).attr("data-popover-content");
+                return $(content).children(".popover-body").html();
+            },
+            title: function () {
+                var title = $(this).attr("data-popover-content");
+                return $(title).children(".popover-heading").html();
+            }
+        });
+    });
+</script>
+<div class="page account-page return-request-list-page  article">
+    <div class="page-title">
+        <h1>Delivered Items</h1>
+    </div>
+    <div class="page-body">
+        @if (Model.DeliveryList.Count > 0)
+        {
+            foreach (var item1 in Model.DeliveryList)
+            {
+              
+                 if (item1.Deliveries.Count > 0)
+                    {
+                        <div class="col-sm-12" style="padding: 30px 0; border-bottom: 1px solid #ccc;">
+                            @if (@item1.BatchId > 0)
+                            {
+                            <h3 class="col-sm-6">Transaction Id: @item1.BatchId</h3>
+                            }
+                            <div class="col-sm-6">
+                                @foreach (var itemShipment in item1.Shipments)
+                                {
+
+                                    <table>
+                                        <tr>
+                                            <th class="product-picture">
+                                                Shipped Date
+                                            </th>
+                                            <th class="product-picture">
+                                                Delivered Date
+                                            </th>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="sku">
+                                                <span class="sku-number">@itemShipment.ShippedDate</span>
+                                            </td>
+                                            <td class="sku">
+                                                <span class="sku-number">@itemShipment.DeliveryDate</span>
+                                            </td>
+
+                                        </tr>
+                                    </table>
+
+                                }
+                                @if (item1.IsPendingReturn ==true) { 
+                                <div class="cart-options">
+                                    <div class="common-buttons">
+                                        <input type="button" onclick="location.href = '/returnitems/@(item1.BatchId)';" name="updatecart" value="Return Items" class="button-2 update-cart-button" />
+                                    </div>
+                                </div>
+                                }
+                            </div>
+
+                            <table class="cart">
+                                <colgroup>
+                                    <col width="1" />
+                                    <col width="1" />
+                                    <col width="1" />
+                                    <col />
+                                    <col width="1" />
+                                    <col width="1" />
+                                    <col width="1" />
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th class="sku">
+                                            @T("BorrowCart.SKU")
+                                        </th>
+                                        <th class="product-picture">
+                                            @T("BorrowCart.Image")
+                                        </th>
+                                        <th class="product">
+                                            @T("BorrowCart.Product(s)")
+                                        </th>
+                                        <th class="sku">
+                                            Status
+                                        </th>
+
+                                        <th class="subtotal">
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in item1.Deliveries)
+                                            {
+                                                if (item.IsPendingDelivery == false)
+                                                {
+                                            <tr>
+                                                <td class="sku">
+                                                    <span class="sku-number">@item.Sku</span>
+                                                </td>
+                                                <td class="product-picture">
+                                                    <img src="@item.DefaultPictureModel.ImageUrl" />
+                                                </td>
+                                                <td class="product">
+                                                    @item.ProductName
+                                                </td>
+
+                                                <td class="subtotal">
+                                                    @item.ReturnStatus
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="5"></td>
+                                            </tr>
+                                                }
+                                            }
+                                </tbody>
+                                <tfoot>
+
+                                </tfoot>
+                            </table>
+                        </div>
+                    }
+
+            }
+
+
+        }
+        else
+        {
+            <div class="no-data" style="padding:25px 0;">
+                <h4>Delivered items not found.</h4>
+            </div>
+        }
+    </div>
+
+</div>

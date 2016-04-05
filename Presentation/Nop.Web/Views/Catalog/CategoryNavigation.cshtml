@@ -53,19 +53,22 @@
             }
         }
     </li>
+   
 }
 @if (Model.Categories.Count > 0)
 {
-    <div class="block block-category-navigation">
-        <div class="title">
+    <div class="block block-category-navigation widget woocommerce widget_product_categories shoppagewidget orange" style="padding: 40px; border-radius: 10px; margin-bottom: 40px;">
+        <div class="widgetnails"></div>
+        <h3 class="widget-title">
             <strong>@T("Categories")</strong>
-        </div>
+        </h3>
         <div class="listbox">
             <ul class="list">
                 @foreach (var category in Model.Categories)
                 {
                     @RenderCategoryLine(category)
                 }
+
             </ul>
         </div>
     </div>

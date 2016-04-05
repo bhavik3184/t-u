@@ -10,32 +10,25 @@
     //store name
     var storeName = EngineContext.Current.Resolve<IStoreContext>().CurrentStore.GetLocalized(x => x.Name);
 }
-<div class="header">
+<link rel='stylesheet' id='redux-google-fonts-unf_options-css' href='http://fonts.googleapis.com/css?family=Lato%3A100%2C300%2C400%2C700%2C900%2C100italic%2C300italic%2C400italic%2C700italic%2C900italic%7CRancho%3A400&#038;subset=latin' type='text/css' media='all' />
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="/Themes/DefaultClean/Content/css/bootstrap-dropdownhover.min.css" type='text/css' media='all' / >
+<div class="header" id="header">
     @Html.Widget("header")
     <div class="header-upper">
-        <div class="header-selectors-wrapper">
-            
-            @Html.Action("TaxTypeSelector", "Common")
-            
-            @Html.Action("CurrencySelector", "Common")
-            
-            @Html.Action("LanguageSelector", "Common")
-            
-            @Html.Widget("header_selectors")
-        </div>
-        <div class="header-links-wrapper">
+        <div class="header-links-wrapper" style="width:100%;">
             @Html.Action("HeaderLinks", "Common")
-            @Html.Action("FlyoutShoppingCart", "ShoppingCart")
+            @*@Html.Action("FlyoutBorrowCart", "BorrowCart")*@
+
         </div>
+      
     </div>
-    <div class="header-lower">
-        <div class="header-logo">
-            <a href="@Url.RouteUrl("HomePage")">
-                <img title="" alt="@storeName" src="@Url.Content(logoPath)">
-            </a>
-        </div>
-        <div class="search-box store-search-box">
-            @Html.Action("SearchBox", "Catalog")
-        </div>
+   
+     
+    <div class="logo">
+        <a href="@Url.RouteUrl("HomePage")">
+            <img title="" alt="@storeName" src="@Url.Content(logoPath)">
+        </a>
     </div>
 </div>

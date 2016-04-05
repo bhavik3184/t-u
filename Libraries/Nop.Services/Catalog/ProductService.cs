@@ -8,7 +8,7 @@ using Nop.Core.Data;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Localization;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
@@ -1213,7 +1213,7 @@ namespace Nop.Services.Catalog
                     {
                         case LowStockActivity.DisableBuyButton:
                             product.DisableBuyButton = true;
-                            product.DisableWishlistButton = true;
+                            product.DisableMyToyBoxButton = true;
                             UpdateProduct(product);
                             break;
                         case LowStockActivity.Unpublish:
@@ -1233,7 +1233,7 @@ namespace Nop.Services.Catalog
                         {
                             case LowStockActivity.DisableBuyButton:
                                 product.DisableBuyButton = false;
-                                product.DisableWishlistButton = false;
+                                product.DisableMyToyBoxButton = false;
                                 UpdateProduct(product);
                                 break;
                             case LowStockActivity.Unpublish:
@@ -1630,7 +1630,7 @@ namespace Nop.Services.Catalog
         /// <param name="cart">Shopping cart</param>
         /// <param name="numberOfProducts">Number of products to return</param>
         /// <returns>Cross-sells</returns>
-        public virtual IList<Product> GetCrosssellProductsByShoppingCart(IList<ShoppingCartItem> cart, int numberOfProducts)
+        public virtual IList<Product> GetCrosssellProductsByBorrowCart(IList<BorrowCartItem> cart, int numberOfProducts)
         {
             var result = new List<Product>();
 

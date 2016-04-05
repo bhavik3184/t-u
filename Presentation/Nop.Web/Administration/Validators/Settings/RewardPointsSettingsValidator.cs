@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Nop.Admin.Models.Settings;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Validators;
 
@@ -10,8 +10,8 @@ namespace Nop.Admin.Validators.Settings
     {
         public RewardPointsSettingsValidator(ILocalizationService localizationService)
         {
-            RuleFor(x => x.PointsForPurchases_Awarded).NotEqual((int)OrderStatus.Pending).WithMessage(localizationService.GetResource("Admin.Configuration.Settings.RewardPoints.PointsForPurchases_Awarded.Pending"));
-            RuleFor(x => x.PointsForPurchases_Canceled).NotEqual((int)OrderStatus.Pending).WithMessage(localizationService.GetResource("Admin.Configuration.Settings.RewardPoints.PointsForPurchases_Canceled.Pending"));
+            RuleFor(x => x.PointsForPurchases_Awarded).NotEqual((int)SubscriptionOrderStatus.Pending).WithMessage(localizationService.GetResource("Admin.Configuration.Settings.RewardPoints.PointsForPurchases_Awarded.Pending"));
+            RuleFor(x => x.PointsForPurchases_Canceled).NotEqual((int)SubscriptionOrderStatus.Pending).WithMessage(localizationService.GetResource("Admin.Configuration.Settings.RewardPoints.PointsForPurchases_Canceled.Pending"));
         }
     }
 }

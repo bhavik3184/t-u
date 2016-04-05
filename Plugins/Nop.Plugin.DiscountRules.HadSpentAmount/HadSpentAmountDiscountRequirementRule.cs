@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Plugins;
 using Nop.Services.Configuration;
 using Nop.Services.Discounts;
 using Nop.Services.Localization;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 
 namespace Nop.Plugin.DiscountRules.HadSpentAmount
 {
@@ -15,11 +15,11 @@ namespace Nop.Plugin.DiscountRules.HadSpentAmount
     {
         private readonly ILocalizationService _localizationService;
         private readonly ISettingService _settingService;
-        private readonly IOrderService _orderService;
+        private readonly ISubscriptionOrderService _orderService;
 
         public HadSpentAmountDiscountRequirementRule(ILocalizationService localizationService,
             ISettingService settingService, 
-            IOrderService orderService)
+            ISubscriptionOrderService orderService)
         {
             this._localizationService = localizationService;
             this._settingService = settingService;
@@ -49,10 +49,10 @@ namespace Nop.Plugin.DiscountRules.HadSpentAmount
 
             if (request.Customer == null || request.Customer.IsGuest())
                 return result;
-            var orders = _orderService.SearchOrders(storeId: request.Store.Id, 
-                customerId: request.Customer.Id, 
-                os: OrderStatus.Complete);
-            decimal spentAmount = orders.Sum(o => o.OrderTotal);
+            var orders = _orderService.SearchSubscriptionOrders(storeId: request.Store.Id, 
+                customerId: request.Customer.Id,
+                os: SubscriptionOrderStatus.Complete);
+            decimal spentAmount = orders.Sum(o => o.SubscriptionOrderTotal);
             if (spentAmount > spentAmountRequirement)
             {
                 result.IsValid = true;

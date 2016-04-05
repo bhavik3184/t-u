@@ -117,7 +117,7 @@ namespace Nop.Web.Controllers
             if (subscription == null)
                 return RedirectToRoute("HomePage");
 
-            var model = new SubscriptionActivationModel();
+            var model = new SubscriptionOrderActivationModel();
 
             if (active)
             {

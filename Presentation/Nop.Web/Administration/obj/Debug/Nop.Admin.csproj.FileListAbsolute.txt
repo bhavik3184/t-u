@@ -1,0 +1,12 @@
+C:\projects\NewToys\Presentation\Nop.Web\bin\Nop.Admin.dll.config
+C:\projects\NewToys\Presentation\Nop.Web\bin\Nop.Admin.dll
+C:\projects\NewToys\Presentation\Nop.Web\bin\Nop.Admin.pdb
+C:\projects\NewToys\Presentation\Nop.Web\Administration\obj\Debug\Nop.Admin.csprojResolveAssemblyReference.cache
+C:\projects\NewToys\Presentation\Nop.Web\Administration\obj\Debug\Nop.Admin.dll
+C:\projects\NewToys\Presentation\Nop.Web\Administration\obj\Debug\Nop.Admin.pdb
+C:\projects\ToysAndUs\Presentation\Nop.Web\bin\Nop.Admin.dll.config
+C:\projects\ToysAndUs\Presentation\Nop.Web\bin\Nop.Admin.dll
+C:\projects\ToysAndUs\Presentation\Nop.Web\bin\Nop.Admin.pdb
+C:\projects\ToysAndUs\Presentation\Nop.Web\Administration\obj\Debug\Nop.Admin.csprojResolveAssemblyReference.cache
+C:\projects\ToysAndUs\Presentation\Nop.Web\Administration\obj\Debug\Nop.Admin.dll
+C:\projects\ToysAndUs\Presentation\Nop.Web\Administration\obj\Debug\Nop.Admin.pdb

@@ -10,12 +10,12 @@
 {
     @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.BackInStockSubscriptions })
 }
-<div class="page account-page back-in-stock-subscription-list-page">
+<div class="page account-page back-in-stock-subscription-list-page article">
     <div class="page-title">
         <h1>@T("Account.MyAccount") - @T("Account.BackInStockSubscriptions")</h1>
     </div>
     <div class="page-body">
-        @if (Model.Subscriptions.Count > 0)
+        @if (Model.SubscriptionOrders.Count > 0)
         {
             <div class="description">
                 @T("Account.BackInStockSubscriptions.Description")
@@ -54,9 +54,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for (int i = 0; i < Model.Subscriptions.Count; i++)
+                            @for (int i = 0; i < Model.SubscriptionOrders.Count; i++)
                             {
-                                var item = Model.Subscriptions[i];
+                                var item = Model.SubscriptionOrders[i];
                                 <tr @(i % 2 == 0 ? Html.Raw(" class=\"odd\"") : Html.Raw(" class=\"even\""))>
                                     <td class="select-boxes">
                                         <input type="checkbox" name="biss@(item.Id)" class="rowcheckbox" />
@@ -87,7 +87,7 @@
         else
         {
             <div class="no-data">
-                @T("Account.BackInStockSubscriptions.NoSubscriptions")
+                @T("Account.BackInStockSubscriptions.NoSubscriptionOrders")
             </div>
         }
     </div>

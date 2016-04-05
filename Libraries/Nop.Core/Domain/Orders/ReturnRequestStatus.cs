@@ -1,5 +1,5 @@
 
-namespace Nop.Core.Domain.Orders
+namespace Nop.Core.Domain.SubscriptionOrders
 {
     /// <summary>
     /// Represents a return status

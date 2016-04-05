@@ -29,6 +29,10 @@ namespace Nop.Services.Common
         /// <returns>Number of addresses</returns>
         int GetAddressTotalByStateProvinceId(int stateProvinceId);
 
+        int GetAddressTotalByCityId(int cityId);
+
+        int GetAddressTotalByLocalityId(int localityId);
+
         /// <summary>
         /// Gets an address by address identifier
         /// </summary>

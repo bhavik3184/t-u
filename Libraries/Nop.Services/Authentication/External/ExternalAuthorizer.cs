@@ -10,7 +10,7 @@ using Nop.Services.Events;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 
 namespace Nop.Services.Authentication.External
 {
@@ -31,7 +31,7 @@ namespace Nop.Services.Authentication.External
         private readonly IStoreContext _storeContext;
         private readonly CustomerSettings _customerSettings;
         private readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
-        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IBorrowCartService _borrowCartService;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly IEventPublisher _eventPublisher;
         private readonly LocalizationSettings _localizationSettings;
@@ -49,7 +49,7 @@ namespace Nop.Services.Authentication.External
             IStoreContext storeContext,
             CustomerSettings customerSettings,
             ExternalAuthenticationSettings externalAuthenticationSettings,
-            IShoppingCartService shoppingCartService,
+            IBorrowCartService borrowCartService,
             IWorkflowMessageService workflowMessageService,
             IEventPublisher eventPublisher,
             LocalizationSettings localizationSettings)
@@ -64,7 +64,7 @@ namespace Nop.Services.Authentication.External
             this._storeContext = storeContext;
             this._customerSettings = customerSettings;
             this._externalAuthenticationSettings = externalAuthenticationSettings;
-            this._shoppingCartService = shoppingCartService;
+            this._borrowCartService = borrowCartService;
             this._workflowMessageService = workflowMessageService;
             this._eventPublisher = eventPublisher;
             this._localizationSettings = localizationSettings;
@@ -233,7 +233,7 @@ namespace Nop.Services.Authentication.External
             }
 
             //migrate shopping cart
-            _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, userFound ?? userLoggedIn, true);
+            _borrowCartService.MigrateBorrowCart(_workContext.CurrentCustomer, userFound ?? userLoggedIn, true);
             //authenticate
             _authenticationService.SignIn(userFound ?? userLoggedIn, false);
             //raise event       

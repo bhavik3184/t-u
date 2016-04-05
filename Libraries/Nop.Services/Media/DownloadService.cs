@@ -3,7 +3,7 @@ using System.Linq;
 using Nop.Core.Data;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Media;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Payments;
 using Nop.Services.Events;
 
@@ -121,62 +121,14 @@ namespace Nop.Services.Media
             if (orderItem == null)
                 return false;
 
-            var order = orderItem.Order;
+            var order = orderItem.SubscriptionOrder;
             if (order == null || order.Deleted)
                 return false;
 
             //order status
-            if (order.OrderStatus == OrderStatus.Cancelled)
+            if (order.SubscriptionOrderStatus == SubscriptionOrderStatus.Cancelled)
                 return false;
-
-            var product = orderItem.Product;
-            if (product == null || !product.IsDownload)
-                return false;
-
-            //payment status
-            switch (product.DownloadActivationType)
-            {
-                case DownloadActivationType.WhenOrderIsPaid:
-                    {
-                        if (order.PaymentStatus == PaymentStatus.Paid && order.PaidDateUtc.HasValue)
-                        {
-                            //expiration date
-                            if (product.DownloadExpirationDays.HasValue)
-                            {
-                                if (order.PaidDateUtc.Value.AddDays(product.DownloadExpirationDays.Value) > DateTime.UtcNow)
-                                {
-                                    return true;
-                                }
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                    break;
-                case DownloadActivationType.Manually:
-                    {
-                        if (orderItem.IsDownloadActivated)
-                        {
-                            //expiration date
-                            if (product.DownloadExpirationDays.HasValue)
-                            {
-                                if (order.CreatedOnUtc.AddDays(product.DownloadExpirationDays.Value) > DateTime.UtcNow)
-                                {
-                                    return true;
-                                }
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
+ 
 
             return false;
         }
@@ -191,9 +143,7 @@ namespace Nop.Services.Media
             if (orderItem == null)
                 return false;
 
-            return IsDownloadAllowed(orderItem) &&
-                orderItem.LicenseDownloadId.HasValue &&
-                orderItem.LicenseDownloadId > 0;
+            return IsDownloadAllowed(orderItem) ;
         }
 
         #endregion

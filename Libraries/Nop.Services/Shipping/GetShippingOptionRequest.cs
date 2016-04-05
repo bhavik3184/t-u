@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Shipping;
 
 namespace Nop.Services.Shipping
@@ -79,18 +79,26 @@ namespace Nop.Services.Shipping
             /// </summary>
             /// <param name="sci">Shopping cart item</param>
             /// <param name="qty">Override "Quantity" property of shopping cart item</param>
-            public PackageItem(ShoppingCartItem sci, int? qty = null)
+            public PackageItem(BorrowCartItem sci, int? qty = null)
             {
-                this.ShoppingCartItem = sci;
+                this.BorrowCartItem = sci;
+                this.OverriddenQuantity = qty;
+            }
+
+            public PackageItem(SubscriptionCartItem sci, int? qty = null)
+            {
+                this.SubscriptionCartItem = sci;
                 this.OverriddenQuantity = qty;
             }
 
             /// <summary>
             /// Shopping cart item
             /// </summary>
-            public ShoppingCartItem ShoppingCartItem { get; set; }
+            public BorrowCartItem BorrowCartItem { get; set; }
+
+            public SubscriptionCartItem SubscriptionCartItem { get; set; }
             /// <summary>
-            /// If specified, override "Quantity" property of "ShoppingCartItem
+            /// If specified, override "Quantity" property of "BorrowCartItem
             /// </summary>
             public int? OverriddenQuantity { get; set; }
 
@@ -99,7 +107,7 @@ namespace Nop.Services.Shipping
                 if (OverriddenQuantity.HasValue)
                     return OverriddenQuantity.Value;
 
-                return ShoppingCartItem.Quantity;
+                return BorrowCartItem.Quantity;
             }
         }
 

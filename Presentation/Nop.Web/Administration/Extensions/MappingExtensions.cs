@@ -36,7 +36,7 @@ using Nop.Core.Domain.Logging;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Polls;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
@@ -50,6 +50,7 @@ using Nop.Services.Common;
 using Nop.Services.Payments;
 using Nop.Services.Shipping;
 using Nop.Services.Tax;
+using Nop.Admin.Models.SubscriptionOrders;
 
 namespace Nop.Admin.Extensions
 {
@@ -116,6 +117,44 @@ namespace Nop.Admin.Extensions
         }
 
         public static Vendor ToEntity(this VendorModel model, Vendor destination)
+        {
+            return model.MapTo(destination);
+        }
+
+        #endregion
+
+        #region MembershipCategory
+
+        public static MembershipCategoryModel ToModel(this MembershipCategory entity)
+        {
+            return entity.MapTo<MembershipCategory, MembershipCategoryModel>();
+        }
+
+        public static MembershipCategory ToEntity(this MembershipCategoryModel model)
+        {
+            return model.MapTo<MembershipCategoryModel, MembershipCategory>();
+        }
+
+        public static MembershipCategory ToEntity(this MembershipCategoryModel model, MembershipCategory destination)
+        {
+            return model.MapTo(destination);
+        }
+
+        #endregion
+
+        #region Plans
+
+        public static PlanModel ToModel(this Plan entity)
+        {
+            return entity.MapTo<Plan, PlanModel>();
+        }
+
+        public static Plan ToEntity(this PlanModel model)
+        {
+            return model.MapTo<PlanModel, Plan>();
+        }
+
+        public static Plan ToEntity(this PlanModel model, Plan destination)
         {
             return model.MapTo(destination);
         }
@@ -198,17 +237,17 @@ namespace Nop.Admin.Extensions
         #region Checkout attributes
 
         //attributes
-        public static CheckoutAttributeModel ToModel(this CheckoutAttribute entity)
+        public static Nop.Admin.Models.SubscriptionOrders.CheckoutAttributeModel ToModel(this Nop.Core.Domain.SubscriptionOrders.CheckoutAttribute entity)
         {
-            return entity.MapTo<CheckoutAttribute, CheckoutAttributeModel>();
+            return entity.MapTo<Nop.Core.Domain.SubscriptionOrders.CheckoutAttribute, Nop.Admin.Models.SubscriptionOrders.CheckoutAttributeModel>();
         }
 
-        public static CheckoutAttribute ToEntity(this CheckoutAttributeModel model)
+        public static Nop.Core.Domain.SubscriptionOrders.CheckoutAttribute ToEntity(this Nop.Admin.Models.SubscriptionOrders.CheckoutAttributeModel model)
         {
-            return model.MapTo<CheckoutAttributeModel, CheckoutAttribute>();
+            return model.MapTo<Nop.Admin.Models.SubscriptionOrders.CheckoutAttributeModel, Nop.Core.Domain.SubscriptionOrders.CheckoutAttribute>();
         }
 
-        public static CheckoutAttribute ToEntity(this CheckoutAttributeModel model, CheckoutAttribute destination)
+        public static Nop.Core.Domain.SubscriptionOrders.CheckoutAttribute ToEntity(this Nop.Admin.Models.SubscriptionOrders.CheckoutAttributeModel model, Nop.Core.Domain.SubscriptionOrders.CheckoutAttribute destination)
         {
             return model.MapTo(destination);
         }
@@ -668,17 +707,17 @@ namespace Nop.Admin.Extensions
 
         #region NewsLetter subscriptions
 
-        public static NewsLetterSubscriptionModel ToModel(this NewsLetterSubscription entity)
+        public static NewsLetterSubscriptionOrderModel ToModel(this NewsLetterSubscription entity)
         {
-            return entity.MapTo<NewsLetterSubscription, NewsLetterSubscriptionModel>();
+            return entity.MapTo<NewsLetterSubscription, NewsLetterSubscriptionOrderModel>();
         }
 
-        public static NewsLetterSubscription ToEntity(this NewsLetterSubscriptionModel model)
+        public static NewsLetterSubscription ToEntity(this NewsLetterSubscriptionOrderModel model)
         {
-            return model.MapTo<NewsLetterSubscriptionModel, NewsLetterSubscription>();
+            return model.MapTo<NewsLetterSubscriptionOrderModel, NewsLetterSubscription>();
         }
 
-        public static NewsLetterSubscription ToEntity(this NewsLetterSubscriptionModel model, NewsLetterSubscription destination)
+        public static NewsLetterSubscription ToEntity(this NewsLetterSubscriptionOrderModel model, NewsLetterSubscription destination)
         {
             return model.MapTo(destination);
         }
@@ -870,6 +909,38 @@ namespace Nop.Admin.Extensions
         }
 
 
+        public static CityModel ToModel(this City entity)
+        {
+            return entity.MapTo<City, CityModel>();
+        }
+
+        public static City ToEntity(this CityModel model)
+        {
+            return model.MapTo<CityModel, City>();
+        }
+
+        public static City ToEntity(this CityModel model, City destination)
+        {
+            return model.MapTo(destination);
+        }
+
+
+        public static LocalityModel ToModel(this Locality entity)
+        {
+            return entity.MapTo<Locality, LocalityModel>();
+        }
+
+        public static Locality ToEntity(this LocalityModel model)
+        {
+            return model.MapTo<LocalityModel, Locality>();
+        }
+
+        public static Locality ToEntity(this LocalityModel model, Locality destination)
+        {
+            return model.MapTo(destination);
+        }
+
+
         #endregion
 
         #region Settings
@@ -964,11 +1035,11 @@ namespace Nop.Admin.Extensions
         }
 
 
-        public static ShoppingCartSettingsModel ToModel(this ShoppingCartSettings entity)
+        public static BorrowCartSettingsModel ToModel(this BorrowCartSettings entity)
         {
-            return entity.MapTo<ShoppingCartSettings, ShoppingCartSettingsModel>();
+            return entity.MapTo<BorrowCartSettings, BorrowCartSettingsModel>();
         }
-        public static ShoppingCartSettings ToEntity(this ShoppingCartSettingsModel model, ShoppingCartSettings destination)
+        public static BorrowCartSettings ToEntity(this BorrowCartSettingsModel model, BorrowCartSettings destination)
         {
             return model.MapTo(destination);
         }

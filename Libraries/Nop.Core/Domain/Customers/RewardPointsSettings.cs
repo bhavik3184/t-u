@@ -1,5 +1,5 @@
 ﻿using Nop.Core.Configuration;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Core.Domain.Customers
 {
@@ -38,12 +38,12 @@ namespace Nop.Core.Domain.Customers
         /// <summary>
         /// Points are awarded when the order status is
         /// </summary>
-        public OrderStatus PointsForPurchases_Awarded { get; set; }
+        public SubscriptionOrderStatus PointsForPurchases_Awarded { get; set; }
 
         /// <summary>
         /// Points are canceled when the order is
         /// </summary>
-        public OrderStatus PointsForPurchases_Canceled { get; set; }
+        public SubscriptionOrderStatus PointsForPurchases_Canceled { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether "You will earn" message should be displayed

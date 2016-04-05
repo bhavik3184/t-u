@@ -442,7 +442,7 @@ namespace Nop.Web.Controllers
             {
                 forumSubscription = new ForumSubscription
                 {
-                    SubscriptionGuid = Guid.NewGuid(),
+                    SubscriptionOrderGuid = Guid.NewGuid(),
                     CustomerId = _workContext.CurrentCustomer.Id,
                     ForumId = forum.Id,
                     CreatedOnUtc = DateTime.UtcNow
@@ -591,7 +591,7 @@ namespace Nop.Web.Controllers
             {
                 forumSubscription = new ForumSubscription
                 {
-                    SubscriptionGuid = Guid.NewGuid(),
+                    SubscriptionOrderGuid = Guid.NewGuid(),
                     CustomerId = _workContext.CurrentCustomer.Id,
                     TopicId = forumTopic.Id,
                     CreatedOnUtc = DateTime.UtcNow
@@ -808,7 +808,7 @@ namespace Nop.Web.Controllers
                         {
                             var forumSubscription = new ForumSubscription
                             {
-                                SubscriptionGuid = Guid.NewGuid(),
+                                SubscriptionOrderGuid = Guid.NewGuid(),
                                 CustomerId = _workContext.CurrentCustomer.Id,
                                 TopicId = forumTopic.Id,
                                 CreatedOnUtc = nowUtc
@@ -988,7 +988,7 @@ namespace Nop.Web.Controllers
                             {
                                 forumSubscription = new ForumSubscription
                                 {
-                                    SubscriptionGuid = Guid.NewGuid(),
+                                    SubscriptionOrderGuid = Guid.NewGuid(),
                                     CustomerId = _workContext.CurrentCustomer.Id,
                                     TopicId = forumTopic.Id,
                                     CreatedOnUtc = nowUtc
@@ -1188,7 +1188,7 @@ namespace Nop.Web.Controllers
                             {
                                 forumSubscription = new ForumSubscription
                                 {
-                                    SubscriptionGuid = Guid.NewGuid(),
+                                    SubscriptionOrderGuid = Guid.NewGuid(),
                                     CustomerId = _workContext.CurrentCustomer.Id,
                                     TopicId = forumPost.TopicId,
                                     CreatedOnUtc = nowUtc
@@ -1358,7 +1358,7 @@ namespace Nop.Web.Controllers
                             {
                                 forumSubscription = new ForumSubscription
                                 {
-                                    SubscriptionGuid = Guid.NewGuid(),
+                                    SubscriptionOrderGuid = Guid.NewGuid(),
                                     CustomerId = _workContext.CurrentCustomer.Id,
                                     TopicId = forumPost.TopicId,
                                     CreatedOnUtc = nowUtc
@@ -1654,7 +1654,7 @@ namespace Nop.Web.Controllers
 
         public ActionResult CustomerForumSubscriptions(int? page)
         {
-            if (!_forumSettings.AllowCustomersToManageSubscriptions)
+            if (!_forumSettings.AllowCustomersToManageSubscriptionOrders)
             {
                 return RedirectToRoute("CustomerInfo");
             }
@@ -1701,12 +1701,12 @@ namespace Nop.Web.Controllers
                     }
                 }
 
-                model.ForumSubscriptions.Add(new CustomerForumSubscriptionsModel.ForumSubscriptionModel
+                model.ForumSubscriptions.Add(new CustomerForumSubscriptionsModel.ForumSubscriptionOrderModel
                 {
                     Id = forumSubscription.Id,
                     ForumTopicId = forumTopicId,
                     ForumId = forumSubscription.ForumId,
-                    TopicSubscription = topicSubscription,
+                    TopicSubscriptionOrder = topicSubscription,
                     Title = title,
                     Slug = slug,
                 });

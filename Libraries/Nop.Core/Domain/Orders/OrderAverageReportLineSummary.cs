@@ -1,4 +1,4 @@
-namespace Nop.Core.Domain.Orders
+namespace Nop.Core.Domain.SubscriptionOrders
 {
     /// <summary>
     /// Represents an order average report line summary
@@ -8,7 +8,7 @@ namespace Nop.Core.Domain.Orders
         /// <summary>
         /// Gets or sets the order status
         /// </summary>
-        public OrderStatus OrderStatus { get; set; }
+        public SubscriptionOrderStatus SubscriptionOrderStatus { get; set; }
 
         /// <summary>
         /// Gets or sets the sum today total

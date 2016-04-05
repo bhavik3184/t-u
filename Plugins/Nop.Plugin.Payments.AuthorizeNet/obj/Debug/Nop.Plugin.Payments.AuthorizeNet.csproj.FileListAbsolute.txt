@@ -1,0 +1,11 @@
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.AuthorizeNet\Views\PaymentAuthorizeNet\Configure.cshtml
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.AuthorizeNet\Views\PaymentAuthorizeNet\PaymentInfo.cshtml
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.AuthorizeNet\web.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.AuthorizeNet\Description.txt
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.AuthorizeNet\logo.jpg
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.AuthorizeNet\Nop.Plugin.Payments.AuthorizeNet.dll.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.AuthorizeNet\Nop.Plugin.Payments.AuthorizeNet.dll
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.AuthorizeNet\Nop.Plugin.Payments.AuthorizeNet.pdb
+C:\projects\NewToys\Plugins\Nop.Plugin.Payments.AuthorizeNet\obj\Debug\Nop.Plugin.Payments.AuthorizeNet.csprojResolveAssemblyReference.cache
+C:\projects\NewToys\Plugins\Nop.Plugin.Payments.AuthorizeNet\obj\Debug\Nop.Plugin.Payments.AuthorizeNet.dll
+C:\projects\NewToys\Plugins\Nop.Plugin.Payments.AuthorizeNet\obj\Debug\Nop.Plugin.Payments.AuthorizeNet.pdb

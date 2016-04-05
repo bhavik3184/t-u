@@ -14,7 +14,7 @@ using Nop.Services.Discounts;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Services.Vendors;
@@ -35,15 +35,15 @@ namespace Nop.Admin.Controllers
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly ICustomerActivityService _customerActivityService;
         private readonly ICurrencyService _currencyService;
-        private readonly ICategoryService _categoryService;
-        private readonly IProductService _productService;
+        private readonly IMembershipCategoryService _categoryService;
+        private readonly IPlanService _planService;
         private readonly CurrencySettings _currencySettings;
         private readonly IPermissionService _permissionService;
         private readonly IWorkContext _workContext;
         private readonly IManufacturerService _manufacturerService;
         private readonly IStoreService _storeService;
         private readonly IVendorService _vendorService;
-        private readonly IOrderService _orderService;
+        private readonly ISubscriptionOrderService _subscriptionService;
         private readonly IPriceFormatter _priceFormatter;
 
         #endregion
@@ -53,8 +53,8 @@ namespace Nop.Admin.Controllers
         public DiscountController(IDiscountService discountService, 
             ILocalizationService localizationService,
             ICurrencyService currencyService,
-            ICategoryService categoryService,
-            IProductService productService,
+            IMembershipCategoryService categoryService,
+            IPlanService planService,
             IWebHelper webHelper, 
             IDateTimeHelper dateTimeHelper,
             ICustomerActivityService customerActivityService, 
@@ -64,14 +64,14 @@ namespace Nop.Admin.Controllers
             IManufacturerService manufacturerService,
             IStoreService storeService,
             IVendorService vendorService,
-            IOrderService orderService,
+            ISubscriptionOrderService subscriptionService,
             IPriceFormatter priceFormatter)
         {
             this._discountService = discountService;
             this._localizationService = localizationService;
             this._currencyService = currencyService;
             this._categoryService = categoryService;
-            this._productService = productService;
+            this._planService = planService;
             this._webHelper = webHelper;
             this._dateTimeHelper = dateTimeHelper;
             this._customerActivityService = customerActivityService;
@@ -81,7 +81,7 @@ namespace Nop.Admin.Controllers
             this._manufacturerService = manufacturerService;
             this._storeService = storeService;
             this._vendorService = vendorService;
-            this._orderService = orderService;
+            this._subscriptionService = subscriptionService;
             this._priceFormatter = priceFormatter;
         }
 
@@ -149,7 +149,7 @@ namespace Nop.Admin.Controllers
                 return AccessDeniedView();
 
             var model = new DiscountListModel();
-            model.AvailableDiscountTypes = DiscountType.AssignedToOrderTotal.ToSelectList(false).ToList();
+            model.AvailableDiscountTypes = DiscountType.AssignedToSubscriptionOrderTotal.ToSelectList(false).ToList();
             model.AvailableDiscountTypes.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
 
             return View(model);
@@ -272,13 +272,13 @@ namespace Nop.Admin.Controllers
                 if (prevDiscountType == DiscountType.AssignedToSkus
                     && discount.DiscountType != DiscountType.AssignedToSkus)
                 {
-                    //applied to products
-                    var products = discount.AppliedToProducts.ToList();
-                    discount.AppliedToProducts.Clear();
+                    //applied to plans
+                    var plans = discount.AppliedToPlans.ToList();
+                    discount.AppliedToPlans.Clear();
                     _discountService.UpdateDiscount(discount);
                     //update "HasDiscountsApplied" property
-                    foreach (var p in products)
-                        _productService.UpdateHasDiscountsApplied(p);
+                    foreach (var p in plans)
+                        _planService.UpdateHasDiscountsApplied(p);
                 }
 
                 //activity log
@@ -313,14 +313,14 @@ namespace Nop.Admin.Controllers
                 //No discount found with the specified id
                 return RedirectToAction("List");
             
-            //applied to products
-            var products = discount.AppliedToProducts.ToList();
+            //applied to plans
+            var plans = discount.AppliedToPlans.ToList();
 
             _discountService.DeleteDiscount(discount);
             
             //update "HasDiscountsApplied" properties
-            foreach (var p in products)
-                _productService.UpdateHasDiscountsApplied(p);
+            foreach (var p in plans)
+                _planService.UpdateHasDiscountsApplied(p);
 
             //activity log
             _customerActivityService.InsertActivity("DeleteDiscount", _localizationService.GetResource("ActivityLog.DeleteDiscount"), discount.Name);
@@ -397,10 +397,10 @@ namespace Nop.Admin.Controllers
 
         #endregion
 
-        #region Applied to products
+        #region Applied to plans
 
         [HttpPost]
-        public ActionResult ProductList(DataSourceRequest command, int discountId)
+        public ActionResult PlanList(DataSourceRequest command, int discountId)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageDiscounts))
                 return AccessDeniedView();
@@ -409,24 +409,24 @@ namespace Nop.Admin.Controllers
             if (discount == null)
                 throw new Exception("No discount found with the specified id");
 
-            var products = discount
-                .AppliedToProducts
+            var plans = discount
+                .AppliedToPlans
                 .Where(x => !x.Deleted)
                 .ToList();
             var gridModel = new DataSourceResult
             {
-                Data = products.Select(x => new DiscountModel.AppliedToProductModel
+                Data = plans.Select(x => new DiscountModel.AppliedToPlanModel
                 {
-                    ProductId = x.Id,
-                    ProductName = x.Name
+                    PlanId = x.Id,
+                    PlanName = x.Name
                 }),
-                Total = products.Count
+                Total = plans.Count
             };
 
             return Json(gridModel);
         }
 
-        public ActionResult ProductDelete(int discountId, int productId)
+        public ActionResult PlanDelete(int discountId, int planId)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageDiscounts))
                 return AccessDeniedView();
@@ -435,26 +435,26 @@ namespace Nop.Admin.Controllers
             if (discount == null)
                 throw new Exception("No discount found with the specified id");
 
-            var product = _productService.GetProductById(productId);
-            if (product == null)
-                throw new Exception("No product found with the specified id");
+            var plan = _planService.GetPlanById(planId);
+            if (plan == null)
+                throw new Exception("No plan found with the specified id");
             
             //remove discount
-            if (product.AppliedDiscounts.Count(d => d.Id == discount.Id) > 0)
-                product.AppliedDiscounts.Remove(discount);
+            if (plan.AppliedDiscounts.Count(d => d.Id == discount.Id) > 0)
+                plan.AppliedDiscounts.Remove(discount);
 
-            _productService.UpdateProduct(product);
-            _productService.UpdateHasDiscountsApplied(product);
+            _planService.UpdatePlan(plan);
+            _planService.UpdateHasDiscountsApplied(plan);
 
             return new NullJsonResult();
         }
 
-        public ActionResult ProductAddPopup(int discountId)
+        public ActionResult PlanAddPopup(int discountId)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageDiscounts))
                 return AccessDeniedView();
 
-            var model = new DiscountModel.AddProductToDiscountModel();
+            var model = new DiscountModel.AddPlanToDiscountModel();
             //categories
             model.AvailableCategories.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
             var categories = _categoryService.GetAllCategories(showHidden: true);
@@ -476,40 +476,40 @@ namespace Nop.Admin.Controllers
             foreach (var v in _vendorService.GetAllVendors(showHidden: true))
                 model.AvailableVendors.Add(new SelectListItem { Text = v.Name, Value = v.Id.ToString() });
 
-            //product types
-            model.AvailableProductTypes = ProductType.SimpleProduct.ToSelectList(false).ToList();
-            model.AvailableProductTypes.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
+            //plan types
+            model.AvailablePlanTypes = PlanType.SimplePlan.ToSelectList(false).ToList();
+            model.AvailablePlanTypes.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
 
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult ProductAddPopupList(DataSourceRequest command, DiscountModel.AddProductToDiscountModel model)
+        public ActionResult PlanAddPopupList(DataSourceRequest command, DiscountModel.AddPlanToDiscountModel model)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageDiscounts))
                 return AccessDeniedView();
 
             var gridModel = new DataSourceResult();
-            var products = _productService.SearchProducts(
+            var plans = _planService.SearchPlans(
                 categoryIds: new List<int> { model.SearchCategoryId },
                 manufacturerId: model.SearchManufacturerId,
                 storeId: model.SearchStoreId,
                 vendorId: model.SearchVendorId,
-                productType: model.SearchProductTypeId > 0 ? (ProductType?)model.SearchProductTypeId : null,
-                keywords: model.SearchProductName,
+                planType: model.SearchPlanTypeId > 0 ? (PlanType?)model.SearchPlanTypeId : null,
+                keywords: model.SearchPlanName,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize,
                 showHidden: true
                 );
-            gridModel.Data = products.Select(x => x.ToModel());
-            gridModel.Total = products.TotalCount;
+            gridModel.Data = plans.Select(x => x.ToModel());
+            gridModel.Total = plans.TotalCount;
 
             return Json(gridModel);
         }
 
         [HttpPost]
         [FormValueRequired("save")]
-        public ActionResult ProductAddPopup(string btnId, string formId, DiscountModel.AddProductToDiscountModel model)
+        public ActionResult PlanAddPopup(string btnId, string formId, DiscountModel.AddPlanToDiscountModel model)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageDiscounts))
                 return AccessDeniedView();
@@ -518,18 +518,18 @@ namespace Nop.Admin.Controllers
             if (discount == null)
                 throw new Exception("No discount found with the specified id");
 
-            if (model.SelectedProductIds != null)
+            if (model.SelectedPlanIds != null)
             {
-                foreach (int id in model.SelectedProductIds)
+                foreach (int id in model.SelectedPlanIds)
                 {
-                    var product = _productService.GetProductById(id);
-                    if (product != null)
+                    var plan = _planService.GetPlanById(id);
+                    if (plan != null)
                     {
-                        if (product.AppliedDiscounts.Count(d => d.Id == discount.Id) == 0)
-                            product.AppliedDiscounts.Add(discount);
+                        if (plan.AppliedDiscounts.Count(d => d.Id == discount.Id) == 0)
+                            plan.AppliedDiscounts.Add(discount);
 
-                        _productService.UpdateProduct(product);
-                        _productService.UpdateHasDiscountsApplied(product);
+                        _planService.UpdatePlan(plan);
+                        _planService.UpdateHasDiscountsApplied(plan);
                     }
                 }
             }
@@ -560,10 +560,10 @@ namespace Nop.Admin.Controllers
                 .ToList();
             var gridModel = new DataSourceResult
             {
-                Data = categories.Select(x => new DiscountModel.AppliedToCategoryModel
+                Data = categories.Select(x => new DiscountModel.AppliedToMembershipCategoryModel
                 {
-                    CategoryId = x.Id,
-                    CategoryName = x.GetFormattedBreadCrumb(_categoryService)
+                    MembershipCategoryId = x.Id,
+                    MembershipCategoryName = x.GetFormattedBreadCrumb(_categoryService)
                 }),
                 Total = categories.Count
             };
@@ -580,7 +580,7 @@ namespace Nop.Admin.Controllers
             if (discount == null)
                 throw new Exception("No discount found with the specified id");
 
-            var category = _categoryService.GetCategoryById(categoryId);
+            var category = _categoryService.GetMembershipCategoryById(categoryId);
             if (category == null)
                 throw new Exception("No category found with the specified id");
 
@@ -588,7 +588,7 @@ namespace Nop.Admin.Controllers
             if (category.AppliedDiscounts.Count(d => d.Id == discount.Id) > 0)
                 category.AppliedDiscounts.Remove(discount);
 
-            _categoryService.UpdateCategory(category);
+            _categoryService.UpdateMembershipCategory(category);
 
             return new NullJsonResult();
         }
@@ -639,13 +639,13 @@ namespace Nop.Admin.Controllers
             {
                 foreach (int id in model.SelectedCategoryIds)
                 {
-                    var category = _categoryService.GetCategoryById(id);
+                    var category = _categoryService.GetMembershipCategoryById(id);
                     if (category != null)
                     {
                         if (category.AppliedDiscounts.Count(d => d.Id == discount.Id) == 0)
                             category.AppliedDiscounts.Add(discount);
 
-                        _categoryService.UpdateCategory(category);
+                        _categoryService.UpdateMembershipCategory(category);
                     }
                 }
             }
@@ -786,13 +786,13 @@ namespace Nop.Admin.Controllers
             var gridModel = new DataSourceResult
             {
                 Data = duh.Select(x => {
-                    var order = _orderService.GetOrderById(x.OrderId);
+                    var order = _subscriptionService.GetOrderById(x.SubscriptionOrderId);
                     var duhModel = new DiscountModel.DiscountUsageHistoryModel
                     {
                         Id = x.Id,
                         DiscountId = x.DiscountId,
-                        OrderId = x.OrderId,
-                        OrderTotal = order != null ? _priceFormatter.FormatPrice(order.OrderTotal, true, false) : "",
+                        SubscriptionOrderId = x.SubscriptionOrderId,
+                        SubscriptionOrderTotal = order != null ? _priceFormatter.FormatPrice(order.SubscriptionOrderTotal, true, false) : "",
                         CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc)
                     };
                     return duhModel;

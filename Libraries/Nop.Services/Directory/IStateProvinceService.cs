@@ -36,6 +36,7 @@ namespace Nop.Services.Directory
         /// <param name="showHidden">A value indicating whether to show hidden records</param>
         /// <returns>States</returns>
         IList<StateProvince> GetStateProvincesByCountryId(int countryId, int languageId = 0, bool showHidden = false);
+        IList<StateProvince> GetStateProvincesByIds(int[] stateProvinceIds);
 
         /// <summary>
         /// Gets all states/provinces

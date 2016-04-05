@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Web.Routing;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Plugins;
 using Nop.Plugin.Payments.CheckMoneyOrder.Controllers;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Payments;
+using Nop.Services.SubscriptionOrders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Plugin.Payments.CheckMoneyOrder
 {
@@ -20,13 +22,13 @@ namespace Nop.Plugin.Payments.CheckMoneyOrder
         #region Fields
         private readonly CheckMoneyOrderPaymentSettings _checkMoneyOrderPaymentSettings;
         private readonly ISettingService _settingService;
-        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly ISubscriptionOrderTotalCalculationService _orderTotalCalculationService;
         #endregion
 
         #region Ctor
 
         public CheckMoneyOrderPaymentProcessor(CheckMoneyOrderPaymentSettings checkMoneyOrderPaymentSettings,
-            ISettingService settingService, IOrderTotalCalculationService orderTotalCalculationService)
+            ISettingService settingService, ISubscriptionOrderTotalCalculationService orderTotalCalculationService)
         {
             this._checkMoneyOrderPaymentSettings = checkMoneyOrderPaymentSettings;
             this._settingService = settingService;
@@ -63,7 +65,7 @@ namespace Nop.Plugin.Payments.CheckMoneyOrder
         /// </summary>
         /// <param name="cart">Shoping cart</param>
         /// <returns>true - hide; false - display.</returns>
-        public bool HidePaymentMethod(IList<ShoppingCartItem> cart)
+        public bool HidePaymentMethod(IList<SubscriptionCartItem> cart)
         {
             //you can put any logic here
             //for example, hide this payment method if all products in the cart are downloadable
@@ -80,7 +82,7 @@ namespace Nop.Plugin.Payments.CheckMoneyOrder
         /// </summary>
         /// <param name="cart">Shoping cart</param>
         /// <returns>Additional handling fee</returns>
-        public decimal GetAdditionalHandlingFee(IList<ShoppingCartItem> cart)
+        public decimal GetAdditionalHandlingFee(IList<SubscriptionCartItem> cart)
         {
             var result = this.CalculateAdditionalFee(_orderTotalCalculationService, cart,
                 _checkMoneyOrderPaymentSettings.AdditionalFee, _checkMoneyOrderPaymentSettings.AdditionalFeePercentage);
@@ -152,7 +154,7 @@ namespace Nop.Plugin.Payments.CheckMoneyOrder
         /// </summary>
         /// <param name="order">Order</param>
         /// <returns>Result</returns>
-        public bool CanRePostProcessPayment(Order order)
+        public bool CanRePostProcessPayment(SubscriptionOrder order)
         {
             if (order == null)
                 throw new ArgumentNullException("order");

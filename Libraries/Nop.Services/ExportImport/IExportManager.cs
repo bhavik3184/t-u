@@ -4,7 +4,7 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Messages;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Services.ExportImport
 {
@@ -45,14 +45,14 @@ namespace Nop.Services.ExportImport
         /// </summary>
         /// <param name="orders">Orders</param>
         /// <returns>Result in XML format</returns>
-        string ExportOrdersToXml(IList<Order> orders);
+        string ExportOrdersToXml(IList<SubscriptionOrder> orders);
 
         /// <summary>
         /// Export orders to XLSX
         /// </summary>
         /// <param name="stream">Stream</param>
         /// <param name="orders">Orders</param>
-        void ExportOrdersToXlsx(Stream stream, IList<Order> orders);
+        void ExportOrdersToXlsx(Stream stream, IList<SubscriptionOrder> orders);
         
         /// <summary>
         /// Export customer list to XLSX
@@ -81,5 +81,7 @@ namespace Nop.Services.ExportImport
         /// <param name="states">States</param>
         /// <returns>Result in TXT (string) format</returns>
         string ExportStatesToTxt(IList<StateProvince> states);
+
+        string ExportCitiesToTxt(IList<City> cities);
     }
 }

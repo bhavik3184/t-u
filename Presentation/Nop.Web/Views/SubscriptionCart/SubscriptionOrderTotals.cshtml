@@ -1,0 +1,193 @@
+﻿@model SubscriptionOrderTotalsModel
+@using Nop.Web.Models.SubscriptionCart;
+<div class="total-info">
+    <table class="cart-total">
+        <tbody>
+            <tr class="order-subtotal">
+                <td class="cart-total-left">
+                    <label>Rental:</label>
+                </td>
+                <td class="cart-total-right">
+                    <span class="value-summary">@Model.SubTotal</span>
+                </td>
+            </tr>
+            @if (!String.IsNullOrEmpty(Model.SubTotalDiscount))
+            {
+                <tr class="order-subtotal-discount">
+                    <td class="cart-total-left">
+                        <label>@T("SubscriptionCart.Totals.SubTotalDiscount"):</label>
+                        @if (Model.AllowRemovingSubTotalDiscount)
+                        {
+                            /*empty value (little hack for FormValueExistsAttribute)*/
+                            <input type="submit" name="removesubtotaldiscount" value=" " title="@T("Common.Remove")" class="remove-discount-button" />                                    
+                        }
+                    </td>
+                    <td class="cart-total-right">
+                        <span class="value-summary">@Model.SubTotalDiscount</span>
+                    </td>
+                </tr>
+            }
+            @if (Model.PreviousRentalBalanceAmt > 0)
+            {
+                <tr class="shipping-cost">
+                    <td class="cart-total-left">
+                        <label>Previous Rental Balance (@Model.PreviousRentalBalanceDesc): </label>
+                    </td>
+                    <td class="cart-total-right">
+                        <span class="value-summary">- @Model.PreviousRentalBalance</span>
+                    </td>
+                </tr>
+            }
+            @if (Model.RegistrationChargePaidAmt > 0)
+            {
+             <tr class="shipping-cost">
+                <td class="cart-total-left">
+                    <label>Registration : </label>
+                </td>
+                <td class="cart-total-right">
+                    <span class="value-summary">@Model.RegistrationCharge</span>
+                </td>
+            </tr>
+           
+            <tr class="shipping-cost">
+                <td class="cart-total-left">
+                    <label>Registration all ready paid : </label>
+                </td>
+                <td class="cart-total-right">
+                    <span class="value-summary">- @Model.RegistrationChargePaid</span>
+                </td>
+            </tr>
+            }
+            
+            <tr class="shipping-cost">
+                <td class="cart-total-left">
+                    <label>@Model.RegistrationChargeBalanceLabel : </label>
+                </td>
+                <td class="cart-total-right">
+                    <span class="value-summary">@Model.RegistrationChargeBalance</span>
+                </td>
+            </tr>
+           
+           @if (Model.SecurityDepositPaidAmt > 0)
+            {
+            <tr class="shipping-cost">
+                <td class="cart-total-left">
+                    <label>Security Deposit : </label>
+                </td>
+                <td class="cart-total-right">
+                    <span class="value-summary">@Model.SecurityDeposit</span>
+                </td>
+            </tr>
+
+            <tr class="shipping-cost">
+                <td class="cart-total-left">
+                    <label>Security Deposit all ready paid : </label>
+                </td>
+                <td class="cart-total-right">
+                    <span class="value-summary">- @Model.SecurityDepositPaid</span>
+                </td>
+            </tr>
+            }
+            <tr class="shipping-cost">
+                <td class="cart-total-left">
+                    <label>@Model.SecurityDepositBalanceLabel </label>
+                </td>
+                <td class="cart-total-right">
+                    <span class="value-summary">@Model.SecurityDepositBalance</span>
+                </td>
+            </tr>
+           
+            
+            @if (!String.IsNullOrEmpty(Model.PaymentMethodAdditionalFee))
+            {
+                <tr class="additional-fees">
+                    <td class="cart-total-left">
+                        <label>@T("SubscriptionCart.Totals.PaymentMethodAdditionalFee"):</label>
+                    </td>
+                    <td class="cart-total-right">
+                        <span class="value-summary">@Model.PaymentMethodAdditionalFee</span>
+                    </td>
+                </tr>
+            }
+            @*@if (Model.DisplayTaxRates && Model.TaxRates.Count > 0)
+            {
+                foreach (var taxRate in Model.TaxRates)
+                {
+                <tr class="tax-rate">
+                    <td class="cart-total-left">
+                        <label>@string.Format(T("SubscriptionCart.Totals.TaxRateLine").Text, taxRate.Rate):</label>
+                    </td>
+                    <td class="cart-total-right">
+                        <span>@taxRate.Value</span>
+                    </td>
+                </tr>
+                }
+            }
+            @if (Model.DisplayTax)
+            {
+                <tr class="tax-value">
+                    <td class="cart-total-left">
+                        <label>@T("SubscriptionCart.Totals.Tax"):</label>
+                    </td>
+                    <td class="cart-total-right">
+                        <span class="value-summary">@Model.Tax</span>
+                    </td>
+                </tr>
+            }*@
+            @if (!String.IsNullOrEmpty(Model.SubscriptionOrderTotalDiscount))
+            {
+                <tr class="discount-total">
+                    <td class="cart-total-left">
+                        <label>@T("SubscriptionCart.Totals.SubscriptionOrderTotalDiscount"):</label>
+                        @if (Model.AllowRemovingSubscriptionOrderTotalDiscount)
+                        {
+                            /*empty value (little hack for FormValueExistsAttribute)*/
+                            <input type="submit" name="removeordertotaldiscount" value=" " title="@T("Common.Remove")" class="remove-discount-button" />
+                        }
+                    </td>
+                    <td class="cart-total-right">
+                        <span class="value-summary">@Model.SubscriptionOrderTotalDiscount</span>
+                    </td>
+                </tr>
+            } 
+            @if (Model.GiftCards.Count > 0)
+            {
+                foreach (var gc in Model.GiftCards)
+                {
+                <tr class="giftcard-summary">
+                    <td class="cart-total-left">
+                        <label>@T("SubscriptionCart.Totals.GiftCardInfo"):</label>
+                        <span>@T("SubscriptionCart.Totals.GiftCardInfo.Code", gc.CouponCode)</span>
+                        @if (Model.IsEditable)
+                        {
+                            //little hack here with empty "value" element
+                            <input type="submit" name="removegiftcard-@gc.Id" value=" " title="@T("Common.Remove")" class="remove-gift-card-button" />
+                        }
+                        <span class="giftcard-remaining">@string.Format(T("SubscriptionCart.Totals.GiftCardInfo.Remaining").Text, gc.Remaining)</span>
+                    </td>
+                    <td class="cart-total-right">
+                        <span class="value-summary">@gc.Amount</span>
+                    </td>
+                </tr>
+                }
+            }
+          
+            <tr class="order-total">
+                <td class="cart-total-left">
+                    <label>@T("SubscriptionCart.Totals.SubscriptionOrderTotal"):</label>
+                </td>
+                <td class="cart-total-right">
+                    @if (!String.IsNullOrEmpty(Model.SubscriptionOrderTotal))
+                    {
+                        <span class="value-summary"><strong>@Model.SubscriptionOrderTotal</strong></span>
+                    }
+                    else
+                    {
+                        <span>@T("SubscriptionCart.Totals.CalculatedDuringCheckout")</span>
+                    }
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>

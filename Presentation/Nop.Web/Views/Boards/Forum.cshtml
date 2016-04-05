@@ -7,7 +7,7 @@
 
     Html.AddTitleParts(Model.Name);
 }
-<div class="page forum-page">
+<div class="page forum-page article">
     @Html.Action("ForumBreadcrumb", new { forumId = Model.Id })
     @Html.Partial("_ForumHeader")
     <div class="forum-info">

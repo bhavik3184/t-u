@@ -1,73 +1,108 @@
 ﻿@model HeaderLinksModel
 @using Nop.Web.Models.Common;
+<style>
+    #myaccountmenu{
+        background-color:white;
+        min-width:200px;
+    }
+    
+     #myaccountmenu li {
+        width: 100%;
+        margin: 0px;
+    }
+
+    #myaccountmenu li a {
+        font-size:14px;
+    }
+</style>
 <div class="header-links">
-    <ul>
-        @Html.Widget("header_links_before")
-        @if (Model.IsAuthenticated)
+    <div class="col-sm-6">
+        <div class="topmenu">
+            <ul id="menu-top-menu" class="nav top-menu">
+                @Html.Widget("header_links_before")
+                @if (Model.IsAuthenticated)
+                {
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page dropdown">
+                        <a href="@Url.RouteUrl("CustomerInfo")"
+                           data-hover="dropdown"  data-toggle="dropdown" aria-haspopup="true" class="ico-account dropdown-toggle">My Account<span class="caret"></span></a>
+
+                        <ul role="menu" id="myaccountmenu" class=" dropdown-menu">
+                            <li style="text-align: center; font-size: 14px;">Welcome @Model.CustomerName</li>
+                            <li><a href="/customer/Dashboard" class="inactive">Dashboard</a></li>
+                            <li><a href="/customer/info" class="inactive">Edit Profile</a></li>
+                            <li><a href="/customer/addresses" class="inactive">Addresses</a></li>
+                            <li><a href="/subscriptionorder/history" class="inactive">Subscription History</a></li>
+                            <li><a href="/mytoybox" class="inactive">MyToyBox</a></li>
+                            <li><a href="/cart" class="inactive">Borrow List</a></li>
+                            <li><a href="/pendingdelivery" class="active">Pending Delivery</a></li>
+                            <li><a href="/delivereditems" class="active">Delivered Items</a></li>
+                            <li><a href="/returnrequest/pending" class="inactive">Return Requests</a></li>
+                            <li><a href="/returneditems/" class="inactive">Returned Items</a></li>
+                            <li><a href="/customer/changepassword" class="inactive">Change password</a></li>
+                            <li><a href="@Url.RouteUrl("Logout")" class="ico-logout">@T("Account.Logout")</a></li>
+                        </ul>
+                    </li>
+                    
+                }
+            else
+            {
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="@Url.RouteUrl("Register")" class="ico-register">@T("Account.Register")</a></li>
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="@Url.RouteUrl("Login")" class="ico-login">@T("Account.Login")</a></li>
+            }
+             
+
+                @if (Model.BorrowCartEnabled)
+                {
+                    @*<li id="topcartlink" class="menu-item menu-item-type-post_type menu-item-object-page">
+                        <a href="@Url.RouteUrl("BorrowCart")" class="ico-cart">
+                            <span class="cart-label">Borrow Cart</span>
+                            <span class="cart-qty">@T("BorrowCart.HeaderQuantity", Model.BorrowCartItems)</span>
+                        </a>
+                    </li>*@
+                }
+                @Html.Widget("header_links_after")
+            </ul>
+        </div>
+        <div class="search-box store-search-box">
+
+        </div>
+        @if (Model.AllowPrivateMessages && !string.IsNullOrEmpty(Model.AlertMessage))
         {
-            <li><a href="@Url.RouteUrl("CustomerInfo")" class="ico-account">@Model.CustomerEmailUsername</a></li>
-            <li><a href="@Url.RouteUrl("Logout")" class="ico-logout">@T("Account.Logout")</a></li>
-        }
-        else
-        {
-            <li><a href="@Url.RouteUrl("Register")" class="ico-register">@T("Account.Register")</a></li>
-            <li><a href="@Url.RouteUrl("Login")" class="ico-login">@T("Account.Login")</a></li>
-        }
-        @if (Model.AllowPrivateMessages)
-        {
-            <li>
-                <a href="@Url.RouteUrl("PrivateMessages", new { tab = "" })" class="ico-inbox">
-                    <span class="inbox-label">@T("PrivateMessages.Inbox")</span>
-                    <span class="inbox-unread">@Model.UnreadPrivateMessages</span>
-                </a>
-            </li>
-        }
-        @if (Model.WishlistEnabled)
-        {
-            <li>
-                <a href="@Url.RouteUrl("Wishlist")" class="ico-wishlist">
-                    <span class="wishlist-label">@T("Wishlist")</span>
-                    <span class="wishlist-qty">@T("Wishlist.HeaderQuantity", Model.WishlistItems)</span>
-                </a>
-            </li>
-        }
-        @if (Model.ShoppingCartEnabled)
-        {
-            <li id="topcartlink">
-                <a href="@Url.RouteUrl("ShoppingCart")" class="ico-cart">
-                    <span class="cart-label">@T("ShoppingCart")</span>
-                    <span class="cart-qty">@T("ShoppingCart.HeaderQuantity", Model.ShoppingCartItems)</span>
-                </a>
-            </li>
-        }
-        @Html.Widget("header_links_after")
-    </ul>
-    @if (Model.AllowPrivateMessages && !string.IsNullOrEmpty(Model.AlertMessage))
-    {
-        //new private message notification
-        <script type="text/javascript">
-            $(document).ready(function () {
-                displayPopupNotification('@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.AlertMessage))', 'success', false);
-            });
-        </script>
-    }
-    @if (Model.ShoppingCartEnabled)
-    {
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $('.header').on('mouseenter', '#topcartlink', function () {
-                    $('#flyout-cart').addClass('active');
+            //new private message notification
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    displayPopupNotification('@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.AlertMessage))', 'success', false);
                 });
-                $('.header').on('mouseleave', '#topcartlink', function () {
-                    $('#flyout-cart').removeClass('active');
+            </script>
+        }
+        @if (Model.BorrowCartEnabled)
+        {
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('.header').on('mouseenter', '#topcartlink', function () {
+                        $('#flyout-cart').addClass('active');
+                    });
+                    $('.header').on('mouseleave', '#topcartlink', function () {
+                        $('#flyout-cart').removeClass('active');
+                    });
+                    $('.header').on('mouseenter', '#flyout-cart', function () {
+                        $('#flyout-cart').addClass('active');
+                    });
+                    $('.header').on('mouseleave', '#flyout-cart', function () {
+                        $('#flyout-cart').removeClass('active');
+                    });
                 });
-                $('.header').on('mouseenter', '#flyout-cart', function () {
-                    $('#flyout-cart').addClass('active');
-                });
-                $('.header').on('mouseleave', '#flyout-cart', function () {
-                    $('#flyout-cart').removeClass('active');
-                });
-            });
-        </script>
-    }
+            </script>
+        }
+    </div>
+    <div class="col-sm-6">
+        <div class="headsearch">
+            @Html.Action("SearchBox", "Catalog")
+        </div>
+        <div class="socialnav">
+            <span style="color: #DAEFF3;">Call : +91 76666 76701</span>
+        </div>
+        
+    </div>
+    
 </div>

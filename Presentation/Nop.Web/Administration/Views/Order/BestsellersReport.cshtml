@@ -43,10 +43,10 @@
     </tr>
     <tr @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
         <td class="adminTitle">
-            @Html.NopLabelFor(model => model.OrderStatusId):
+            @Html.NopLabelFor(model => model.SubscriptionOrderStatusId):
         </td>
         <td class="adminData">
-            @Html.DropDownList("OrderStatusId", Model.AvailableOrderStatuses)
+            @Html.DropDownList("SubscriptionOrderStatusId", Model.AvailableSubscriptionOrderStatuses)
         </td>
     </tr>
     <tr>
@@ -174,7 +174,7 @@
                         StartDate: $('#@Html.FieldIdFor(model => model.StartDate)').val(),
                         EndDate: $('#@Html.FieldIdFor(model => model.EndDate)').val(),
                         StoreId: $('#StoreId').val(),
-                        OrderStatusId: $('#OrderStatusId').val(),
+                        SubscriptionOrderStatusId: $('#SubscriptionOrderStatusId').val(),
                         PaymentStatusId: $('#PaymentStatusId').val(),
                         CategoryId: $('#CategoryId').val(),
                         ManufacturerId: $('#ManufacturerId').val(),

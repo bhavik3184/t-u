@@ -17,7 +17,14 @@ namespace Nop.Web.Models.Customer
             this.AvailableTimeZones = new List<SelectListItem>();
             this.AvailableCountries = new List<SelectListItem>();
             this.AvailableStates = new List<SelectListItem>();
+            this.AvailableCities = new List<SelectListItem>();
+            this.AvailableLocalities = new List<SelectListItem>();
+            this.AvailableShippingCountries = new List<SelectListItem>();
+            this.AvailableShippingStates = new List<SelectListItem>();
+            this.AvailableShippingCities = new List<SelectListItem>();
+            this.AvailableShippingLocalities = new List<SelectListItem>();
             this.CustomerAttributes = new List<CustomerAttributeModel>();
+            this.AvailableChildren = new List<SelectListItem>();
         }
 
         [NopResourceDisplayName("Account.Fields.Email")]
@@ -52,8 +59,8 @@ namespace Nop.Web.Models.Customer
         [NopResourceDisplayName("Account.Fields.LastName")]
         [AllowHtml]
         public string LastName { get; set; }
-
-
+        public bool chkshippingaddress { get; set; }
+        
         public bool DateOfBirthEnabled { get; set; }
         [NopResourceDisplayName("Account.Fields.DateOfBirth")]
         public int? DateOfBirthDay { get; set; }
@@ -106,18 +113,87 @@ namespace Nop.Web.Models.Customer
         [AllowHtml]
         public string City { get; set; }
 
+      
+        [NopResourceDisplayName("Account.Fields.StreetAddress")]
+        [AllowHtml]
+        public string ShippingStreetAddress { get; set; }
+
+        
+        [NopResourceDisplayName("Account.Fields.StreetAddress2")]
+        [AllowHtml]
+        public string ShippingStreetAddress2 { get; set; }
+
+        
+        [NopResourceDisplayName("Account.Fields.ZipPostalCode")]
+        [AllowHtml]
+        public string ShippingZipPostalCode { get; set; }
+
+        
+        [NopResourceDisplayName("Account.Fields.City")]
+        [AllowHtml]
+        public string ShippingCity { get; set; }
+
+        public int NoOfChildren { get; set; }
+
+        public string Name1 { get; set; }
+
+        [UIHint("DateTimeNullable")]
+        public DateTime? BirthDate1 { get; set; }
+
+        public string Name2 { get; set; }
+
+        [UIHint("DateTimeNullable")]
+        public DateTime? BirthDate2 { get; set; }
+
+
+        public string Name3 { get; set; }
+
+        [UIHint("DateTimeNullable")]
+        public DateTime? BirthDate3 { get; set; }
+
+
+        public string Name4 { get; set; }
+
+        [UIHint("DateTimeNullable")]
+        public DateTime? BirthDate4 { get; set; }
+
+        public string Name5 { get; set; }
+
+        [UIHint("DateTimeNullable")]
+        public DateTime? BirthDate5 { get; set; }
+        
+        public IList<SelectListItem> AvailableChildren { get; set; }
+
         public bool CountryEnabled { get; set; }
         public bool CountryRequired { get; set; }
         [NopResourceDisplayName("Account.Fields.Country")]
         public int CountryId { get; set; }
         public IList<SelectListItem> AvailableCountries { get; set; }
 
+        public IList<SelectListItem> AvailableShippingCountries { get; set; }
+
+        public int ShippingCountryId { get; set; }
+
         public bool StateProvinceEnabled { get; set; }
         public bool StateProvinceRequired { get; set; }
         [NopResourceDisplayName("Account.Fields.StateProvince")]
         public int StateProvinceId { get; set; }
+
+        public int ShippingStateProvinceId { get; set; }
         public IList<SelectListItem> AvailableStates { get; set; }
 
+        public IList<SelectListItem> AvailableShippingStates { get; set; }
+
+        public int CityId { get; set; }
+        public IList<SelectListItem> AvailableCities { get; set; }
+
+        public IList<SelectListItem> AvailableShippingCities { get; set; }
+        public int ShippingCityId { get; set; }
+        public int LocalityId { get; set; }
+        public IList<SelectListItem> AvailableLocalities { get; set; }
+
+        public IList<SelectListItem> AvailableShippingLocalities { get; set; }
+        public int ShippingLocalityId { get; set; }
         public bool PhoneEnabled { get; set; }
         public bool PhoneRequired { get; set; }
         [NopResourceDisplayName("Account.Fields.Phone")]

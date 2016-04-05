@@ -10,7 +10,7 @@ namespace Nop.Core.Domain.Catalog
         /// <summary>
         /// Gets or sets the product identifier
         /// </summary>
-        public int ProductId { get; set; }
+        public int PlanId { get; set; }
 
         /// <summary>
         /// Gets or sets the store identifier (0 - all stores)
@@ -35,7 +35,7 @@ namespace Nop.Core.Domain.Catalog
         /// <summary>
         /// Gets or sets the product
         /// </summary>
-        public virtual Product Product { get; set; }
+        public virtual Plan Plan { get; set; }
 
         /// <summary>
         /// Gets or sets the customer role

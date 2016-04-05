@@ -5,7 +5,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Vendors;
 
@@ -49,62 +49,62 @@ namespace Nop.Services.Messages
         
         #endregion
 
-        #region Order workflow
+        #region SubscriptionOrder workflow
 
         /// <summary>
         /// Sends an order placed notification to a vendor
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="vendor">Vendor instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderPlacedVendorNotification(Order order, Vendor vendor, int languageId);
+        int SendSubscriptionOrderPlacedVendorNotification(SubscriptionOrder order, Vendor vendor, int languageId);
 
         /// <summary>
         /// Sends an order placed notification to a store owner
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderPlacedStoreOwnerNotification(Order order, int languageId);
+        int SendSubscriptionOrderPlacedStoreOwnerNotification(SubscriptionOrder order, int languageId);
 
         /// <summary>
         /// Sends an order paid notification to a store owner
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderPaidStoreOwnerNotification(Order order, int languageId);
+        int SendSubscriptionOrderPaidStoreOwnerNotification(SubscriptionOrder order, int languageId);
 
         /// <summary>
         /// Sends an order paid notification to a customer
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <param name="attachmentFilePath">Attachment file path</param>
         /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderPaidCustomerNotification(Order order, int languageId,
+        int SendSubscriptionOrderPaidCustomerNotification(SubscriptionOrder order, int languageId,
             string attachmentFilePath = null, string attachmentFileName = null);
 
         /// <summary>
         /// Sends an order paid notification to a vendor
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="vendor">Vendor instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderPaidVendorNotification(Order order, Vendor vendor, int languageId);
+        int SendSubscriptionOrderPaidVendorNotification(SubscriptionOrder order, Vendor vendor, int languageId);
 
         /// <summary>
         /// Sends an order placed notification to a customer
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <param name="attachmentFilePath">Attachment file path</param>
         /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderPlacedCustomerNotification(Order order, int languageId,
+        int SendSubscriptionOrderPlacedCustomerNotification(SubscriptionOrder order, int languageId,
             string attachmentFilePath = null, string attachmentFileName = null);
 
         /// <summary>
@@ -126,47 +126,47 @@ namespace Nop.Services.Messages
         /// <summary>
         /// Sends an order completed notification to a customer
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <param name="attachmentFilePath">Attachment file path</param>
         /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderCompletedCustomerNotification(Order order, int languageId, 
+        int SendSubscriptionOrderCompletedCustomerNotification(SubscriptionOrder order, int languageId,
             string attachmentFilePath = null, string attachmentFileName = null);
 
         /// <summary>
         /// Sends an order cancelled notification to a customer
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderCancelledCustomerNotification(Order order, int languageId);
+        int SendSubscriptionOrderCancelledCustomerNotification(SubscriptionOrder order, int languageId);
 
         /// <summary>
         /// Sends an order refunded notification to a store owner
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="refundedAmount">Amount refunded</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderRefundedStoreOwnerNotification(Order order, decimal refundedAmount, int languageId);
+        int SendSubscriptionOrderRefundedStoreOwnerNotification(SubscriptionOrder order, decimal refundedAmount, int languageId);
 
         /// <summary>
         /// Sends an order refunded notification to a customer
         /// </summary>
-        /// <param name="order">Order instance</param>
+        /// <param name="order">SubscriptionOrder instance</param>
         /// <param name="refundedAmount">Amount refunded</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        int SendOrderRefundedCustomerNotification(Order order, decimal refundedAmount, int languageId);
+        int SendSubscriptionOrderRefundedCustomerNotification(SubscriptionOrder order, decimal refundedAmount, int languageId);
 
         /// <summary>
         /// Sends a new order note added notification to a customer
         /// </summary>
-        /// <param name="orderNote">Order note</param>
+        /// <param name="orderNote">SubscriptionOrder note</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        int SendNewOrderNoteAddedCustomerNotification(OrderNote orderNote, int languageId);
+        int SendNewSubscriptionOrderNoteAddedCustomerNotification(SubscriptionOrderNote orderNote, int languageId);
 
         /// <summary>
         /// Sends a "Recurring payment cancelled" notification to a store owner
@@ -175,6 +175,119 @@ namespace Nop.Services.Messages
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
         int SendRecurringPaymentCancelledStoreOwnerNotification(RecurringPayment recurringPayment, int languageId);
+
+        #endregion
+
+        #region Order workflow
+
+        /// <summary>
+        /// Sends an order placed notification to a vendor
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="vendor">Vendor instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderPlacedVendorNotification(SubscriptionOrder order, Vendor vendor, int languageId);
+
+        /// <summary>
+        /// Sends an order placed notification to a store owner
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderPlacedStoreOwnerNotification(SubscriptionOrder order, int languageId);
+
+        /// <summary>
+        /// Sends an order paid notification to a store owner
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderPaidStoreOwnerNotification(SubscriptionOrder order, int languageId);
+
+        /// <summary>
+        /// Sends an order paid notification to a customer
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <param name="attachmentFilePath">Attachment file path</param>
+        /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderPaidCustomerNotification(SubscriptionOrder order, int languageId,
+            string attachmentFilePath = null, string attachmentFileName = null);
+
+        /// <summary>
+        /// Sends an order paid notification to a vendor
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="vendor">Vendor instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderPaidVendorNotification(SubscriptionOrder order, Vendor vendor, int languageId);
+
+        /// <summary>
+        /// Sends an order placed notification to a customer
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <param name="attachmentFilePath">Attachment file path</param>
+        /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderPlacedCustomerNotification(SubscriptionOrder order, int languageId,
+            string attachmentFilePath = null, string attachmentFileName = null);
+ 
+
+        /// <summary>
+        /// Sends an order completed notification to a customer
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <param name="attachmentFilePath">Attachment file path</param>
+        /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderCompletedCustomerNotification(SubscriptionOrder order, int languageId, 
+            string attachmentFilePath = null, string attachmentFileName = null);
+
+        /// <summary>
+        /// Sends an order cancelled notification to a customer
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderCancelledCustomerNotification(SubscriptionOrder order, int languageId);
+
+        /// <summary>
+        /// Sends an order refunded notification to a store owner
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="refundedAmount">Amount refunded</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderRefundedStoreOwnerNotification(SubscriptionOrder order, decimal refundedAmount, int languageId);
+
+        /// <summary>
+        /// Sends an order refunded notification to a customer
+        /// </summary>
+        /// <param name="order">Order instance</param>
+        /// <param name="refundedAmount">Amount refunded</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        int SendOrderRefundedCustomerNotification(SubscriptionOrder order, decimal refundedAmount, int languageId);
+
+        /// <summary>
+        /// Sends a new order note added notification to a customer
+        /// </summary>
+        /// <param name="orderNote">Order note</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        int SendNewOrderNoteAddedCustomerNotification(SubscriptionOrderNote orderNote, int languageId);
+
+        /// <summary>
+        /// Sends a "Recurring payment cancelled" notification to a store owner
+        /// </summary>
+        /// <param name="recurringPayment">Recurring payment</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
         
         #endregion
 
@@ -216,7 +329,7 @@ namespace Nop.Services.Messages
             Product product, string customerEmail, string friendsEmail, string personalMessage);
 
         /// <summary>
-        /// Sends wishlist "email a friend" message
+        /// Sends mytoybox "email a friend" message
         /// </summary>
         /// <param name="customer">Customer</param>
         /// <param name="languageId">Message language identifier</param>
@@ -224,7 +337,7 @@ namespace Nop.Services.Messages
         /// <param name="friendsEmail">Friend's email</param>
         /// <param name="personalMessage">Personal message</param>
         /// <returns>Queued email identifier</returns>
-        int SendWishlistEmailAFriendMessage(Customer customer, int languageId,
+        int SendMyToyBoxEmailAFriendMessage(Customer customer, int languageId,
              string customerEmail, string friendsEmail, string personalMessage);
 
         #endregion
@@ -365,7 +478,7 @@ namespace Nop.Services.Messages
         /// <summary>
         /// Sends a 'Back in stock' notification message to a customer
         /// </summary>
-        /// <param name="subscription">Subscription</param>
+        /// <param name="subscription">SubscriptionOrder</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
         int SendBackInStockNotification(BackInStockSubscription subscription, int languageId);

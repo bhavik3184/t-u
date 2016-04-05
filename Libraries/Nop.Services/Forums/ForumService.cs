@@ -1095,11 +1095,11 @@ namespace Nop.Services.Forums
                           (forumId == 0 || fs.ForumId == forumId) &&
                           (topicId == 0 || fs.TopicId == topicId) &&
                           (c.Active && !c.Deleted)
-                          select fs.SubscriptionGuid;
+                          select fs.SubscriptionOrderGuid;
 
             var query = from fs in _forumSubscriptionRepository.Table
-                        where fsQuery.Contains(fs.SubscriptionGuid)
-                        orderby fs.CreatedOnUtc descending, fs.SubscriptionGuid descending
+                        where fsQuery.Contains(fs.SubscriptionOrderGuid)
+                        orderby fs.CreatedOnUtc descending, fs.SubscriptionOrderGuid descending
                         select fs;
 
             var forumSubscriptions = new PagedList<ForumSubscription>(query, pageIndex, pageSize);
@@ -1127,7 +1127,7 @@ namespace Nop.Services.Forums
         /// Updates the forum subscription
         /// </summary>
         /// <param name="forumSubscription">Forum subscription</param>
-        public virtual void UpdateSubscription(ForumSubscription forumSubscription)
+        public virtual void UpdateSubscriptionOrder(ForumSubscription forumSubscription)
         {
             if (forumSubscription == null)
             {

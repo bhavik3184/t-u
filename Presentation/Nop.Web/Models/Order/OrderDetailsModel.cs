@@ -26,7 +26,7 @@ namespace Nop.Web.Models.Order
 
         public DateTime CreatedOn { get; set; }
 
-        public string OrderStatus { get; set; }
+        public string SubscriptionOrderStatus { get; set; }
 
         public bool IsReOrderAllowed { get; set; }
 
@@ -48,9 +48,9 @@ namespace Nop.Web.Models.Order
         public bool CanRePostProcessPayment { get; set; }
         public Dictionary<string, object> CustomValues { get; set; }
 
-        public string OrderSubtotal { get; set; }
-        public string OrderSubTotalDiscount { get; set; }
-        public string OrderShipping { get; set; }
+        public string SubscriptionOrderSubtotal { get; set; }
+        public string SubscriptionOrderSubTotalDiscount { get; set; }
+        public string SubscriptionOrderShipping { get; set; }
         public string PaymentMethodAdditionalFee { get; set; }
         public string CheckoutAttributeInfo { get; set; }
 
@@ -61,10 +61,10 @@ namespace Nop.Web.Models.Order
         public bool DisplayTax { get; set; }
         public bool DisplayTaxRates { get; set; }
 
-        public string OrderTotalDiscount { get; set; }
+        public string SubscriptionOrderTotalDiscount { get; set; }
         public int RedeemedRewardPoints { get; set; }
         public string RedeemedRewardPointsAmount { get; set; }
-        public string OrderTotal { get; set; }
+        public string SubscriptionOrderTotal { get; set; }
         
         public IList<GiftCard> GiftCards { get; set; }
 

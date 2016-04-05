@@ -6,7 +6,7 @@
     //title
     Html.AddTitleParts(T("PageTitle.NewsArchive").Text);
 }
-<div class="page news-list-page">
+<div class="page news-list-page article">
     <div class="page-title">
         <a href="@Url.RouteUrl("NewsRSS", new { languageId = Model.WorkingLanguageId })" class="link-rss" title="@T("News.RSS.Hint")">@T("News.RSS")</a>
         <h1>@T("News")</h1>

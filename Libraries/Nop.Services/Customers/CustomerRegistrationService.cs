@@ -4,7 +4,7 @@ using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Localization;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 

@@ -1,24 +1,24 @@
 ﻿@model ProductOverviewModel
 @using Nop.Core
-@using Nop.Core.Domain.Orders
+@using Nop.Core.Domain.SubscriptionOrders
 @using Nop.Core.Domain.Tax
 @using Nop.Core.Infrastructure
 @using Nop.Web.Models.Catalog;
 @{
     //prepare "Add to cart" AJAX link
     string addtocartlink = "";
-    var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
+    var borrowCartTypeId = (int)BorrowCartType.BorrowCart;
     var quantity = 1;
     if (Model.ProductPrice.ForceRedirectionAfterAddingToCart)
     {
-        addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity, forceredirection = Model.ProductPrice.ForceRedirectionAfterAddingToCart });
+        addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, borrowCartTypeId = borrowCartTypeId, quantity = quantity, forceredirection = Model.ProductPrice.ForceRedirectionAfterAddingToCart });
     }
     else
     {
-        addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity });
+        addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, borrowCartTypeId = borrowCartTypeId, quantity = quantity });
     }
 
-    var addtowishlistlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
+    var addtomytoyboxlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.Id, borrowCartTypeId = (int)BorrowCartType.MyToyBox, quantity = quantity });
     var addtocomparelink = Url.RouteUrl("AddProductToCompare", new { productId = Model.Id });
 }
 <div class="product-item" data-productid="@Model.Id">
@@ -71,25 +71,19 @@
                 @*<input type="button" value="@T("Products.Details")" class="button-1 product-box-detail-button" onclick="setLocation('@Url.RouteUrl("Product", new { SeName = Model.SeName })')" />*@
                 @if (!Model.ProductPrice.DisableBuyButton)
                 {
-                    var addToCartText = T("ShoppingCart.AddToCart").Text;
+                    var addToCartText = T("BorrowCart.AddToCart").Text;
                     if (Model.ProductPrice.IsRental)
                     {
-                        addToCartText = T("ShoppingCart.Rent").Text;
+                        addToCartText = T("BorrowCart.Rent").Text;
                     }
                     if (Model.ProductPrice.AvailableForPreOrder)
                     {
-                        addToCartText = T("ShoppingCart.PreOrder").Text;
+                        addToCartText = T("BorrowCart.PreOrder").Text;
                     }
-                    <input type="button" value="@(addToCartText)" class="button-2 product-box-add-to-cart-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;" />
+                    <input type="button" value="Add to MyToyBox" class=" button-2 product-box-add-to-cart-button" onclick="AjaxCart.addproducttocart_catalog('@addtomytoyboxlink');return false;" />
+                    @*<input type="button" value="@T("ShoppingCart.AddToMyToyBox")" title="@T("ShoppingCart.AddToMyToyBox")" class="button-2 add-to-mytoybox-button" onclick="AjaxCart.addproducttocart_catalog('@addtomytoyboxlink');return false;" />*@
                 }
-                @if (!Model.ProductPrice.DisableAddToCompareListButton)
-                {
-                    <input type="button" value="@T("ShoppingCart.AddToCompareList")" title="@T("ShoppingCart.AddToCompareList")" class="button-2 add-to-compare-list-button" onclick="AjaxCart.addproducttocomparelist('@addtocomparelink');return false;" />
-                }
-                @if (!Model.ProductPrice.DisableWishlistButton)
-                {
-                    <input type="button" value="@T("ShoppingCart.AddToWishlist")" title="@T("ShoppingCart.AddToWishlist")" class="button-2 add-to-wishlist-button" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink');return false;" />
-                }
+                 
             </div>
             @Html.Widget("productbox_addinfo_after", Model.Id)
         </div>

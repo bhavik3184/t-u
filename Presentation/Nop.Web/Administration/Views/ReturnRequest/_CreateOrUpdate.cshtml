@@ -1,5 +1,5 @@
 ﻿@model ReturnRequestModel
-@using Nop.Core.Domain.Orders;
+@using Nop.Core.Domain.SubscriptionOrders;
 @Html.ValidationSummary(false)
 @Html.HiddenFor(model => model.Id)
 <table class="adminContent">
@@ -13,10 +13,10 @@
     </tr>
     <tr>
         <td class="adminTitle">
-            @Html.NopLabelFor(model => model.OrderId):
+            @Html.NopLabelFor(model => model.SubscriptionOrderId):
         </td>
         <td class="adminData">
-            @Html.ActionLink(T("Admin.Common.View").Text, "Edit", "Order", new { id = Model.OrderId }, new { })
+            @Html.ActionLink(T("Admin.Common.View").Text, "Edit", "Order", new { id = Model.SubscriptionOrderId }, new { })
         </td>
     </tr>
     <tr>
@@ -87,6 +87,14 @@
         <td class="adminData">
             @Html.TextAreaFor(model => model.StaffNotes, new { style = "Width: 500px; Height: 150px;" })
             @Html.ValidationMessageFor(model => model.StaffNotes)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.AvaliableDate):
+        </td>
+        <td class="adminData">
+            @Html.DisplayFor(model => model.AvaliableDate)
         </td>
     </tr>
     <tr>

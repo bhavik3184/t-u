@@ -2,18 +2,18 @@
 using System.Linq;
 using System.Web.Mvc;
 using Nop.Admin.Extensions;
-using Nop.Admin.Models.Orders;
+using Nop.Admin.Models.SubscriptionOrders;
 using Nop.Core;
 using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Localization;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Services.Catalog;
 using Nop.Services.Directory;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
@@ -172,7 +172,7 @@ namespace Nop.Admin.Controllers
                 return RedirectToAction("List");
 
             var model = giftCard.ToModel();
-            model.PurchasedWithOrderId = giftCard.PurchasedWithOrderItem != null ? (int?)giftCard.PurchasedWithOrderItem.OrderId : null;
+            model.PurchasedWithSubscriptionOrderId = giftCard.PurchasedWithSubscriptionOrderItem != null ? (int?)giftCard.PurchasedWithSubscriptionOrderItem.SubscriptionOrderId : null;
             model.RemainingAmountStr = _priceFormatter.FormatPrice(giftCard.GetGiftCardRemainingAmount(), true, false);
             model.AmountStr = _priceFormatter.FormatPrice(giftCard.Amount, true, false);
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(giftCard.CreatedOnUtc, DateTimeKind.Utc);
@@ -190,7 +190,7 @@ namespace Nop.Admin.Controllers
 
             var giftCard = _giftCardService.GetGiftCardById(model.Id);
 
-            model.PurchasedWithOrderId = giftCard.PurchasedWithOrderItem != null ? (int?)giftCard.PurchasedWithOrderItem.OrderId : null;
+            model.PurchasedWithSubscriptionOrderId = giftCard.PurchasedWithSubscriptionOrderItem != null ? (int?)giftCard.PurchasedWithSubscriptionOrderItem.SubscriptionOrderId : null;
             model.RemainingAmountStr = _priceFormatter.FormatPrice(giftCard.GetGiftCardRemainingAmount(), true, false);
             model.AmountStr = _priceFormatter.FormatPrice(giftCard.Amount, true, false);
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(giftCard.CreatedOnUtc, DateTimeKind.Utc);
@@ -236,7 +236,7 @@ namespace Nop.Admin.Controllers
             var giftCard = _giftCardService.GetGiftCardById(model.Id);
 
             model = giftCard.ToModel();
-            model.PurchasedWithOrderId = giftCard.PurchasedWithOrderItem != null ? (int?)giftCard.PurchasedWithOrderItem.OrderId : null;
+            model.PurchasedWithSubscriptionOrderId = giftCard.PurchasedWithSubscriptionOrderItem != null ? (int?)giftCard.PurchasedWithSubscriptionOrderItem.SubscriptionOrderId : null;
             model.RemainingAmountStr = _priceFormatter.FormatPrice(giftCard.GetGiftCardRemainingAmount(), true, false);
             model.AmountStr = _priceFormatter.FormatPrice(giftCard.Amount, true, false);
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(giftCard.CreatedOnUtc, DateTimeKind.Utc);
@@ -250,7 +250,7 @@ namespace Nop.Admin.Controllers
                     throw new NopException("Sender email is not valid");
 
                 var languageId = 0;
-                var order = giftCard.PurchasedWithOrderItem != null ? giftCard.PurchasedWithOrderItem.Order : null;
+                var order = giftCard.PurchasedWithSubscriptionOrderItem != null ? giftCard.PurchasedWithSubscriptionOrderItem.SubscriptionOrder : null;
                 if (order != null)
                 {
                     var customerLang = _languageService.GetLanguageById(order.CustomerLanguageId);
@@ -314,7 +314,7 @@ namespace Nop.Admin.Controllers
                 .Select(x => new GiftCardModel.GiftCardUsageHistoryModel
                 {
                     Id = x.Id,
-                    OrderId = x.UsedWithOrderId,
+                    SubscriptionOrderId = x.UsedWithSubscriptionOrderId,
                     UsedValue = _priceFormatter.FormatPrice(x.UsedValue, true, false),
                     CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc)
                 })

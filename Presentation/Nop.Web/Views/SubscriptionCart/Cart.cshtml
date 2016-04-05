@@ -1,0 +1,41 @@
+﻿@model SubscriptionCartModel
+@using Nop.Web.Models.Checkout
+@using Nop.Web.Models.SubscriptionCart;
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.SubscriptionCart").Text);
+}
+@Html.Action("CheckoutProgress", "CheckOut", new { step = CheckoutProgressStep.Confirm })
+<style>
+    #content .article {
+        padding: 30px !important;
+    }
+</style>
+<div class="page borrow-cart-page" id="content">
+   
+    <div class="page-body article">
+        <div class="page-title">
+            <h1>@T("SubscriptionCart")</h1>
+        </div>
+        @if (Model.Warnings.Count > 0)
+        {
+        <div class="message-error">
+            <ul>
+                @foreach (var warning in Model.Warnings)
+                {
+                    <li>@warning</li>
+                }
+            </ul>
+        </div>
+        }
+        @Html.Action("SubscriptionPlan", "Plan")
+        @Html.Partial("SubscriptionOrderSummary", Model)
+       
+        <div class="addon-buttons">
+            @*Payment method buttons (e.g. GoogleCheckoutButton, Paypal Express)*@
+            @Html.Partial("_ButtonPaymentMethod", Model)
+        </div>
+    </div>
+        </div>

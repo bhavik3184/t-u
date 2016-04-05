@@ -195,7 +195,7 @@ namespace Nop.Services.Catalog
                 AllowedQuantities = product.AllowedQuantities,
                 AllowAddingOnlyExistingAttributeCombinations = product.AllowAddingOnlyExistingAttributeCombinations,
                 DisableBuyButton = product.DisableBuyButton,
-                DisableWishlistButton = product.DisableWishlistButton,
+                DisableMyToyBoxButton = product.DisableMyToyBoxButton,
                 AvailableForPreOrder = product.AvailableForPreOrder,
                 PreOrderAvailabilityStartDateTimeUtc = product.PreOrderAvailabilityStartDateTimeUtc,
                 CallForPrice = product.CallForPrice,
@@ -507,18 +507,7 @@ namespace Nop.Services.Catalog
             }
 
             //tier prices
-            foreach (var tierPrice in product.TierPrices)
-            {
-                _productService.InsertTierPrice(
-                    new TierPrice
-                    {
-                        ProductId = productCopy.Id,
-                        StoreId = tierPrice.StoreId,
-                        CustomerRoleId = tierPrice.CustomerRoleId,
-                        Quantity = tierPrice.Quantity,
-                        Price = tierPrice.Price
-                    });
-            }
+            
 
             // product <-> discounts mapping
             foreach (var discount in product.AppliedDiscounts)

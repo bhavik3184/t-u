@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Core.Domain.Shipping
 {
@@ -14,7 +14,7 @@ namespace Nop.Core.Domain.Shipping
         /// <summary>
         /// Gets or sets the order identifier
         /// </summary>
-        public int OrderId { get; set; }
+        public int OrderItemId { get; set; }
         
         /// <summary>
         /// Gets or sets the tracking number of this shipment
@@ -50,7 +50,7 @@ namespace Nop.Core.Domain.Shipping
         /// <summary>
         /// Gets the order
         /// </summary>
-        public virtual Order Order { get; set; }
+        public virtual OrderItem OrderItem { get; set; }
 
         /// <summary>
         /// Gets or sets the shipment items

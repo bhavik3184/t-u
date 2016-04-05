@@ -10,9 +10,9 @@ namespace Nop.Core.Domain.Discounts
     public partial class Discount : BaseEntity
     {
         private ICollection<DiscountRequirement> _discountRequirements;
-        private ICollection<Category> _appliedToCategories;
+        private ICollection<MembershipCategory> _appliedToCategories;
         private ICollection<Manufacturer> _appliedToManufacturers;
-        private ICollection<Product> _appliedToProducts;
+        private ICollection<Plan> _appliedToPlans;
 
         /// <summary>
         /// Gets or sets the name
@@ -128,9 +128,9 @@ namespace Nop.Core.Domain.Discounts
         /// <summary>
         /// Gets or sets the categories
         /// </summary>
-        public virtual ICollection<Category> AppliedToCategories
+        public virtual ICollection<MembershipCategory> AppliedToCategories
         {
-            get { return _appliedToCategories ?? (_appliedToCategories = new List<Category>()); }
+            get { return _appliedToCategories ?? (_appliedToCategories = new List<MembershipCategory>()); }
             protected set { _appliedToCategories = value; }
         }
 
@@ -145,10 +145,10 @@ namespace Nop.Core.Domain.Discounts
         /// <summary>
         /// Gets or sets the products 
         /// </summary>
-        public virtual ICollection<Product> AppliedToProducts
+        public virtual ICollection<Plan> AppliedToPlans
         {
-            get { return _appliedToProducts ?? (_appliedToProducts = new List<Product>()); }
-            protected set { _appliedToProducts = value; }
+            get { return _appliedToPlans ?? (_appliedToPlans = new List<Plan>()); }
+            protected set { _appliedToPlans = value; }
         }
     }
 }

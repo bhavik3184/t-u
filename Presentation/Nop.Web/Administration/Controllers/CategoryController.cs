@@ -44,6 +44,7 @@ namespace Nop.Admin.Controllers
         private readonly IStoreService _storeService;
         private readonly IStoreMappingService _storeMappingService;
         private readonly IExportManager _exportManager;
+        private readonly IImportManager _importManager;
         private readonly ICustomerActivityService _customerActivityService;
         private readonly IVendorService _vendorService;
         private readonly CatalogSettings _catalogSettings;
@@ -52,8 +53,10 @@ namespace Nop.Admin.Controllers
         
         #region Constructors
 
-        public CategoryController(ICategoryService categoryService, ICategoryTemplateService categoryTemplateService,
-            IManufacturerService manufacturerService, IProductService productService, 
+        public CategoryController(ICategoryService categoryService, 
+            ICategoryTemplateService categoryTemplateService,
+            IManufacturerService manufacturerService, 
+            IProductService productService, 
             ICustomerService customerService,
             IUrlRecordService urlRecordService, 
             IPictureService pictureService, 
@@ -65,7 +68,8 @@ namespace Nop.Admin.Controllers
             IAclService aclService, 
             IStoreService storeService,
             IStoreMappingService storeMappingService,
-            IExportManager exportManager, 
+            IExportManager exportManager,
+            IImportManager importManager, 
             IVendorService vendorService, 
             ICustomerActivityService customerActivityService,
             CatalogSettings catalogSettings)
@@ -87,6 +91,7 @@ namespace Nop.Admin.Controllers
             this._storeService = storeService;
             this._storeMappingService = storeMappingService;
             this._exportManager = exportManager;
+            this._importManager = importManager;
             this._customerActivityService = customerActivityService;
             this._catalogSettings = catalogSettings;
         }
@@ -585,6 +590,36 @@ namespace Nop.Admin.Controllers
                 ErrorNotification(exc);
                 return RedirectToAction("List");
             }
+        }
+
+        [HttpPost]
+        public ActionResult ImportExcel()
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCategories))
+                return AccessDeniedView();
+
+
+            try
+            {
+                var file = Request.Files["importexcelfile"];
+                if (file != null && file.ContentLength > 0)
+                {
+                    _importManager.ImportCategoriesFromXlsx(file.InputStream);
+                }
+                else
+                {
+                    ErrorNotification(_localizationService.GetResource("Admin.Common.UploadFile"));
+                    return RedirectToAction("List");
+                }
+                SuccessNotification(_localizationService.GetResource("Categories Imported Successfully."));
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                ErrorNotification(exc);
+                return RedirectToAction("List");
+            }
+
         }
 
         #endregion

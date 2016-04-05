@@ -1,0 +1,11 @@
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PayPalStandard\Views\PaymentPayPalStandard\Configure.cshtml
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PayPalStandard\Views\PaymentPayPalStandard\PaymentInfo.cshtml
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PayPalStandard\web.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PayPalStandard\Description.txt
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PayPalStandard\logo.jpg
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PayPalStandard\Nop.Plugin.Payments.PayPalStandard.dll.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PayPalStandard\Nop.Plugin.Payments.PayPalStandard.dll
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Payments.PayPalStandard\Nop.Plugin.Payments.PayPalStandard.pdb
+C:\projects\NewToys\Plugins\Nop.Plugin.Payments.PayPalStandard\obj\Debug\Nop.Plugin.Payments.PayPalStandard.csprojResolveAssemblyReference.cache
+C:\projects\NewToys\Plugins\Nop.Plugin.Payments.PayPalStandard\obj\Debug\Nop.Plugin.Payments.PayPalStandard.dll
+C:\projects\NewToys\Plugins\Nop.Plugin.Payments.PayPalStandard\obj\Debug\Nop.Plugin.Payments.PayPalStandard.pdb

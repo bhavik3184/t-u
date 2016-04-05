@@ -75,6 +75,8 @@ namespace Nop.Services.Catalog
 
         private readonly IRepository<Category> _categoryRepository;
         private readonly IRepository<ProductCategory> _productCategoryRepository;
+        private readonly IRepository<PlanCategory> _planCategoryRepository;
+        private readonly IRepository<Plan> _planRepository;
         private readonly IRepository<Product> _productRepository;
         private readonly IRepository<AclRecord> _aclRepository;
         private readonly IRepository<StoreMapping> _storeMappingRepository;
@@ -108,6 +110,8 @@ namespace Nop.Services.Catalog
         public CategoryService(ICacheManager cacheManager,
             IRepository<Category> categoryRepository,
             IRepository<ProductCategory> productCategoryRepository,
+            IRepository<PlanCategory> planCategoryRepository,
+            IRepository<Plan> planRepository,
             IRepository<Product> productRepository,
             IRepository<AclRecord> aclRepository,
             IRepository<StoreMapping> storeMappingRepository,
@@ -121,6 +125,8 @@ namespace Nop.Services.Catalog
             this._cacheManager = cacheManager;
             this._categoryRepository = categoryRepository;
             this._productCategoryRepository = productCategoryRepository;
+            this._planCategoryRepository = planCategoryRepository;
+            this._planRepository = planRepository;
             this._productRepository = productRepository;
             this._aclRepository = aclRepository;
             this._storeMappingRepository = storeMappingRepository;
@@ -136,6 +142,20 @@ namespace Nop.Services.Catalog
 
         #region Methods
 
+        public virtual void DeleteCategoryAll()
+        {
+
+
+            var query = _categoryRepository.Table;
+
+            var categories = query.ToList();
+            //reset a "Parent category" property of all child subcategories
+            // var subcategories = GetAllCategoriesByParentCategoryId(category.Id, true);
+            foreach (var subcategory in categories)
+            {
+                _categoryRepository.Delete(subcategory);
+            }
+        }
         /// <summary>
         /// Delete category
         /// </summary>
@@ -210,6 +230,27 @@ namespace Nop.Services.Catalog
                 query = query.OrderBy(c => c.ParentCategoryId).ThenBy(c => c.DisplayOrder);
             }
             
+            var unsortedCategories = query.ToList();
+
+            //sort categories
+            var sortedCategories = unsortedCategories.SortCategoriesForTree();
+
+            //paging
+            return new PagedList<Category>(sortedCategories, pageIndex, pageSize);
+        }
+
+        public virtual IPagedList<Category> GetAllBaseCategories(string categoryName = "",
+         int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false)
+        {
+            var query = _categoryRepository.Table;
+            if (!showHidden)
+                query = query.Where(c => c.Published);
+            if (!String.IsNullOrWhiteSpace(categoryName))
+                query = query.Where(c => c.Name.Contains(categoryName));
+            query = query.Where(c => !c.Deleted);
+            query = query.Where(c => c.ParentCategoryId == 0);
+            query = query.OrderBy(c => c.DisplayOrder).ThenBy(c => c.DisplayOrder);
+
             var unsortedCategories = query.ToList();
 
             //sort categories
@@ -564,6 +605,174 @@ namespace Nop.Services.Catalog
 
             //event notification
             _eventPublisher.EntityUpdated(productCategory);
+        }
+
+
+        public virtual void DeletePlanCategory(PlanCategory planCategory)
+        {
+            if (planCategory == null)
+                throw new ArgumentNullException("planCategory");
+
+            _planCategoryRepository.Delete(planCategory);
+
+            //cache
+            _cacheManager.RemoveByPattern(CATEGORIES_PATTERN_KEY);
+            _cacheManager.RemoveByPattern(PRODUCTCATEGORIES_PATTERN_KEY);
+
+            //event notification
+            _eventPublisher.EntityDeleted(planCategory);
+        }
+
+        /// <summary>
+        /// Gets plan category mapping collection
+        /// </summary>
+        /// <param name="categoryId">Category identifier</param>
+        /// <param name="pageIndex">Page index</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="showHidden">A value indicating whether to show hidden records</param>
+        /// <returns>Plan a category mapping collection</returns>
+        public virtual IPagedList<PlanCategory> GetPlanCategoriesByCategoryId(int categoryId,
+            int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false)
+        {
+            if (categoryId == 0)
+                return new PagedList<PlanCategory>(new List<PlanCategory>(), pageIndex, pageSize);
+
+            string key = string.Format(PRODUCTCATEGORIES_ALLBYCATEGORYID_KEY, showHidden, categoryId, pageIndex, pageSize, _workContext.CurrentCustomer.Id, _storeContext.CurrentStore.Id);
+            return _cacheManager.Get(key, () =>
+            {
+                var query = from pc in _planCategoryRepository.Table
+                            join p in _planRepository.Table on pc.PlanId equals p.Id
+                            where pc.CategoryId == categoryId &&
+                                  !p.Deleted &&
+                                  (showHidden || p.Published)
+                            orderby pc.DisplayOrder
+                            select pc;
+
+                if (!showHidden && (!_catalogSettings.IgnoreAcl || !_catalogSettings.IgnoreStoreLimitations))
+                {
+                    if (!_catalogSettings.IgnoreAcl)
+                    {
+                        //ACL (access control list)
+                        var allowedCustomerRolesIds = _workContext.CurrentCustomer.GetCustomerRoleIds();
+                        query = from pc in query
+                                join c in _categoryRepository.Table on pc.CategoryId equals c.Id
+                                join acl in _aclRepository.Table
+                                on new { c1 = c.Id, c2 = "Category" } equals new { c1 = acl.EntityId, c2 = acl.EntityName } into c_acl
+                                from acl in c_acl.DefaultIfEmpty()
+                                where !c.SubjectToAcl || allowedCustomerRolesIds.Contains(acl.CustomerRoleId)
+                                select pc;
+                    }
+                    if (!_catalogSettings.IgnoreStoreLimitations)
+                    {
+                        //Store mapping
+                        var currentStoreId = _storeContext.CurrentStore.Id;
+                        query = from pc in query
+                                join c in _categoryRepository.Table on pc.CategoryId equals c.Id
+                                join sm in _storeMappingRepository.Table
+                                on new { c1 = c.Id, c2 = "Category" } equals new { c1 = sm.EntityId, c2 = sm.EntityName } into c_sm
+                                from sm in c_sm.DefaultIfEmpty()
+                                where !c.LimitedToStores || currentStoreId == sm.StoreId
+                                select pc;
+                    }
+                    //only distinct categories (group by ID)
+                    query = from c in query
+                            group c by c.Id
+                                into cGroup
+                                orderby cGroup.Key
+                                select cGroup.FirstOrDefault();
+                    query = query.OrderBy(pc => pc.DisplayOrder);
+                }
+
+                var planCategories = new PagedList<PlanCategory>(query, pageIndex, pageSize);
+                return planCategories;
+            });
+        }
+
+        /// <summary>
+        /// Gets a plan category mapping collection
+        /// </summary>
+        /// <param name="planId">Plan identifier</param>
+        /// <param name="showHidden"> A value indicating whether to show hidden records</param>
+        /// <returns> Plan category mapping collection</returns>
+        public virtual IList<PlanCategory> GetPlanCategoriesByPlanId(int planId, bool showHidden = false)
+        {
+            return GetPlanCategoriesByPlanId(planId, _storeContext.CurrentStore.Id, showHidden);
+        }
+     
+
+        public virtual IList<PlanCategory> GetPlanCategoriesByPlanId(int planId, int storeId, bool showHidden = false)
+        {
+            if (planId == 0)
+                return new List<PlanCategory>();
+
+            string key = string.Format(PRODUCTCATEGORIES_ALLBYPRODUCTID_KEY, showHidden, planId, _workContext.CurrentCustomer.Id, storeId);
+            return _cacheManager.Get(key, () =>
+            {
+                var query = from pc in _planCategoryRepository.Table
+                            join c in _categoryRepository.Table on pc.CategoryId equals c.Id
+                            where pc.PlanId == planId &&
+                                  !c.Deleted &&
+                                  (showHidden || c.Published)
+                            orderby pc.DisplayOrder
+                            select pc;
+
+                var allPlanCategories = query.ToList();
+                var result = new List<PlanCategory>();
+                if (!showHidden)
+                {
+                    foreach (var pc in allPlanCategories)
+                    {
+                        //ACL (access control list) and store mapping
+                        var category = pc.Category;
+                        if (_aclService.Authorize(category) && _storeMappingService.Authorize(category, storeId))
+                            result.Add(pc);
+                    }
+                }
+                else
+                {
+                    //no filtering
+                    result.AddRange(allPlanCategories);
+                }
+                return result;
+            });
+        }
+      
+        public virtual PlanCategory GetPlanCategoryById(int planCategoryId)
+        {
+            if (planCategoryId == 0)
+                return null;
+
+            return _planCategoryRepository.GetById(planCategoryId);
+        }
+        
+        public virtual void InsertPlanCategory(PlanCategory planCategory)
+        {
+            if (planCategory == null)
+                throw new ArgumentNullException("PlanCategory");
+
+            _planCategoryRepository.Insert(planCategory);
+
+            //cache
+            _cacheManager.RemoveByPattern(CATEGORIES_PATTERN_KEY);
+            _cacheManager.RemoveByPattern(PRODUCTCATEGORIES_PATTERN_KEY);
+
+            //event notification
+            _eventPublisher.EntityInserted(planCategory);
+        }
+
+        public virtual void UpdatePlanCategory(PlanCategory planCategory)
+        {
+            if (planCategory == null)
+                throw new ArgumentNullException("PlanCategory");
+
+            _planCategoryRepository.Update(planCategory);
+
+            //cache
+            _cacheManager.RemoveByPattern(CATEGORIES_PATTERN_KEY);
+            _cacheManager.RemoveByPattern(PRODUCTCATEGORIES_PATTERN_KEY);
+
+            //event notification
+            _eventPublisher.EntityUpdated(planCategory);
         }
 
         #endregion

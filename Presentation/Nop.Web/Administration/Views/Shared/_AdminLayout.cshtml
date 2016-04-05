@@ -95,7 +95,7 @@
                         </div>
                         @Html.Widget("admin_header_middle", area: "Admin")
                         <div class="links">
-                            @Html.ActionLink(T("Admin.Header.PublicStore").Text, "Index", "Home", new { area = "" }, null)
+                            @Html.ActionLink(T("Admin.Header.PublicStore").Text, "Index", "Home", new { area = "" }, new { target = "_blank" })
                             @if (canManageMaintenance)
                             {
                                 <span class="separator">|</span>

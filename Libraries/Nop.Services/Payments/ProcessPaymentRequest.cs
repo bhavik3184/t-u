@@ -28,12 +28,18 @@ namespace Nop.Services.Payments
         /// <summary>
         /// Gets or sets an order unique identifier. Used when order is not saved yet (payment gateways that do not redirect a customer to a third-party URL)
         /// </summary>
-        public Guid OrderGuid { get; set; }
+        public Guid SubscriptionOrderGuid { get; set; }
+
+        public decimal RegistrationChargeDiscount { get; set; }
+
+        public decimal RegistrationCharge { get; set; }
+
+        public decimal SecurityDeposit { get; set; }
 
         /// <summary>
         /// Gets or sets an order total
         /// </summary>
-        public decimal OrderTotal { get; set; }
+        public decimal SubscriptionOrderTotal { get; set; }
 
         /// <summary>
         /// /// <summary>
@@ -86,7 +92,7 @@ namespace Nop.Services.Payments
         /// <summary>
         /// Gets or sets an initial (parent) order identifier if order is recurring
         /// </summary>
-        public int InitialOrderId { get; set; }
+        public int InitialSubscriptionOrderId { get; set; }
         
         /// <summary>
         /// Gets or sets the cycle length
@@ -96,7 +102,7 @@ namespace Nop.Services.Payments
         /// <summary>
         /// Gets or sets the cycle period
         /// </summary>
-        public RecurringProductCyclePeriod RecurringCyclePeriod { get; set; }
+        public RecurringPlanCyclePeriod RecurringCyclePeriod { get; set; }
 
         /// <summary>
         /// Gets or sets the total cycles

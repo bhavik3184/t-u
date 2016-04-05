@@ -1,23 +1,23 @@
 ﻿@model OrderModel
 @using Nop.Core.Domain.Tax;
-@using Nop.Core.Domain.Orders;
+@using Nop.Core.Domain.SubscriptionOrders;
 
 @if (!Model.IsLoggedInAsVendor)
 {
     <script type="text/javascript">
         $(document).ready(function() {
-            toggleChangeOrderStatus(false);
+            toggleChangeSubscriptionOrderStatus(false);
             toggleOrderTotals(false);
             toggleCC(false);
         });
 
-        function toggleChangeOrderStatus(editmode) {
+        function toggleChangeSubscriptionOrderStatus(editmode) {
             if (editmode) {
-                $('#pnlChangeOrderStatus').show();
-                $('#btnChangeOrderStatus').hide();
+                $('#pnlChangeSubscriptionOrderStatus').show();
+                $('#btnChangeSubscriptionOrderStatus').hide();
             } else {
-                $('#pnlChangeOrderStatus').hide();
-                $('#btnChangeOrderStatus').show();
+                $('#pnlChangeSubscriptionOrderStatus').hide();
+                $('#btnChangeSubscriptionOrderStatus').show();
             }
         }
 
@@ -79,22 +79,22 @@
         <tr>
             <td class="adminTitle">
                 <strong>
-                    @Html.NopLabelFor(model => model.OrderStatus): </strong>
+                    @Html.NopLabelFor(model => model.SubscriptionOrderStatus): </strong>
             </td>
             <td class="adminData">
                 <strong>
-                    @Model.OrderStatus</strong>&nbsp;
+                    @Model.SubscriptionOrderStatus</strong>&nbsp;
                 @if (Model.CanCancelOrder)
                 {
-                    <input type="submit" name="cancelorder" value="@T("Admin.Orders.Fields.OrderStatus.Cancel")" id="cancelorder" class="adminButton" onclick="return confirm('@T("Admin.Common.AreYouSure")');"  />
+                    <input type="submit" name="cancelorder" value="@T("Admin.Orders.Fields.SubscriptionOrderStatus.Cancel")" id="cancelorder" class="adminButton" onclick="return confirm('@T("Admin.Common.AreYouSure")');"  />
                 }
-                <input type="submit" name="btnChangeOrderStatus" value="@T("Admin.Orders.Fields.OrderStatus.Change")" onclick="toggleChangeOrderStatus(true);return false;" id="btnChangeOrderStatus" class="adminButton"  />
-                <div id="pnlChangeOrderStatus">
-                    <em>@T("Admin.Orders.Fields.OrderStatus.Change.ForAdvancedUsers")</em>
+                <input type="submit" name="btnChangeSubscriptionOrderStatus" value="@T("Admin.Orders.Fields.SubscriptionOrderStatus.Change")" onclick="toggleChangeSubscriptionOrderStatus(true);return false;" id="btnChangeSubscriptionOrderStatus" class="adminButton"  />
+                <div id="pnlChangeSubscriptionOrderStatus">
+                    <em>@T("Admin.Orders.Fields.SubscriptionOrderStatus.Change.ForAdvancedUsers")</em>
                     <br />
-                    @Html.DropDownListFor(model => model.OrderStatusId, ((OrderStatus)Model.OrderStatusId).ToSelectList())
-                    <input type="submit" name="btnSaveOrderStatus" value="@T("Admin.Common.Save")" id="btnSaveOrderStatus" class="adminButton" onclick="return confirm('@T("Admin.Common.AreYouSure")');"  />
-                    <input type="submit" name="btnCancelOrderStatus" value="@T("Admin.Common.Cancel")" onclick="toggleChangeOrderStatus(false);return false;" id="btnCancelOrderStatus" class="adminButton" />
+                    @Html.DropDownListFor(model => model.SubscriptionOrderStatusId, ((SubscriptionOrderStatus)Model.SubscriptionOrderStatusId).ToSelectList())
+                    <input type="submit" name="btnSaveSubscriptionOrderStatus" value="@T("Admin.Common.Save")" id="btnSaveSubscriptionOrderStatus" class="adminButton" onclick="return confirm('@T("Admin.Common.AreYouSure")');"  />
+                    <input type="submit" name="btnCancelSubscriptionOrderStatus" value="@T("Admin.Common.Cancel")" onclick="toggleChangeSubscriptionOrderStatus(false);return false;" id="btnCancelSubscriptionOrderStatus" class="adminButton" />
                 </div>
             </td>
         </tr>
@@ -111,10 +111,10 @@
     {
         <tr>
             <td class="adminTitle">
-                @Html.NopLabelFor(model => model.OrderGuid):
+                @Html.NopLabelFor(model => model.SubscriptionOrderGuid):
             </td>
             <td class="adminData">
-                @Model.OrderGuid
+                @Model.SubscriptionOrderGuid
             </td>
         </tr>
     }

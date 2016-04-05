@@ -39,5 +39,8 @@ namespace Nop.Core.Domain.Common
         /// Gets or sets the text that will appear at the bottom of invoices (column 1)
         /// </summary>
         public string InvoiceFooterTextColumn2 { get; set; }
+
+        public bool RenderSubscriptionOrderNotes { get; set; }
+        
     }
 }

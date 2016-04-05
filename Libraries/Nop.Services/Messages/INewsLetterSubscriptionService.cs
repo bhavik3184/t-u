@@ -12,37 +12,37 @@ namespace Nop.Services.Messages
         /// <summary>
         /// Inserts a newsletter subscription
         /// </summary>
-        /// <param name="newsLetterSubscription">NewsLetter subscription</param>
-        /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
-        void InsertNewsLetterSubscription(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true);
+        /// <param name="newsLetterSubscriptionOrder">NewsLetter subscription</param>
+        /// <param name="publishSubscriptionOrderEvents">if set to <c>true</c> [publish subscription events].</param>
+        void InsertNewsLetterSubscription(NewsLetterSubscription newsLetterSubscriptionOrder, bool publishSubscriptionOrderEvents = true);
 
         /// <summary>
         /// Updates a newsletter subscription
         /// </summary>
-        /// <param name="newsLetterSubscription">NewsLetter subscription</param>
-        /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
-        void UpdateNewsLetterSubscription(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true);
+        /// <param name="newsLetterSubscriptionOrder">NewsLetter subscription</param>
+        /// <param name="publishSubscriptionOrderEvents">if set to <c>true</c> [publish subscription events].</param>
+        void UpdateNewsLetterSubscription(NewsLetterSubscription newsLetterSubscriptionOrder, bool publishSubscriptionOrderEvents = true);
 
         /// <summary>
         /// Deletes a newsletter subscription
         /// </summary>
-        /// <param name="newsLetterSubscription">NewsLetter subscription</param>
-        /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
-        void DeleteNewsLetterSubscription(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true);
+        /// <param name="newsLetterSubscriptionOrder">NewsLetter subscription</param>
+        /// <param name="publishSubscriptionOrderEvents">if set to <c>true</c> [publish subscription events].</param>
+        void DeleteNewsLetterSubscription(NewsLetterSubscription newsLetterSubscriptionOrder, bool publishSubscriptionOrderEvents = true);
 
         /// <summary>
         /// Gets a newsletter subscription by newsletter subscription identifier
         /// </summary>
-        /// <param name="newsLetterSubscriptionId">The newsletter subscription identifier</param>
+        /// <param name="newsLetterSubscriptionOrderId">The newsletter subscription identifier</param>
         /// <returns>NewsLetter subscription</returns>
-        NewsLetterSubscription GetNewsLetterSubscriptionById(int newsLetterSubscriptionId);
+        NewsLetterSubscription GetNewsLetterSubscriptionById(int newsLetterSubscriptionOrderId);
 
         /// <summary>
         /// Gets a newsletter subscription by newsletter subscription GUID
         /// </summary>
-        /// <param name="newsLetterSubscriptionGuid">The newsletter subscription GUID</param>
+        /// <param name="newsLetterSubscriptionOrderGuid">The newsletter subscription GUID</param>
         /// <returns>NewsLetter subscription</returns>
-        NewsLetterSubscription GetNewsLetterSubscriptionByGuid(Guid newsLetterSubscriptionGuid);
+        NewsLetterSubscription GetNewsLetterSubscriptionByGuid(Guid newsLetterSubscriptionOrderGuid);
 
         /// <summary>
         /// Gets a newsletter subscription by email and store ID

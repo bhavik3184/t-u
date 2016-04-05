@@ -1,0 +1,349 @@
+@model BorrowCartModel
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Core.Infrastructure
+@using Nop.Web.Models.BorrowCart;
+@{
+   var webHelper = EngineContext.Current.Resolve<IWebHelper>();
+}
+<div class="order-summary-content">
+   @Html.Widget("order_summary_content_before")
+   @Html.Partial("_OrderReviewData", Model.OrderReviewData)
+   @if (Model.Items.Count > 0)
+   {
+       if (Model.Warnings.Count > 0)
+       {
+       <div class="message-error">
+           <ul>
+               @foreach (var warning in Model.Warnings)
+               {
+                   <li>@warning</li>
+               }
+           </ul>
+       </div>
+       }     
+       @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
+       using (Html.BeginRouteForm("BorrowCart", FormMethod.Post, new { enctype = "multipart/form-data" }))
+       {
+           @Html.AntiForgeryToken()
+       <div class="table-wrapper">
+           <table class="cart">
+               <colgroup>
+                  
+                   @if (Model.ShowSku)
+                   {
+                       <col width="1" />
+                   }
+                   @if (Model.ShowProductImages)
+                   {
+                       <col width="1" />
+                   }
+                   <col />
+                   <col width="1" />
+                   <col width="1" />
+                   <col width="1" />
+                   
+                   @if (Model.IsEditable)
+                   {
+                       <col width="1" />
+                   }
+               </colgroup>
+               <thead>
+                   <tr>
+                     
+                       @if (Model.ShowSku)
+                       {
+                           <th class="sku">
+                               @T("BorrowCart.SKU")
+                           </th>
+                       }
+                       @if (Model.ShowProductImages)
+                       {
+                           <th class="product-picture">
+                               @T("BorrowCart.Image")
+                           </th>
+                       }
+                       <th class="product">
+                           @T("BorrowCart.Product(s)")
+                       </th>
+                        
+                       <th class="quantity">
+                           @T("BorrowCart.Quantity")
+                       </th>
+                       <th class="subtotal">
+                           Date
+                       </th>
+                      
+                       @if (Model.IsEditable)
+                       {
+                           <th class="remove-from-cart">
+                               @T("BorrowCart.Remove")
+                           </th>
+                       }
+                   </tr>
+               </thead>
+               <tbody>
+                   @foreach (var item in Model.Items)
+                   {
+                       <tr>
+                          
+                           @if (Model.ShowSku)
+                           {
+                               <td class="sku">
+                                   <label class="td-title">@T("BorrowCart.SKU"):</label>
+                                    <span class="sku-number">@item.Sku</span>
+                               </td>
+                           }
+                           @if (Model.ShowProductImages)
+                           {
+                               <td class="product-picture">
+                                   <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })"><img alt="@item.Picture.AlternateText" src="@item.Picture.ImageUrl" title="@item.Picture.Title" /></a>
+                               </td>
+                           }
+                           <td class="product">
+                               <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>
+                               @if (!String.IsNullOrEmpty(item.AttributeInfo))
+                               {
+                                   <div class="attributes">
+                                       @Html.Raw(item.AttributeInfo)
+                                   </div>
+                               }
+                               @if (!String.IsNullOrEmpty(item.RecurringInfo))
+                               {
+                                   <div class="recurring-info">
+                                       @Html.Raw(item.RecurringInfo)
+                                   </div>
+                               }
+                               @if (!String.IsNullOrEmpty(item.RentalInfo))
+                               {
+                                   <div class="rental-info">
+                                       @Html.Raw(item.RentalInfo)
+                                   </div>
+                               }
+                               @if (Model.IsEditable && item.AllowItemEditing)
+                               {
+                                   var editCartItemUrl = Url.RouteUrl("Product", new {SeName = item.ProductSeName});
+                                   editCartItemUrl = webHelper.ModifyQueryString(editCartItemUrl, "updatecartitemid=" + item.Id, null);
+                                   <div class="edit-item">
+                                       <a href="@editCartItemUrl">@T("Common.Edit")</a>
+                                   </div>
+                               }
+                               @if (item.Warnings.Count > 0)
+                               {
+                                   <div class="message-error">
+                                       <ul>
+                                           @foreach (var warning in item.Warnings)
+                                           {
+                                               <li>@warning</li>
+                                           }
+                                       </ul>
+                                   </div>
+                               }
+                           </td>
+                          
+                           <td class="quantity">
+                               <label class="td-title">@T("BorrowCart.Quantity"):</label>
+                               <span class="product-quantity">@item.Quantity</span>
+                           </td>
+                           <td class="quantity">
+                               <label class="td-title">@T("BorrowCart.Quantity"):</label>
+                               <span class="product-quantity">@item.CreatedOn</span>
+                           </td>
+                           @*<td class="subtotal">
+                               <label class="td-title">@T("BorrowCart.ItemTotal"):</label>
+                               <input type="button" class="btnUp btn btn-default bootstrap-touchspin-up button-2 product-box-add-to-cart-button" value="Borrow Item" id="btnUp" data-prop="@item.Id" />
+                           </td>*@
+                           @if (Model.IsEditable)
+                           {
+                               <td class="remove-from-cart" style="text-align:center"> 
+                                   <label class="td-title">@T("BorrowCart.Remove"):</label>
+                                   <input style="visibility:hidden;display:none;" type="checkbox" name="removefromcart" value="@(item.Id)" />
+                                   <a class="btnRemove" id="btnRemove" data-prop="@item.ProductId"><img style="width:30px;" src="/Content/Images/cartremove.png" /></a>
+                               </td>
+                           }
+                       </tr>
+                   }
+               </tbody>
+           </table>
+       </div>
+        if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
+        {
+            var inclTax = EngineContext.Current.Resolve<IWorkContext>().TaxDisplayType == TaxDisplayType.IncludingTax;
+            //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
+            //of course, you can modify appropriate locales to include VAT info there
+        <div class="tax-shipping-info">
+            @T(inclTax ? "BorrowCart.TaxShipping.InclTax" : "BorrowCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+        </div>
+        }
+       <div class="cart-options">
+           @if (Model.IsEditable)
+           {
+               <div class="common-buttons">
+                   @*<input type="button" onclick="location.href = '/subscriptioncart';" name="updatecart" value="Upgrade Membership" class="button-2 update-cart-button" />
+                   <input type="submit" name="continueshopping" value="Add More Items" class="button-2 continue-shopping-button" />*@
+                   <input type="button" name="continueshopping" value="Borrow Items" id="btnorrow" class=" button-2 update-cart-button" />
+               </div>
+           }
+           @if (Model.IsEditable)
+           {
+               @Html.Partial("_CheckoutAttributes", Model.CheckoutAttributes, new ViewDataDictionary())
+           }
+           @if (!String.IsNullOrEmpty(Model.CheckoutAttributeInfo))
+           {
+               <div class="selected-checkout-attributes">
+                   @Html.Raw(Model.CheckoutAttributeInfo)
+               </div>
+           }
+       </div>
+       <div class="cart-footer">
+           @Html.Widget("order_summary_cart_footer")
+           @if (Model.IsEditable)
+           {
+               <div class="cart-collaterals">
+                   <div class="deals">
+                      
+                       @Html.Widget("order_summary_content_deals")
+                   </div>
+               </div>
+           }
+            
+       </div>
+       if (Model.IsEditable)
+       {
+            @Html.Action("CrossSellProducts", "Product")
+       }
+       }
+   }
+   else
+   {
+       <div class="no-data" style="padding:30px 0;">
+           <h4>@T("BorrowCart.CartIsEmpty")</h4>
+       </div>
+   }
+   @Html.Widget("order_summary_content_after")
+</div>
+ 
+
+<script type="text/javascript">
+
+
+    var waitingDialog = waitingDialog || (function ($) {
+        'use strict';
+
+        // Creating modal dialog's DOM
+        var $dialog = $(
+            '<div class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true" style="padding-top:15%; overflow-y:visible;">' +
+            '<div class="modal-dialog modal-m">' +
+            '<div class="modal-content">' +
+                '<div class="modal-header"><h3 style="margin:0;"></h3></div>' +
+                '<div class="modal-body">' +
+                    '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>' +
+                '</div>' +
+            '</div></div></div>');
+
+        return {
+
+            show: function (message, options) {
+                // Assigning defaults
+                if (typeof options === 'undefined') {
+                    options = {};
+                }
+                if (typeof message === 'undefined') {
+                    message = 'Loading';
+                }
+                var settings = $.extend({
+                    dialogSize: 'm',
+                    progressType: '',
+                    onHide: null // This callback runs after the dialog was hidden
+                }, options);
+
+                // Configuring dialog
+                $dialog.find('.modal-dialog').attr('class', 'modal-dialog').addClass('modal-' + settings.dialogSize);
+                $dialog.find('.progress-bar').attr('class', 'progress-bar');
+                if (settings.progressType) {
+                    $dialog.find('.progress-bar').addClass('progress-bar-' + settings.progressType);
+                }
+                $dialog.find('h3').text(message);
+                // Adding callbacks
+                if (typeof settings.onHide === 'function') {
+                    $dialog.off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
+                        settings.onHide.call($dialog);
+                    });
+                }
+                // Opening dialog
+                $dialog.modal();
+            },
+            /**
+             * Closes dialog
+             */
+            hide: function () {
+                $dialog.modal('hide');
+            }
+        };
+
+    })(jQuery);
+
+    $(function () {
+        $('.btnRemove').click(function () {
+            //console.log('s');
+            var prop = $(this).attr('data-prop');
+          //  console.log(prop);
+            waitingDialog.show();
+            $.ajax({
+                type: 'POST',
+                url: '/removeproducttocart',
+                data: { "ProductId": prop },
+                cache: false,
+                success: function (data) {
+                    window.location.reload(true);
+                    waitingDialog.hide();
+                },
+                error: function () {
+                    window.location.reload(true);
+                    waitingDialog.hide();
+                }
+                
+            });
+        });
+
+        $("#btnorrow").on('click', function () {
+            var item = $(this).closest("tr")   // Finds the closest row <tr>
+                      .find(".qty-input");   // Gets a descendent with class="nr"
+            // Retrieves the text within <td>
+            item.val(parseInt(item.val()) + 1);
+            var prop = $(this).attr('data-prop');
+           // console.log(prop);
+            waitingDialog.show();
+            $.ajax({
+                type: 'POST',
+                url: '/borrowproduct',
+                data: { "Id": 0 },
+                cache: false,
+                success: function (data) {
+                  //  console.log(data);
+                    if (data.success == 1) {
+                        window.location.reload(true);
+                    } else if (data.success == 99)  {
+                        alert("No paid subscription order found.");
+                    } else {
+                        if (data.message.length > 0) {
+                            alert(data.message);
+                        } else {
+                            alert("No paid subscription order found.");
+                        }
+                        
+                    }
+                    waitingDialog.hide();
+                },
+                error: function () {
+                    waitingDialog.hide();
+                    window.location.reload(true);
+                }
+            });
+
+        });
+
+
+
+    });
+</script>

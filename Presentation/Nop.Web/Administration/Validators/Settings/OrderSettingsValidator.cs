@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Nop.Admin.Models.Settings;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Validators;
 
@@ -10,9 +10,9 @@ namespace Nop.Admin.Validators.Settings
     {
         public OrderSettingsValidator(ILocalizationService localizationService)
         {
-            RuleFor(x => x.GiftCards_Activated_OrderStatusId).NotEqual((int)OrderStatus.Pending)
+            RuleFor(x => x.GiftCards_Activated_SubscriptionOrderStatusId).NotEqual((int)SubscriptionOrderStatus.Pending)
                 .WithMessage(localizationService.GetResource("Admin.Configuration.Settings.Order.GiftCards_Activated.Pending"));
-            RuleFor(x => x.GiftCards_Deactivated_OrderStatusId).NotEqual((int)OrderStatus.Pending)
+            RuleFor(x => x.GiftCards_Deactivated_SubscriptionOrderStatusId).NotEqual((int)SubscriptionOrderStatus.Pending)
                 .WithMessage(localizationService.GetResource("Admin.Configuration.Settings.Order.GiftCards_Deactivated.Pending"));
         }
     }

@@ -29,6 +29,12 @@ namespace Nop.Web.Models.Customer
         RewardPoints = 60,
         ChangePassword = 70,
         Avatar = 80,
-        ForumSubscriptions = 90
+        ForumSubscriptions = 90,
+        SubscriptionOrders =100,
+        MyToyBox = 110,
+        PendingDeliveryItems= 120,
+        DeliveredItems = 130,
+        ReturnedItems = 140,
+        Dashboard = 150,
     }
 }

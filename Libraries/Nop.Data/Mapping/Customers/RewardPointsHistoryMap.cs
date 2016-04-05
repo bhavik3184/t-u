@@ -15,7 +15,7 @@ namespace Nop.Data.Mapping.Customers
                 .WithMany()
                 .HasForeignKey(rph => rph.CustomerId);
 
-            this.HasOptional(rph => rph.UsedWithOrder)
+            this.HasOptional(rph => rph.UsedWithSubscriptionOrder)
                 .WithOptionalDependent(o => o.RedeemedRewardPointsEntry)
                 .WillCascadeOnDelete(false);
         }

@@ -70,7 +70,7 @@ namespace Nop.Web.Controllers
                 product.GetTotalStockQuantity() <= 0)
             {
                 //out of stock
-                model.SubscriptionAllowed = true;
+                //model.SubscriptionAllowed = true;
                 model.AlreadySubscribed = _backInStockSubscriptionService
                     .FindSubscription(_workContext.CurrentCustomer.Id, product.Id, _storeContext.CurrentStore.Id) != null;
             }
@@ -153,14 +153,14 @@ namespace Nop.Web.Controllers
 
                 if (product != null)
                 {
-                    var subscriptionModel = new CustomerBackInStockSubscriptionsModel.BackInStockSubscriptionModel
+                    var subscriptionModel = new CustomerBackInStockSubscriptionsModel.BackInStockSubscriptionOrderModel
                     {
                         Id = subscription.Id,
                         ProductId = product.Id,
                         ProductName = product.GetLocalized(x => x.Name),
                         SeName = product.GetSeName(),
                     };
-                    model.Subscriptions.Add(subscriptionModel);
+                    model.SubscriptionOrders.Add(subscriptionModel);
                 }
             }
 

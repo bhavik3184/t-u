@@ -8,7 +8,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Vendors;
@@ -307,6 +307,569 @@ namespace Nop.Services.Messages
 
         #endregion
 
+        #region SubscriptionOrder workflow
+
+        /// <summary>
+        /// Sends an order placed notification to a vendor
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="vendor">Vendor instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderPlacedVendorNotification(SubscriptionOrder order, Vendor vendor, int languageId)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            if (vendor == null)
+                throw new ArgumentNullException("vendor");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderPlaced.VendorNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId, vendor.Id);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = vendor.Email;
+            var toName = vendor.Name;
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends an order placed notification to a store owner
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderPlacedStoreOwnerNotification(SubscriptionOrder order, int languageId)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderPlaced.StoreOwnerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = emailAccount.Email;
+            var toName = emailAccount.DisplayName;
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends an order paid notification to a store owner
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderPaidStoreOwnerNotification(SubscriptionOrder order, int languageId)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderPaid.StoreOwnerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = emailAccount.Email;
+            var toName = emailAccount.DisplayName;
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends an order paid notification to a customer
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <param name="attachmentFilePath">Attachment file path</param>
+        /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderPaidCustomerNotification(SubscriptionOrder order, int languageId,
+            string attachmentFilePath = null, string attachmentFileName = null)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderPaid.CustomerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = order.BillingAddress.Email;
+            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName,
+                attachmentFilePath,
+                attachmentFileName);
+        }
+
+        /// <summary>
+        /// Sends an order paid notification to a vendor
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="vendor">Vendor instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderPaidVendorNotification(SubscriptionOrder order, Vendor vendor, int languageId)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            if (vendor == null)
+                throw new ArgumentNullException("vendor");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderPaid.VendorNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId, vendor.Id);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = vendor.Email;
+            var toName = vendor.Name;
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends an order placed notification to a customer
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <param name="attachmentFilePath">Attachment file path</param>
+        /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderPlacedCustomerNotification(SubscriptionOrder order, int languageId,
+            string attachmentFilePath = null, string attachmentFileName = null)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderPlaced.CustomerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = order.BillingAddress.Email;
+            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName,
+                attachmentFilePath,
+                attachmentFileName);
+        }
+
+        /// <summary>
+        /// Sends a shipment sent notification to a customer
+        /// </summary>
+        /// <param name="shipment">Shipment</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendShipmentSentCustomerNotification(Shipment shipment, int languageId)
+        {
+            if (shipment == null)
+                throw new ArgumentNullException("shipment");
+
+            var order = shipment.OrderItem.SubscriptionOrder;
+            if (order == null)
+                throw new Exception("SubscriptionOrder cannot be loaded");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("ShipmentSent.CustomerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddShipmentTokens(tokens, shipment, languageId);
+            _messageTokenProvider.AddOrderTokens(tokens, shipment.OrderItem.SubscriptionOrder, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, shipment.OrderItem.SubscriptionOrder.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = order.BillingAddress.Email;
+            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends a shipment delivered notification to a customer
+        /// </summary>
+        /// <param name="shipment">Shipment</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendShipmentDeliveredCustomerNotification(Shipment shipment, int languageId)
+        {
+            if (shipment == null)
+                throw new ArgumentNullException("shipment");
+
+            var order = shipment.OrderItem.SubscriptionOrder;
+            if (order == null)
+                throw new Exception("SubscriptionOrder cannot be loaded");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("ShipmentDelivered.CustomerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddShipmentTokens(tokens, shipment, languageId);
+            _messageTokenProvider.AddOrderTokens(tokens, shipment.OrderItem.SubscriptionOrder, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, shipment.OrderItem.SubscriptionOrder.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = order.BillingAddress.Email;
+            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends an order completed notification to a customer
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <param name="attachmentFilePath">Attachment file path</param>
+        /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderCompletedCustomerNotification(SubscriptionOrder order, int languageId,
+            string attachmentFilePath = null, string attachmentFileName = null)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderCompleted.CustomerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = order.BillingAddress.Email;
+            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName,
+                attachmentFilePath,
+                attachmentFileName);
+        }
+
+        /// <summary>
+        /// Sends an order cancelled notification to a customer
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderCancelledCustomerNotification(SubscriptionOrder order, int languageId)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderCancelled.CustomerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = order.BillingAddress.Email;
+            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends an order refunded notification to a store owner
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="refundedAmount">Amount refunded</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderRefundedStoreOwnerNotification(SubscriptionOrder order, decimal refundedAmount, int languageId)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderRefunded.StoreOwnerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId);
+            _messageTokenProvider.AddSubscriptionOrderRefundedTokens(tokens, order, refundedAmount);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = emailAccount.Email;
+            var toName = emailAccount.DisplayName;
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends an order refunded notification to a customer
+        /// </summary>
+        /// <param name="order">SubscriptionOrder instance</param>
+        /// <param name="refundedAmount">Amount refunded</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendSubscriptionOrderRefundedCustomerNotification(SubscriptionOrder order, decimal refundedAmount, int languageId)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("SubscriptionOrderRefunded.CustomerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, order, languageId);
+            _messageTokenProvider.AddSubscriptionOrderRefundedTokens(tokens, order, refundedAmount);
+            _messageTokenProvider.AddCustomerTokens(tokens, order.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = order.BillingAddress.Email;
+            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends a new order note added notification to a customer
+        /// </summary>
+        /// <param name="orderNote">SubscriptionOrder note</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendNewSubscriptionOrderNoteAddedCustomerNotification(SubscriptionOrderNote orderNote, int languageId)
+        {
+            if (orderNote == null)
+                throw new ArgumentNullException("orderNote");
+
+            var order = orderNote.SubscriptionOrder;
+
+            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("Customer.NewSubscriptionOrderNote", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderNoteTokens(tokens, orderNote);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, orderNote.SubscriptionOrder, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, orderNote.SubscriptionOrder.Customer);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = order.BillingAddress.Email;
+            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        /// <summary>
+        /// Sends a "Recurring payment cancelled" notification to a store owner
+        /// </summary>
+        /// <param name="recurringPayment">Recurring payment</param>
+        /// <param name="languageId">Message language identifier</param>
+        /// <returns>Queued email identifier</returns>
+        public virtual int SendRecurringPaymentCancelledStoreOwnerNotification(RecurringPayment recurringPayment, int languageId)
+        {
+            if (recurringPayment == null)
+                throw new ArgumentNullException("recurringPayment");
+
+            var store = _storeService.GetStoreById(recurringPayment.InitialSubscriptionOrder.StoreId) ?? _storeContext.CurrentStore;
+            languageId = EnsureLanguageIsActive(languageId, store.Id);
+
+            var messageTemplate = GetActiveMessageTemplate("RecurringPaymentCancelled.StoreOwnerNotification", store.Id);
+            if (messageTemplate == null)
+                return 0;
+
+            //email account
+            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
+
+            //tokens
+            var tokens = new List<Token>();
+            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
+            _messageTokenProvider.AddSubscriptionOrderTokens(tokens, recurringPayment.InitialSubscriptionOrder, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, recurringPayment.InitialSubscriptionOrder.Customer);
+            _messageTokenProvider.AddRecurringPaymentTokens(tokens, recurringPayment);
+
+            //event notification
+            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
+
+            var toEmail = emailAccount.Email;
+            var toName = emailAccount.DisplayName;
+            return SendNotification(messageTemplate, emailAccount,
+                languageId, tokens,
+                toEmail, toName);
+        }
+
+        #endregion
+
         #region Order workflow
 
         /// <summary>
@@ -316,7 +879,7 @@ namespace Nop.Services.Messages
         /// <param name="vendor">Vendor instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderPlacedVendorNotification(Order order, Vendor vendor, int languageId)
+        public virtual int SendOrderPlacedVendorNotification(SubscriptionOrder order, Vendor vendor, int languageId)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
@@ -356,7 +919,7 @@ namespace Nop.Services.Messages
         /// <param name="order">Order instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderPlacedStoreOwnerNotification(Order order, int languageId)
+        public virtual int SendOrderPlacedStoreOwnerNotification(SubscriptionOrder order, int languageId)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
@@ -393,7 +956,7 @@ namespace Nop.Services.Messages
         /// <param name="order">Order instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderPaidStoreOwnerNotification(Order order, int languageId)
+        public virtual int SendOrderPaidStoreOwnerNotification(SubscriptionOrder order, int languageId)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
@@ -432,7 +995,7 @@ namespace Nop.Services.Messages
         /// <param name="attachmentFilePath">Attachment file path</param>
         /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderPaidCustomerNotification(Order order, int languageId,
+        public virtual int SendOrderPaidCustomerNotification(SubscriptionOrder order, int languageId,
             string attachmentFilePath = null, string attachmentFileName = null)
         {
             if (order == null)
@@ -473,7 +1036,7 @@ namespace Nop.Services.Messages
         /// <param name="vendor">Vendor instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderPaidVendorNotification(Order order, Vendor vendor, int languageId)
+        public virtual int SendOrderPaidVendorNotification(SubscriptionOrder order, Vendor vendor, int languageId)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
@@ -515,7 +1078,7 @@ namespace Nop.Services.Messages
         /// <param name="attachmentFilePath">Attachment file path</param>
         /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderPlacedCustomerNotification(Order order, int languageId,
+        public virtual int SendOrderPlacedCustomerNotification(SubscriptionOrder order, int languageId,
             string attachmentFilePath = null, string attachmentFileName = null)
         {
             if (order == null)
@@ -549,89 +1112,9 @@ namespace Nop.Services.Messages
                 attachmentFileName);
         }
 
-        /// <summary>
-        /// Sends a shipment sent notification to a customer
-        /// </summary>
-        /// <param name="shipment">Shipment</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        public virtual int SendShipmentSentCustomerNotification(Shipment shipment, int languageId)
-        {
-            if (shipment == null)
-                throw new ArgumentNullException("shipment");
+        
 
-            var order = shipment.Order;
-            if (order == null)
-                throw new Exception("Order cannot be loaded");
-
-            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
-            languageId = EnsureLanguageIsActive(languageId, store.Id);
-
-            var messageTemplate = GetActiveMessageTemplate("ShipmentSent.CustomerNotification", store.Id);
-            if (messageTemplate == null)
-                return 0;
-
-            //email account
-            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
-
-            //tokens
-            var tokens = new List<Token>();
-            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
-            _messageTokenProvider.AddShipmentTokens(tokens, shipment, languageId);
-            _messageTokenProvider.AddOrderTokens(tokens, shipment.Order, languageId);
-            _messageTokenProvider.AddCustomerTokens(tokens, shipment.Order.Customer);
-            
-            //event notification
-            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
-
-            var toEmail = order.BillingAddress.Email;
-            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
-            return SendNotification(messageTemplate, emailAccount,
-                languageId, tokens,
-                toEmail, toName);
-        }
-
-        /// <summary>
-        /// Sends a shipment delivered notification to a customer
-        /// </summary>
-        /// <param name="shipment">Shipment</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        public virtual int SendShipmentDeliveredCustomerNotification(Shipment shipment, int languageId)
-        {
-            if (shipment == null)
-                throw new ArgumentNullException("shipment");
-
-            var order = shipment.Order;
-            if (order == null)
-                throw new Exception("Order cannot be loaded");
-
-            var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
-            languageId = EnsureLanguageIsActive(languageId, store.Id);
-
-            var messageTemplate = GetActiveMessageTemplate("ShipmentDelivered.CustomerNotification", store.Id);
-            if (messageTemplate == null)
-                return 0;
-
-            //email account
-            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
-
-            //tokens
-            var tokens = new List<Token>();
-            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
-            _messageTokenProvider.AddShipmentTokens(tokens, shipment, languageId);
-            _messageTokenProvider.AddOrderTokens(tokens, shipment.Order, languageId);
-            _messageTokenProvider.AddCustomerTokens(tokens, shipment.Order.Customer);
-
-            //event notification
-            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
-
-            var toEmail = order.BillingAddress.Email;
-            var toName = string.Format("{0} {1}", order.BillingAddress.FirstName, order.BillingAddress.LastName);
-            return SendNotification(messageTemplate, emailAccount,
-                languageId, tokens,
-                toEmail, toName);
-        }
+        
 
         /// <summary>
         /// Sends an order completed notification to a customer
@@ -641,7 +1124,7 @@ namespace Nop.Services.Messages
         /// <param name="attachmentFilePath">Attachment file path</param>
         /// <param name="attachmentFileName">Attachment file name. If specified, then this file name will be sent to a recipient. Otherwise, "AttachmentFilePath" name will be used.</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderCompletedCustomerNotification(Order order, int languageId,
+        public virtual int SendOrderCompletedCustomerNotification(SubscriptionOrder order, int languageId,
             string attachmentFilePath = null, string attachmentFileName = null)
         {
             if (order == null)
@@ -681,7 +1164,7 @@ namespace Nop.Services.Messages
         /// <param name="order">Order instance</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderCancelledCustomerNotification(Order order, int languageId)
+        public virtual int SendOrderCancelledCustomerNotification(SubscriptionOrder order, int languageId)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
@@ -719,7 +1202,7 @@ namespace Nop.Services.Messages
         /// <param name="refundedAmount">Amount refunded</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderRefundedStoreOwnerNotification(Order order, decimal refundedAmount, int languageId)
+        public virtual int SendOrderRefundedStoreOwnerNotification(SubscriptionOrder order, decimal refundedAmount, int languageId)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
@@ -758,7 +1241,7 @@ namespace Nop.Services.Messages
         /// <param name="refundedAmount">Amount refunded</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendOrderRefundedCustomerNotification(Order order, decimal refundedAmount, int languageId)
+        public virtual int SendOrderRefundedCustomerNotification(SubscriptionOrder order, decimal refundedAmount, int languageId)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
@@ -796,12 +1279,12 @@ namespace Nop.Services.Messages
         /// <param name="orderNote">Order note</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendNewOrderNoteAddedCustomerNotification(OrderNote orderNote, int languageId)
+        public virtual int SendNewOrderNoteAddedCustomerNotification(SubscriptionOrderNote orderNote, int languageId)
         {
             if (orderNote == null)
                 throw new ArgumentNullException("orderNote");
            
-            var order = orderNote.Order;
+            var order = orderNote.SubscriptionOrder;
 
             var store = _storeService.GetStoreById(order.StoreId) ?? _storeContext.CurrentStore;
             languageId = EnsureLanguageIsActive(languageId, store.Id);
@@ -817,8 +1300,8 @@ namespace Nop.Services.Messages
             var tokens = new List<Token>();
             _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
             _messageTokenProvider.AddOrderNoteTokens(tokens, orderNote);
-            _messageTokenProvider.AddOrderTokens(tokens, orderNote.Order, languageId);
-            _messageTokenProvider.AddCustomerTokens(tokens, orderNote.Order.Customer);
+            _messageTokenProvider.AddOrderTokens(tokens, orderNote.SubscriptionOrder, languageId);
+            _messageTokenProvider.AddCustomerTokens(tokens, orderNote.SubscriptionOrder.Customer);
             
             //event notification
             _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
@@ -829,44 +1312,7 @@ namespace Nop.Services.Messages
                 languageId, tokens,
                 toEmail, toName);
         }
-
-        /// <summary>
-        /// Sends a "Recurring payment cancelled" notification to a store owner
-        /// </summary>
-        /// <param name="recurringPayment">Recurring payment</param>
-        /// <param name="languageId">Message language identifier</param>
-        /// <returns>Queued email identifier</returns>
-        public virtual int SendRecurringPaymentCancelledStoreOwnerNotification(RecurringPayment recurringPayment, int languageId)
-        {
-            if (recurringPayment == null)
-                throw new ArgumentNullException("recurringPayment");
-
-            var store = _storeService.GetStoreById(recurringPayment.InitialOrder.StoreId) ?? _storeContext.CurrentStore;
-            languageId = EnsureLanguageIsActive(languageId, store.Id);
-
-            var messageTemplate = GetActiveMessageTemplate("RecurringPaymentCancelled.StoreOwnerNotification", store.Id);
-            if (messageTemplate == null)
-                return 0;
-
-            //email account
-            var emailAccount = GetEmailAccountOfMessageTemplate(messageTemplate, languageId);
-
-            //tokens
-            var tokens = new List<Token>();
-            _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
-            _messageTokenProvider.AddOrderTokens(tokens, recurringPayment.InitialOrder, languageId);
-            _messageTokenProvider.AddCustomerTokens(tokens, recurringPayment.InitialOrder.Customer);
-            _messageTokenProvider.AddRecurringPaymentTokens(tokens, recurringPayment);
-
-            //event notification
-            _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
-
-            var toEmail = emailAccount.Email;
-            var toName = emailAccount.DisplayName;
-            return SendNotification(messageTemplate, emailAccount,
-                languageId, tokens,
-                toEmail, toName);
-        }
+ 
 
         #endregion
 
@@ -998,7 +1444,7 @@ namespace Nop.Services.Messages
         }
 
         /// <summary>
-        /// Sends wishlist "email a friend" message
+        /// Sends mytoybox "email a friend" message
         /// </summary>
         /// <param name="customer">Customer</param>
         /// <param name="languageId">Message language identifier</param>
@@ -1006,7 +1452,7 @@ namespace Nop.Services.Messages
         /// <param name="friendsEmail">Friend's email</param>
         /// <param name="personalMessage">Personal message</param>
         /// <returns>Queued email identifier</returns>
-        public virtual int SendWishlistEmailAFriendMessage(Customer customer, int languageId,
+        public virtual int SendMyToyBoxEmailAFriendMessage(Customer customer, int languageId,
              string customerEmail, string friendsEmail, string personalMessage)
         {
             if (customer == null)
@@ -1015,7 +1461,7 @@ namespace Nop.Services.Messages
             var store = _storeContext.CurrentStore;
             languageId = EnsureLanguageIsActive(languageId, store.Id);
 
-            var messageTemplate = GetActiveMessageTemplate("Wishlist.EmailAFriend", store.Id);
+            var messageTemplate = GetActiveMessageTemplate("MyToyBox.EmailAFriend", store.Id);
             if (messageTemplate == null)
                 return 0;
 
@@ -1026,8 +1472,8 @@ namespace Nop.Services.Messages
             var tokens = new List<Token>();
             _messageTokenProvider.AddStoreTokens(tokens, store, emailAccount);
             _messageTokenProvider.AddCustomerTokens(tokens, customer);
-            tokens.Add(new Token("Wishlist.PersonalMessage", personalMessage, true));
-            tokens.Add(new Token("Wishlist.Email", customerEmail));
+            tokens.Add(new Token("MyToyBox.PersonalMessage", personalMessage, true));
+            tokens.Add(new Token("MyToyBox.Email", customerEmail));
 
             //event notification
             _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
@@ -1055,7 +1501,7 @@ namespace Nop.Services.Messages
             if (returnRequest == null)
                 throw new ArgumentNullException("returnRequest");
 
-            var store = _storeService.GetStoreById(orderItem.Order.StoreId) ?? _storeContext.CurrentStore;
+            var store = _storeService.GetStoreById(orderItem.SubscriptionOrder.StoreId) ?? _storeContext.CurrentStore;
             languageId = EnsureLanguageIsActive(languageId, store.Id);
 
             var messageTemplate = GetActiveMessageTemplate("NewReturnRequest.StoreOwnerNotification", store.Id);
@@ -1093,7 +1539,7 @@ namespace Nop.Services.Messages
             if (returnRequest == null)
                 throw new ArgumentNullException("returnRequest");
 
-            var store = _storeService.GetStoreById(orderItem.Order.StoreId) ?? _storeContext.CurrentStore;
+            var store = _storeService.GetStoreById(orderItem.SubscriptionOrder.StoreId) ?? _storeContext.CurrentStore;
             languageId = EnsureLanguageIsActive(languageId, store.Id);
 
             var messageTemplate = GetActiveMessageTemplate("ReturnRequestStatusChanged.CustomerNotification", store.Id);
@@ -1112,11 +1558,11 @@ namespace Nop.Services.Messages
             //event notification
             _eventPublisher.MessageTokensAdded(messageTemplate, tokens);
 
-            string toEmail = returnRequest.Customer.IsGuest() ? 
-                orderItem.Order.BillingAddress.Email :
+            string toEmail = returnRequest.Customer.IsGuest() ?
+                orderItem.SubscriptionOrder.BillingAddress.Email :
                 returnRequest.Customer.Email;
-            var toName = returnRequest.Customer.IsGuest() ? 
-                orderItem.Order.BillingAddress.FirstName :
+            var toName = returnRequest.Customer.IsGuest() ?
+                orderItem.SubscriptionOrder.BillingAddress.FirstName :
                 returnRequest.Customer.GetFullName();
             return SendNotification(messageTemplate, emailAccount,
                 languageId, tokens,
@@ -1311,8 +1757,8 @@ namespace Nop.Services.Messages
                 throw new ArgumentNullException("giftCard");
 
             Store store = null;
-            var order = giftCard.PurchasedWithOrderItem != null ?
-                giftCard.PurchasedWithOrderItem.Order : 
+            var order = giftCard.PurchasedWithSubscriptionOrderItem != null ?
+                giftCard.PurchasedWithSubscriptionOrderItem.SubscriptionOrder : 
                 null;
             if (order != null)
                 store = _storeService.GetStoreById(order.StoreId);
@@ -1571,7 +2017,7 @@ namespace Nop.Services.Messages
         /// <summary>
         /// Sends a 'Back in stock' notification message to a customer
         /// </summary>
-        /// <param name="subscription">Subscription</param>
+        /// <param name="subscription">SubscriptionOrder</param>
         /// <param name="languageId">Message language identifier</param>
         /// <returns>Queued email identifier</returns>
         public virtual int SendBackInStockNotification(BackInStockSubscription subscription, int languageId)

@@ -12,7 +12,7 @@ namespace Nop.Admin.Models.Orders
         public BestsellersReportModel()
         {
             AvailableStores = new List<SelectListItem>();
-            AvailableOrderStatuses = new List<SelectListItem>();
+            AvailableSubscriptionOrderStatuses = new List<SelectListItem>();
             AvailablePaymentStatuses = new List<SelectListItem>();
             AvailableCategories = new List<SelectListItem>();
             AvailableManufacturers = new List<SelectListItem>();
@@ -31,8 +31,8 @@ namespace Nop.Admin.Models.Orders
 
         [NopResourceDisplayName("Admin.SalesReport.Bestsellers.Store")]
         public int StoreId { get; set; }
-        [NopResourceDisplayName("Admin.SalesReport.Bestsellers.OrderStatus")]
-        public int OrderStatusId { get; set; }
+        [NopResourceDisplayName("Admin.SalesReport.Bestsellers.SubscriptionOrderStatus")]
+        public int SubscriptionOrderStatusId { get; set; }
         [NopResourceDisplayName("Admin.SalesReport.Bestsellers.PaymentStatus")]
         public int PaymentStatusId { get; set; }
         [NopResourceDisplayName("Admin.SalesReport.Bestsellers.Category")]
@@ -45,7 +45,7 @@ namespace Nop.Admin.Models.Orders
         public int VendorId { get; set; }
 
         public IList<SelectListItem> AvailableStores { get; set; }
-        public IList<SelectListItem> AvailableOrderStatuses { get; set; }
+        public IList<SelectListItem> AvailableSubscriptionOrderStatuses { get; set; }
         public IList<SelectListItem> AvailablePaymentStatuses { get; set; }
         public IList<SelectListItem> AvailableCategories { get; set; }
         public IList<SelectListItem> AvailableManufacturers { get; set; }

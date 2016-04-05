@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Nop.Core.Domain.Common;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
+ 
 
 namespace Nop.Core.Domain.Customers
 {
@@ -12,10 +13,11 @@ namespace Nop.Core.Domain.Customers
     {
         private ICollection<ExternalAuthenticationRecord> _externalAuthenticationRecords;
         private ICollection<CustomerRole> _customerRoles;
-        private ICollection<ShoppingCartItem> _shoppingCartItems;
+        private ICollection<BorrowCartItem> _borrowCartItems;
+        private ICollection<SubscriptionCartItem> _subscriptionPlanCartItems;
         private ICollection<ReturnRequest> _returnRequests;
         private ICollection<Address> _addresses;
-
+        
         /// <summary>
         /// Ctor
         /// </summary>
@@ -47,6 +49,8 @@ namespace Nop.Core.Domain.Customers
         /// Gets or sets the password format
         /// </summary>
         public int PasswordFormatId { get; set; }
+
+        
         /// <summary>
         /// Gets or sets the password format
         /// </summary>
@@ -82,14 +86,17 @@ namespace Nop.Core.Domain.Customers
 
         /// <summary>
         /// Gets or sets a value indicating whether this customer has some products in the shopping cart
-        /// <remarks>The same as if we run this.ShoppingCartItems.Count > 0
+        /// <remarks>The same as if we run this.BorrowCartItems.Count > 0
         /// We use this property for performance optimization:
-        /// if this property is set to false, then we do not need to load "ShoppingCartItems" navigation property for each page load
+        /// if this property is set to false, then we do not need to load "BorrowCartItems" navigation property for each page load
         /// It's used only in a couple of places in the presenation layer
         /// </remarks>
         /// </summary>
-        public bool HasShoppingCartItems { get; set; }
-
+        /// 
+        public int NoOfChildren { get; set; }
+        public bool HasBorrowCartItems { get; set; }
+        public bool HasSubscriptionCartItems { get; set; }
+        
         /// <summary>
         /// Gets or sets a value indicating whether the customer is active
         /// </summary>
@@ -115,6 +122,9 @@ namespace Nop.Core.Domain.Customers
         /// </summary>
         public string LastIpAddress { get; set; }
 
+        public decimal RegistrationChargeBalance { get; set; }
+
+        public decimal SecurityDepositBalance { get; set; }
         /// <summary>
         /// Gets or sets the date and time of entity creation
         /// </summary>
@@ -153,10 +163,20 @@ namespace Nop.Core.Domain.Customers
         /// <summary>
         /// Gets or sets shopping cart items
         /// </summary>
-        public virtual ICollection<ShoppingCartItem> ShoppingCartItems
+        public virtual ICollection<SubscriptionCartItem> SubscriptionCartItems
         {
-            get { return _shoppingCartItems ?? (_shoppingCartItems = new List<ShoppingCartItem>()); }
-            protected set { _shoppingCartItems = value; }            
+            get { return _subscriptionPlanCartItems ?? (_subscriptionPlanCartItems = new List<SubscriptionCartItem>()); }
+            protected set { _subscriptionPlanCartItems = value; }
+        }
+
+
+        /// <summary>
+        /// Gets or sets shopping cart items
+        /// </summary>
+        public virtual ICollection<BorrowCartItem> BorrowCartItems
+        {
+            get { return _borrowCartItems ?? (_borrowCartItems = new List<BorrowCartItem>()); }
+            protected set { _borrowCartItems = value; }            
         }
 
         /// <summary>

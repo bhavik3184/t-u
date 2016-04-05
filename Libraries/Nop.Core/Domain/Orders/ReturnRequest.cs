@@ -1,7 +1,7 @@
 using System;
 using Nop.Core.Domain.Customers;
 
-namespace Nop.Core.Domain.Orders
+namespace Nop.Core.Domain.SubscriptionOrders
 {
     /// <summary>
     /// Represents a return request
@@ -16,7 +16,7 @@ namespace Nop.Core.Domain.Orders
         /// <summary>
         /// Gets or sets the order item identifier
         /// </summary>
-        public int OrderItemId { get; set; }
+        public int ItemDetailId { get; set; }
 
         /// <summary>
         /// Gets or sets the customer identifier
@@ -62,6 +62,8 @@ namespace Nop.Core.Domain.Orders
         /// Gets or sets the date and time of entity update
         /// </summary>
         public DateTime UpdatedOnUtc { get; set; }
+
+        public DateTime AvailableDateUtc { get; set; }
         
         /// <summary>
         /// Gets or sets the return status

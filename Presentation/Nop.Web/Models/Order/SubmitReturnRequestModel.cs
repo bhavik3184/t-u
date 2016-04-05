@@ -2,6 +2,8 @@
 using System.Web.Mvc;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Mvc;
+using System;
+using Nop.Web.Models.Media;
 
 namespace Nop.Web.Models.Order
 {
@@ -14,7 +16,9 @@ namespace Nop.Web.Models.Order
             AvailableReturnActions= new List<ReturnRequestActionModel>();
         }
 
-        public int OrderId { get; set; }
+        public int SubscriptionOrderId { get; set; }
+
+        public int TransactionId { get; set; }
         
         public IList<OrderItemModel> Items { get; set; }
         
@@ -27,6 +31,7 @@ namespace Nop.Web.Models.Order
         [NopResourceDisplayName("ReturnRequests.ReturnAction")]
         public int ReturnRequestActionId { get; set; }
         public IList<ReturnRequestActionModel> AvailableReturnActions { get; set; }
+        public DateTime AvailableDate { get; set; }
 
         [AllowHtml]
         [NopResourceDisplayName("ReturnRequests.Comments")]
@@ -38,17 +43,35 @@ namespace Nop.Web.Models.Order
 
         public partial class OrderItemModel : BaseNopEntityModel
         {
-            public int ProductId { get; set; }
+            public OrderItemModel()
+            {
+                ItemDetails = new List<ItemDetailModel>();
+            }
+            public int OrderItemId { get; set; }
 
-            public string ProductName { get; set; }
+            public IList<ItemDetailModel> ItemDetails { get; set; }
 
-            public string ProductSeName { get; set; }
+            public partial class ItemDetailModel : BaseNopEntityModel
+            {
+                public ItemDetailModel()
+                {
+                    DefaultPictureModel = new PictureModel();
+                }
+                public int ProductId { get; set; }
 
-            public string AttributeInfo { get; set; }
+                public string ProductName { get; set; }
 
-            public string UnitPrice { get; set; }
+                public string ProductSeName { get; set; }
 
-            public int Quantity { get; set; }
+                public string AttributeInfo { get; set; }
+
+                public string UnitPrice { get; set; }
+
+                public int Quantity { get; set; }
+
+                public bool IsPendingReturn { get; set; }
+                public PictureModel DefaultPictureModel { get; set; }
+            }
         }
 
         public partial class ReturnRequestReasonModel : BaseNopEntityModel

@@ -270,7 +270,7 @@ namespace Nop.Services.Forums
         /// Updates the forum subscription
         /// </summary>
         /// <param name="forumSubscription">Forum subscription</param>
-        void UpdateSubscription(ForumSubscription forumSubscription);
+        void UpdateSubscriptionOrder(ForumSubscription forumSubscription);
 
         /// <summary>
         /// Check whether customer is allowed to create new topics

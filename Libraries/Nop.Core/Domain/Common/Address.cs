@@ -34,6 +34,10 @@ namespace Nop.Core.Domain.Common
         /// Gets or sets the state/province identifier
         /// </summary>
         public int? StateProvinceId { get; set; }
+
+        public int? CityId { get; set; }
+
+        public int? LocalityId { get; set; }
         
         /// <summary>
         /// Gets or sets the city
@@ -80,6 +84,9 @@ namespace Nop.Core.Domain.Common
         /// </summary>
         public virtual Country Country { get; set; }
 
+
+        public virtual City CityEntity { get; set; }
+
         /// <summary>
         /// Gets or sets the state/province
         /// </summary>
@@ -96,6 +103,9 @@ namespace Nop.Core.Domain.Common
                 Company = this.Company,
                 Country = this.Country,
                 CountryId = this.CountryId,
+                CityEntity = this.CityEntity,
+                CityId = this.CityId,
+                LocalityId = this.LocalityId,
                 StateProvince = this.StateProvince,
                 StateProvinceId = this.StateProvinceId,
                 City = this.City,

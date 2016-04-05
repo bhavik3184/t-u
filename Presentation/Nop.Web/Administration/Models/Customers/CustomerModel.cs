@@ -24,7 +24,7 @@ namespace Nop.Admin.Models.Customers
             this.AvailableStates = new List<SelectListItem>();
             this.AvailableVendors = new List<SelectListItem>();
             this.CustomerAttributes = new List<CustomerAttributeModel>();
-            this.AvailableNewsletterSubscriptionStores = new List<StoreModel>();
+            this.AvailableNewsletterSubscriptionOrderStores = new List<StoreModel>();
             this.RewardPointsAvailableStores = new List<SelectListItem>();
         }
 
@@ -114,7 +114,9 @@ namespace Nop.Admin.Models.Customers
         public List<CustomerAttributeModel> CustomerAttributes { get; set; }
 
 
+        public string RegistrationChargeBalance { get; set; }
 
+        public string SecurityDepositBalance { get; set; }
 
 
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.AdminComment")]
@@ -185,9 +187,9 @@ namespace Nop.Admin.Models.Customers
 
         //newsletter subscriptions (per store)
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.Newsletter")]
-        public List<StoreModel> AvailableNewsletterSubscriptionStores { get; set; }
+        public List<StoreModel> AvailableNewsletterSubscriptionOrderStores { get; set; }
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.Newsletter")]
-        public int[] SelectedNewsletterSubscriptionStoreIds { get; set; }
+        public int[] SelectedNewsletterSubscriptionOrderStoreIds { get; set; }
 
 
 
@@ -281,8 +283,8 @@ namespace Nop.Admin.Models.Customers
             [NopResourceDisplayName("Admin.Customers.Customers.Orders.ID")]
             public override int Id { get; set; }
 
-            [NopResourceDisplayName("Admin.Customers.Customers.Orders.OrderStatus")]
-            public string OrderStatus { get; set; }
+            [NopResourceDisplayName("Admin.Customers.Customers.Orders.SubscriptionOrderStatus")]
+            public string SubscriptionOrderStatus { get; set; }
 
             [NopResourceDisplayName("Admin.Customers.Customers.Orders.PaymentStatus")]
             public string PaymentStatus { get; set; }
@@ -310,7 +312,7 @@ namespace Nop.Admin.Models.Customers
             public DateTime CreatedOn { get; set; }
         }
 
-        public partial class BackInStockSubscriptionModel : BaseNopEntityModel
+        public partial class BackInStockSubscriptionOrderModel : BaseNopEntityModel
         {
             [NopResourceDisplayName("Admin.Customers.Customers.BackInStockSubscriptions.Store")]
             public string StoreName { get; set; }

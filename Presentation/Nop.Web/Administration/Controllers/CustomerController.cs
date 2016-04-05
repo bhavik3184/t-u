@@ -8,7 +8,7 @@ using System.Web.Mvc;
 using Nop.Admin.Extensions;
 using Nop.Admin.Models.Common;
 using Nop.Admin.Models.Customers;
-using Nop.Admin.Models.ShoppingCart;
+using Nop.Admin.Models.BorrowCart;
 using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
@@ -16,7 +16,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Messages;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Tax;
@@ -32,7 +32,7 @@ using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Services.Tax;
@@ -49,7 +49,7 @@ namespace Nop.Admin.Controllers
         #region Fields
 
         private readonly ICustomerService _customerService;
-        private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
+        private readonly INewsLetterSubscriptionService _newsLetterSubscriptionOrderService;
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly ICustomerRegistrationService _customerRegistrationService;
         private readonly ICustomerReportService _customerReportService;
@@ -67,10 +67,10 @@ namespace Nop.Admin.Controllers
         private readonly IVendorService _vendorService;
         private readonly IStoreContext _storeContext;
         private readonly IPriceFormatter _priceFormatter;
-        private readonly IOrderService _orderService;
+        private readonly ISubscriptionOrderService _orderService;
         private readonly IExportManager _exportManager;
         private readonly ICustomerActivityService _customerActivityService;
-        private readonly IBackInStockSubscriptionService _backInStockSubscriptionService;
+        private readonly IBackInStockSubscriptionService _backInStockSubscriptionOrderService;
         private readonly IPriceCalculationService _priceCalculationService;
         private readonly IProductAttributeFormatter _productAttributeFormatter;
         private readonly IPermissionService _permissionService;
@@ -89,14 +89,13 @@ namespace Nop.Admin.Controllers
         private readonly IAddressAttributeFormatter _addressAttributeFormatter;
         private readonly IAffiliateService _affiliateService;
         private readonly IWorkflowMessageService _workflowMessageService;
-        private readonly IRewardPointService _rewardPointService;
 
         #endregion
 
         #region Constructors
 
         public CustomerController(ICustomerService customerService,
-            INewsLetterSubscriptionService newsLetterSubscriptionService,
+            INewsLetterSubscriptionService newsLetterSubscriptionOrderService,
             IGenericAttributeService genericAttributeService,
             ICustomerRegistrationService customerRegistrationService,
             ICustomerReportService customerReportService, 
@@ -114,10 +113,10 @@ namespace Nop.Admin.Controllers
             IVendorService vendorService,
             IStoreContext storeContext,
             IPriceFormatter priceFormatter,
-            IOrderService orderService, 
+            ISubscriptionOrderService orderService, 
             IExportManager exportManager,
             ICustomerActivityService customerActivityService,
-            IBackInStockSubscriptionService backInStockSubscriptionService,
+            IBackInStockSubscriptionService backInStockSubscriptionOrderService,
             IPriceCalculationService priceCalculationService,
             IProductAttributeFormatter productAttributeFormatter,
             IPermissionService permissionService, 
@@ -135,11 +134,10 @@ namespace Nop.Admin.Controllers
             IAddressAttributeService addressAttributeService,
             IAddressAttributeFormatter addressAttributeFormatter,
             IAffiliateService affiliateService,
-            IWorkflowMessageService workflowMessageService,
-            IRewardPointService rewardPointService)
+            IWorkflowMessageService workflowMessageService)
         {
             this._customerService = customerService;
-            this._newsLetterSubscriptionService = newsLetterSubscriptionService;
+            this._newsLetterSubscriptionOrderService = newsLetterSubscriptionOrderService;
             this._genericAttributeService = genericAttributeService;
             this._customerRegistrationService = customerRegistrationService;
             this._customerReportService = customerReportService;
@@ -160,7 +158,7 @@ namespace Nop.Admin.Controllers
             this._orderService = orderService;
             this._exportManager = exportManager;
             this._customerActivityService = customerActivityService;
-            this._backInStockSubscriptionService = backInStockSubscriptionService;
+            this._backInStockSubscriptionOrderService = backInStockSubscriptionOrderService;
             this._priceCalculationService = priceCalculationService;
             this._productAttributeFormatter = productAttributeFormatter;
             this._permissionService = permissionService;
@@ -179,7 +177,6 @@ namespace Nop.Admin.Controllers
             this._addressAttributeFormatter = addressAttributeFormatter;
             this._affiliateService = affiliateService;
             this._workflowMessageService = workflowMessageService;
-            this._rewardPointService = rewardPointService;
         }
 
         #endregion
@@ -267,6 +264,8 @@ namespace Nop.Admin.Controllers
                 FullName = customer.GetFullName(),
                 Company = customer.GetAttribute<string>(SystemCustomerAttributeNames.Company),
                 Phone = customer.GetAttribute<string>(SystemCustomerAttributeNames.Phone),
+                RegistrationChargeBalance = _priceFormatter.FormatPrice(customer.RegistrationChargeBalance),
+                SecurityDepositBalance = _priceFormatter.FormatPrice(customer.SecurityDepositBalance),
                 ZipPostalCode = customer.GetAttribute<string>(SystemCustomerAttributeNames.ZipPostalCode),
                 CustomerRoleNames = GetCustomerRolesNames(customer.CustomerRoles.ToList()),
                 Active = customer.Active,
@@ -521,14 +520,14 @@ namespace Nop.Admin.Controllers
                     //newsletter subscriptions
                     if (!String.IsNullOrEmpty(customer.Email))
                     {
-                        var newsletterSubscriptionStoreIds = new List<int>();
+                        var newsletterSubscriptionOrderStoreIds = new List<int>();
                         foreach (var store in allStores)
                         {
-                            var newsletterSubscription = _newsLetterSubscriptionService
+                            var newsletterSubscriptionOrder = _newsLetterSubscriptionOrderService
                                 .GetNewsLetterSubscriptionByEmailAndStoreId(customer.Email, store.Id);
-                            if (newsletterSubscription != null)
-                                newsletterSubscriptionStoreIds.Add(store.Id);
-                            model.SelectedNewsletterSubscriptionStoreIds = newsletterSubscriptionStoreIds.ToArray();
+                            if (newsletterSubscriptionOrder != null)
+                                newsletterSubscriptionOrderStoreIds.Add(store.Id);
+                            model.SelectedNewsletterSubscriptionOrderStoreIds = newsletterSubscriptionOrderStoreIds.ToArray();
                         }
                     }
 
@@ -579,7 +578,15 @@ namespace Nop.Admin.Controllers
             model.StateProvinceEnabled = _customerSettings.StateProvinceEnabled;
             model.PhoneEnabled = _customerSettings.PhoneEnabled;
             model.FaxEnabled = _customerSettings.FaxEnabled;
-
+            if (customer != null) { 
+                model.RegistrationChargeBalance = customer.RegistrationChargeBalance.ToString();
+                model.SecurityDepositBalance = customer.SecurityDepositBalance.ToString();
+            }
+            else
+            {
+                model.RegistrationChargeBalance ="0.00";
+                model.SecurityDepositBalance = "0.00";
+            }
             //countries and states
             if (_customerSettings.CountryEnabled)
             {
@@ -621,7 +628,7 @@ namespace Nop.Admin.Controllers
             }
 
             //newsletter subscriptions
-            model.AvailableNewsletterSubscriptionStores = allStores
+            model.AvailableNewsletterSubscriptionOrderStores = allStores
                 .Select(s => new CustomerModel.StoreModel() {Id = s.Id, Name = s.Name })
                 .ToList();
 
@@ -787,7 +794,7 @@ namespace Nop.Admin.Controllers
                 company: model.SearchCompany,
                 phone: model.SearchPhone,
                 zipPostalCode: model.SearchZipPostalCode,
-                loadOnlyWithShoppingCart: false,
+                loadOnlyWithBorrowCart: false,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);
             var gridModel = new DataSourceResult
@@ -900,15 +907,15 @@ namespace Nop.Admin.Controllers
                     var allStores = _storeService.GetAllStores();
                     foreach (var store in allStores)
                     {
-                        var newsletterSubscription = _newsLetterSubscriptionService
+                        var newsletterSubscriptionOrder = _newsLetterSubscriptionOrderService
                             .GetNewsLetterSubscriptionByEmailAndStoreId(customer.Email, store.Id);
-                        if (model.SelectedNewsletterSubscriptionStoreIds != null &&
-                            model.SelectedNewsletterSubscriptionStoreIds.Contains(store.Id))
+                        if (model.SelectedNewsletterSubscriptionOrderStoreIds != null &&
+                            model.SelectedNewsletterSubscriptionOrderStoreIds.Contains(store.Id))
                         {
                             //subscribed
-                            if (newsletterSubscription == null)
+                            if (newsletterSubscriptionOrder == null)
                             {
-                                _newsLetterSubscriptionService.InsertNewsLetterSubscription(new NewsLetterSubscription
+                                _newsLetterSubscriptionOrderService.InsertNewsLetterSubscription(new NewsLetterSubscription
                                 {
                                     NewsLetterSubscriptionGuid = Guid.NewGuid(),
                                     Email = customer.Email,
@@ -921,9 +928,9 @@ namespace Nop.Admin.Controllers
                         else
                         {
                             //not subscribed
-                            if (newsletterSubscription != null)
+                            if (newsletterSubscriptionOrder != null)
                             {
-                                _newsLetterSubscriptionService.DeleteNewsLetterSubscription(newsletterSubscription);
+                                _newsLetterSubscriptionOrderService.DeleteNewsLetterSubscription(newsletterSubscriptionOrder);
                             }
                         }
                     }
@@ -1123,15 +1130,15 @@ namespace Nop.Admin.Controllers
                         var allStores = _storeService.GetAllStores();
                         foreach (var store in allStores)
                         {
-                            var newsletterSubscription = _newsLetterSubscriptionService
+                            var newsletterSubscriptionOrder = _newsLetterSubscriptionOrderService
                                 .GetNewsLetterSubscriptionByEmailAndStoreId(customer.Email, store.Id);
-                            if (model.SelectedNewsletterSubscriptionStoreIds != null &&
-                                model.SelectedNewsletterSubscriptionStoreIds.Contains(store.Id))
+                            if (model.SelectedNewsletterSubscriptionOrderStoreIds != null &&
+                                model.SelectedNewsletterSubscriptionOrderStoreIds.Contains(store.Id))
                             {
                                 //subscribed
-                                if (newsletterSubscription == null)
+                                if (newsletterSubscriptionOrder == null)
                                 {
-                                    _newsLetterSubscriptionService.InsertNewsLetterSubscription(new NewsLetterSubscription
+                                    _newsLetterSubscriptionOrderService.InsertNewsLetterSubscription(new NewsLetterSubscription
                                     {
                                         NewsLetterSubscriptionGuid = Guid.NewGuid(),
                                         Email = customer.Email,
@@ -1144,9 +1151,9 @@ namespace Nop.Admin.Controllers
                             else
                             {
                                 //not subscribed
-                                if (newsletterSubscription != null)
+                                if (newsletterSubscriptionOrder != null)
                                 {
-                                    _newsLetterSubscriptionService.DeleteNewsLetterSubscription(newsletterSubscription);
+                                    _newsLetterSubscriptionOrderService.DeleteNewsLetterSubscription(newsletterSubscriptionOrder);
                                 }
                             }
                         }
@@ -1327,9 +1334,9 @@ namespace Nop.Admin.Controllers
                 //remove newsletter subscription (if exists)
                 foreach (var store in _storeService.GetAllStores())
                 {
-                    var subscription = _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreId(customer.Email, store.Id);
+                    var subscription = _newsLetterSubscriptionOrderService.GetNewsLetterSubscriptionByEmailAndStoreId(customer.Email, store.Id);
                     if (subscription != null)
-                        _newsLetterSubscriptionService.DeleteNewsLetterSubscription(subscription);
+                        _newsLetterSubscriptionOrderService.DeleteNewsLetterSubscription(subscription);
                 }
 
                 //activity log
@@ -1506,58 +1513,6 @@ namespace Nop.Admin.Controllers
             }
 
             return RedirectToAction("Edit", new { id = customer.Id });
-        }
-        
-        #endregion
-        
-        #region Reward points history
-
-        [HttpPost]
-        public ActionResult RewardPointsHistorySelect(int customerId)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
-
-            var customer = _customerService.GetCustomerById(customerId);
-            if (customer == null)
-                throw new ArgumentException("No customer found with the specified id");
-
-            var model = new List<CustomerModel.RewardPointsHistoryModel>();
-            foreach (var rph in _rewardPointService.GetRewardPointsHistory(customer.Id, true))
-            {
-                var store = _storeService.GetStoreById(rph.StoreId);
-                model.Add(new CustomerModel.RewardPointsHistoryModel
-                    {
-                        StoreName = store != null ? store.Name : "Unknown",
-                        Points = rph.Points,
-                        PointsBalance = rph.PointsBalance,
-                        Message = rph.Message,
-                        CreatedOn = _dateTimeHelper.ConvertToUserTime(rph.CreatedOnUtc, DateTimeKind.Utc)
-                    });
-            } 
-            var gridModel = new DataSourceResult
-            {
-                Data = model,
-                Total = model.Count
-            };
-
-            return Json(gridModel);
-        }
-
-        [ValidateInput(false)]
-        public ActionResult RewardPointsHistoryAdd(int customerId, int storeId, int addRewardPointsValue, string addRewardPointsMessage)
-        {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
-                return AccessDeniedView();
-
-            var customer = _customerService.GetCustomerById(customerId);
-            if (customer == null)
-                return Json(new { Result = false }, JsonRequestBehavior.AllowGet);
-
-            _rewardPointService.AddRewardPointsHistoryEntry(customer,
-                addRewardPointsValue, storeId, addRewardPointsMessage);
-
-            return Json(new { Result = true }, JsonRequestBehavior.AllowGet);
         }
         
         #endregion
@@ -1762,7 +1717,7 @@ namespace Nop.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
                 return AccessDeniedView();
 
-            var orders = _orderService.SearchOrders(customerId: customerId);
+            var orders = _orderService.SearchSubscriptionOrders(customerId: customerId);
 
             var gridModel = new DataSourceResult
             {
@@ -1773,10 +1728,10 @@ namespace Nop.Admin.Controllers
                         var orderModel = new CustomerModel.OrderModel
                         {
                             Id = order.Id, 
-                            OrderStatus = order.OrderStatus.GetLocalizedEnum(_localizationService, _workContext),
+                            SubscriptionOrderStatus = order.SubscriptionOrderStatus.GetLocalizedEnum(_localizationService, _workContext),
                             PaymentStatus = order.PaymentStatus.GetLocalizedEnum(_localizationService, _workContext),
                             ShippingStatus = order.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext),
-                            OrderTotal = _priceFormatter.FormatPrice(order.OrderTotal, true, false),
+                            OrderTotal = _priceFormatter.FormatPrice(order.SubscriptionOrderTotal, true, false),
                             StoreName = store != null ? store.Name : "Unknown",
                             CreatedOn = _dateTimeHelper.ConvertToUserTime(order.CreatedOnUtc, DateTimeKind.Utc),
                         };
@@ -1801,8 +1756,8 @@ namespace Nop.Admin.Controllers
             var model = new CustomerReportsModel();
             //customers by number of orders
             model.BestCustomersByNumberOfOrders = new BestCustomersReportModel();
-            model.BestCustomersByNumberOfOrders.AvailableOrderStatuses = OrderStatus.Pending.ToSelectList(false).ToList();
-            model.BestCustomersByNumberOfOrders.AvailableOrderStatuses.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
+            model.BestCustomersByNumberOfOrders.AvailableSubscriptionOrderStatuses = SubscriptionOrderStatus.Pending.ToSelectList(false).ToList();
+            model.BestCustomersByNumberOfOrders.AvailableSubscriptionOrderStatuses.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
             model.BestCustomersByNumberOfOrders.AvailablePaymentStatuses = PaymentStatus.Pending.ToSelectList(false).ToList();
             model.BestCustomersByNumberOfOrders.AvailablePaymentStatuses.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
             model.BestCustomersByNumberOfOrders.AvailableShippingStatuses = ShippingStatus.NotYetShipped.ToSelectList(false).ToList();
@@ -1810,8 +1765,8 @@ namespace Nop.Admin.Controllers
 
             //customers by order total
             model.BestCustomersByOrderTotal = new BestCustomersReportModel();
-            model.BestCustomersByOrderTotal.AvailableOrderStatuses = OrderStatus.Pending.ToSelectList(false).ToList();
-            model.BestCustomersByOrderTotal.AvailableOrderStatuses.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
+            model.BestCustomersByOrderTotal.AvailableSubscriptionOrderStatuses = SubscriptionOrderStatus.Pending.ToSelectList(false).ToList();
+            model.BestCustomersByOrderTotal.AvailableSubscriptionOrderStatuses.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
             model.BestCustomersByOrderTotal.AvailablePaymentStatuses = PaymentStatus.Pending.ToSelectList(false).ToList();
             model.BestCustomersByOrderTotal.AvailablePaymentStatuses.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
             model.BestCustomersByOrderTotal.AvailableShippingStatuses = ShippingStatus.NotYetShipped.ToSelectList(false).ToList();
@@ -1832,7 +1787,7 @@ namespace Nop.Admin.Controllers
             DateTime? endDateValue = (model.EndDate == null) ? null
                             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.EndDate.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
 
-            OrderStatus? orderStatus = model.OrderStatusId > 0 ? (OrderStatus?)(model.OrderStatusId) : null;
+            SubscriptionOrderStatus? orderStatus = model.SubscriptionOrderStatusId > 0 ? (SubscriptionOrderStatus?)(model.SubscriptionOrderStatusId) : null;
             PaymentStatus? paymentStatus = model.PaymentStatusId > 0 ? (PaymentStatus?)(model.PaymentStatusId) : null;
             ShippingStatus? shippingStatus = model.ShippingStatusId > 0 ? (ShippingStatus?)(model.ShippingStatusId) : null;
 
@@ -1873,7 +1828,7 @@ namespace Nop.Admin.Controllers
             DateTime? endDateValue = (model.EndDate == null) ? null
                             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.EndDate.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
 
-            OrderStatus? orderStatus = model.OrderStatusId > 0 ? (OrderStatus?)(model.OrderStatusId) : null;
+            SubscriptionOrderStatus? orderStatus = model.SubscriptionOrderStatusId > 0 ? (SubscriptionOrderStatus?)(model.SubscriptionOrderStatusId) : null;
             PaymentStatus? paymentStatus = model.PaymentStatusId > 0 ? (PaymentStatus?)(model.PaymentStatusId) : null;
             ShippingStatus? shippingStatus = model.ShippingStatusId > 0 ? (ShippingStatus?)(model.ShippingStatusId) : null;
 
@@ -1929,7 +1884,7 @@ namespace Nop.Admin.Controllers
         
         #endregion
 
-        #region Current shopping cart/ wishlist
+        #region Current shopping cart/ mytoybox
 
         [HttpPost]
         public ActionResult GetCartList(int customerId, int cartTypeId)
@@ -1938,7 +1893,7 @@ namespace Nop.Admin.Controllers
                 return Content("");
 
             var customer = _customerService.GetCustomerById(customerId);
-            var cart = customer.ShoppingCartItems.Where(x => x.ShoppingCartTypeId == cartTypeId).ToList();
+            var cart = customer.BorrowCartItems.Where(x => x.BorrowCartTypeId == cartTypeId).ToList();
 
             var gridModel = new DataSourceResult
             {
@@ -1946,7 +1901,7 @@ namespace Nop.Admin.Controllers
                 {
                     decimal taxRate;
                     var store = _storeService.GetStoreById(sci.StoreId); 
-                    var sciModel = new ShoppingCartItemModel
+                    var sciModel = new BorrowCartItemModel
                     {
                         Id = sci.Id,
                         Store = store != null ? store.Name : "Unknown",
@@ -2002,12 +1957,12 @@ namespace Nop.Admin.Controllers
         #region Back in stock subscriptions
 
         [HttpPost]
-        public ActionResult BackInStockSubscriptionList(DataSourceRequest command, int customerId)
+        public ActionResult BackInStockSubscriptionOrderList(DataSourceRequest command, int customerId)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageCustomers))
                 return Content("");
 
-            var subscriptions = _backInStockSubscriptionService.GetAllSubscriptionsByCustomerId(customerId,
+            var subscriptions = _backInStockSubscriptionOrderService.GetAllSubscriptionsByCustomerId(customerId,
                 0, command.Page - 1, command.PageSize);
             var gridModel = new DataSourceResult
             {
@@ -2015,7 +1970,7 @@ namespace Nop.Admin.Controllers
                 {
                     var store = _storeService.GetStoreById(x.StoreId);
                     var product = x.Product;
-                    var m = new CustomerModel.BackInStockSubscriptionModel
+                    var m = new CustomerModel.BackInStockSubscriptionOrderModel
                     {
                         Id = x.Id,
                         StoreName = store != null ? store.Name : "Unknown",
@@ -2061,7 +2016,7 @@ namespace Nop.Admin.Controllers
                 company: model.SearchCompany,
                 phone: model.SearchPhone,
                 zipPostalCode: model.SearchZipPostalCode,
-                loadOnlyWithShoppingCart: false);
+                loadOnlyWithBorrowCart: false);
 
             try
             {
@@ -2130,7 +2085,7 @@ namespace Nop.Admin.Controllers
                 company: model.SearchCompany,
                 phone: model.SearchPhone,
                 zipPostalCode: model.SearchZipPostalCode,
-                loadOnlyWithShoppingCart: false);
+                loadOnlyWithBorrowCart: false);
 
             try
             {

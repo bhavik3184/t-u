@@ -18,6 +18,7 @@ using Nop.Services.Tax;
 using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Catalog;
 using Nop.Web.Models.Media;
+using Nop.Services.SubscriptionOrders;
 
 namespace Nop.Web.Extensions
 {
@@ -129,7 +130,7 @@ namespace Nop.Web.Extensions
                                         {
                                             //no associated products
                                             //priceModel.DisableBuyButton = true;
-                                            //priceModel.DisableWishlistButton = true;
+                                            //priceModel.DisableMyToyBoxButton = true;
                                             //compare products
                                             priceModel.DisableAddToCompareListButton = !catalogSettings.CompareProductsEnabled;
                                             //priceModel.AvailableForPreOrder = false;
@@ -139,7 +140,7 @@ namespace Nop.Web.Extensions
                                         {
                                             //we have at least one associated product
                                             //priceModel.DisableBuyButton = true;
-                                            //priceModel.DisableWishlistButton = true;
+                                            //priceModel.DisableMyToyBoxButton = true;
                                             //compare products
                                             priceModel.DisableAddToCompareListButton = !catalogSettings.CompareProductsEnabled;
                                             //priceModel.AvailableForPreOrder = false;
@@ -206,12 +207,12 @@ namespace Nop.Web.Extensions
 
                                 //add to cart button
                                 priceModel.DisableBuyButton = product.DisableBuyButton ||
-                                    !permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart) ||
+                                    !permissionService.Authorize(StandardPermissionProvider.EnableBorrowCart) ||
                                     !permissionService.Authorize(StandardPermissionProvider.DisplayPrices);
 
-                                //add to wishlist button
-                                priceModel.DisableWishlistButton = product.DisableWishlistButton ||
-                                    !permissionService.Authorize(StandardPermissionProvider.EnableWishlist) ||
+                                //add to mytoybox button
+                                priceModel.DisableMyToyBoxButton = product.DisableMyToyBoxButton ||
+                                    !permissionService.Authorize(StandardPermissionProvider.EnableMyToyBox) ||
                                     !permissionService.Authorize(StandardPermissionProvider.DisplayPrices);
                                 //compare products
                                 priceModel.DisableAddToCompareListButton = !catalogSettings.CompareProductsEnabled;
@@ -370,6 +371,244 @@ namespace Nop.Web.Extensions
                     TotalReviews = product.ApprovedTotalReviews,
                     AllowCustomerReviews = product.AllowCustomerReviews
                 };
+
+                models.Add(model);
+            }
+            return models;
+        }
+
+        public static IEnumerable<PlanOverviewModel> PreparePlanOverviewModels(this Controller controller,
+          IWorkContext workContext,
+          IStoreContext storeContext,
+          ICategoryService categoryService,
+          IPlanService planService,
+          ISubscriptionOrderService subscriptionOrderService,
+          IPriceCalculationService priceCalculationService,
+          IPriceFormatter priceFormatter,
+          IPermissionService permissionService,
+          ILocalizationService localizationService,
+          ITaxService taxService,
+          ICurrencyService currencyService,
+          IPictureService pictureService,
+          IWebHelper webHelper,
+          ICacheManager cacheManager,
+          CatalogSettings catalogSettings,
+          MediaSettings mediaSettings,
+          IEnumerable<Plan> plans,
+          bool preparePriceModel = true, bool preparePictureModel = true,
+          int? planThumbPictureSize = null,
+          bool forceRedirectionAfterAddingToCart = false)
+        {
+            if (plans == null)
+                throw new ArgumentNullException("plans");
+
+            var models = new List<PlanOverviewModel>();
+            var customer = workContext.CurrentCustomer;
+            var currentorder = subscriptionOrderService.GetCurrentSubscribedOrder(customer.Id);
+
+            foreach (var plan in plans)
+            {
+                var model = new PlanOverviewModel
+                {
+                    Id = plan.Id,
+                    Name = plan.GetLocalized(x => x.Name),
+                    ShortDescription = plan.GetLocalized(x => x.ShortDescription),
+                    FullDescription = plan.GetLocalized(x => x.FullDescription),
+                    SeName = plan.GetSeName(),
+                    MaxNoOfDeliveries = plan.MaxNoOfDeliveries,
+                    NoOfItemsToBorrow = plan.NoOfItemsToBorrow,
+                    Duration = plan.RentalPriceLength.ToString() + " " + (RentalPricePeriod?)plan.RentalPricePeriodId,
+                    MarkAsNew = plan.MarkAsNew &&
+                        (!plan.MarkAsNewStartDateTimeUtc.HasValue || plan.MarkAsNewStartDateTimeUtc.Value < DateTime.UtcNow) &&
+                        (!plan.MarkAsNewEndDateTimeUtc.HasValue || plan.MarkAsNewEndDateTimeUtc.Value > DateTime.UtcNow)
+                };
+
+                if (currentorder != null) { 
+                    foreach (var SubscriptionOrderItem in currentorder.SubscriptionOrderItems)
+                    {
+                        if (plan.Id == SubscriptionOrderItem.PlanId) {
+                            model.CurrentPlan = true;
+                        }
+
+                    }
+                }
+                var pcat = categoryService.GetPlanCategoriesByPlanId(plan.Id);
+
+                foreach (PlanCategory pc in pcat)
+                {
+                    model.PlanCategoryProductsName = model.PlanCategoryProductsName + "<br>" + pc.Quantity + " " + pc.Category.Name;
+                }
+
+                //price
+                if (preparePriceModel)
+                {
+                    #region Prepare plan price
+
+                    var priceModel = new PlanOverviewModel.PlanPriceModel
+                    {
+                        ForceRedirectionAfterAddingToCart = forceRedirectionAfterAddingToCart
+                    };
+
+                    switch (plan.PlanType)
+                    {
+
+                        case PlanType.SimplePlan:
+                        default:
+                            {
+                                #region Simple plan
+
+                                //add to cart button
+                                priceModel.DisableBuyButton = plan.DisableBuyButton ||
+                                    !permissionService.Authorize(StandardPermissionProvider.EnableBorrowCart) ||
+                                    !permissionService.Authorize(StandardPermissionProvider.DisplayPrices);
+
+                                //add to mytoybox button
+                                priceModel.DisableMyToyBoxButton = plan.DisableMyToyBoxButton ||
+                                    !permissionService.Authorize(StandardPermissionProvider.EnableMyToyBox) ||
+                                    !permissionService.Authorize(StandardPermissionProvider.DisplayPrices);
+                                //compare plans
+                                priceModel.DisableAddToCompareListButton = true;
+
+                                //rental
+                                priceModel.IsRental = plan.IsRental;
+
+                                //pre-order
+                                if (plan.AvailableForPreSubscription)
+                                {
+                                    priceModel.AvailableForPreSubscription = !plan.PreSubscriptionAvailabilityStartDateTimeUtc.HasValue ||
+                                        plan.PreSubscriptionAvailabilityStartDateTimeUtc.Value >= DateTime.UtcNow;
+                                    priceModel.PreSubscriptionAvailabilityStartDateTimeUtc = plan.PreSubscriptionAvailabilityStartDateTimeUtc;
+                                }
+
+                                //prices
+                                if (permissionService.Authorize(StandardPermissionProvider.DisplayPrices))
+                                {
+                                    if (!plan.CustomerEntersPrice)
+                                    {
+                                        if (plan.CallForPrice)
+                                        {
+                                            //call for price
+                                            priceModel.OldPrice = null;
+                                            priceModel.Price = localizationService.GetResource("Plans.CallForPrice");
+                                        }
+                                        else
+                                        {
+                                            //prices
+
+                                            //calculate for the maximum quantity (in case if we have tier prices)
+                                            decimal minPossiblePrice = priceCalculationService.GetFinalPrice(plan,
+                                                workContext.CurrentCustomer, decimal.Zero, true, int.MaxValue);
+
+                                            decimal taxRate;
+                                            decimal oldPriceBase = taxService.GetPlanPrice(plan, plan.OldPrice, out taxRate);
+                                            decimal finalPriceBase = taxService.GetPlanPrice(plan, minPossiblePrice, out taxRate);
+
+                                            decimal oldPrice = currencyService.ConvertFromPrimaryStoreCurrency(oldPriceBase, workContext.WorkingCurrency);
+                                            decimal finalPrice = currencyService.ConvertFromPrimaryStoreCurrency(finalPriceBase, workContext.WorkingCurrency);
+
+                                            //do we have tier prices configured?
+                                            var tierPrices = new List<TierPrice>();
+                                            if (plan.HasTierPrices)
+                                            {
+                                                tierPrices.AddRange(plan.TierPrices
+                                                    .OrderBy(tp => tp.Quantity)
+                                                    .ToList()
+                                                    .FilterByStore(storeContext.CurrentStore.Id)
+                                                    .FilterForCustomer(workContext.CurrentCustomer)
+                                                    .RemoveDuplicatedQuantities());
+                                            }
+                                            //When there is just one tier (with  qty 1), 
+                                            //there are no actual savings in the list.
+                                            bool displayFromMessage = tierPrices.Count > 0 &&
+                                                !(tierPrices.Count == 1 && tierPrices[0].Quantity <= 1);
+                                            if (displayFromMessage)
+                                            {
+                                                priceModel.OldPrice = null;
+                                                priceModel.Price = String.Format(localizationService.GetResource("Plans.PriceRangeFrom"), priceFormatter.FormatPrice(finalPrice));
+                                                priceModel.PriceValue = finalPrice;
+                                            }
+                                            else
+                                            {
+                                                if (finalPriceBase != oldPriceBase && oldPriceBase != decimal.Zero)
+                                                {
+                                                    priceModel.OldPrice = priceFormatter.FormatPrice(oldPrice);
+                                                    priceModel.Price = priceFormatter.FormatPrice(finalPrice);
+                                                    priceModel.PriceValue = finalPrice;
+                                                }
+                                                else
+                                                {
+                                                    priceModel.OldPrice = null;
+                                                    priceModel.Price = priceFormatter.FormatPrice(finalPrice);
+                                                    priceModel.PriceValue = finalPrice;
+                                                }
+                                            }
+                                            //if (plan.IsRental)
+                                            //{
+                                            //    //rental plan
+                                            //    priceModel.OldPrice = "";
+                                            //    priceModel.Price = "";
+                                            //}
+
+                                            priceModel.SecurityDeposit = priceFormatter.FormatPrice(plan.SecurityDeposit);
+                                            priceModel.SecurityDepositValue = plan.SecurityDeposit;
+                                            //property for German market
+                                            //we display tax/shipping info only with "shipping enabled" for this plan
+                                            //we also ensure this it's not free shipping
+                                            priceModel.DisplayTaxShippingInfo = catalogSettings.DisplayTaxShippingInfoProductBoxes
+                                                && plan.IsShipEnabled &&
+                                                !plan.IsFreeShipping;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    //hide prices
+                                    priceModel.OldPrice = null;
+                                    priceModel.Price = null;
+                                }
+
+                                #endregion
+                            }
+                            break;
+                    }
+
+                    model.PlanPrice = priceModel;
+
+                    #endregion
+                }
+
+                //picture
+                if (preparePictureModel)
+                {
+                    #region Prepare plan picture
+
+                    //If a size has been set in the view, we use it in priority
+                    int pictureSize = planThumbPictureSize.HasValue ? planThumbPictureSize.Value : mediaSettings.ProductThumbPictureSize;
+                    //prepare picture model
+                    var defaultPlanPictureCacheKey = string.Format(ModelCacheEventConsumer.PRODUCT_DEFAULTPICTURE_MODEL_KEY, plan.Id, pictureSize, true, workContext.WorkingLanguage.Id, webHelper.IsCurrentConnectionSecured(), storeContext.CurrentStore.Id);
+                    model.DefaultPictureModel = cacheManager.Get(defaultPlanPictureCacheKey, () =>
+                    {
+                        var picture = pictureService.GetPicturesByProductId(plan.Id, 1).FirstOrDefault();
+                        var pictureModel = new PictureModel
+                        {
+                            ImageUrl = pictureService.GetPictureUrl(picture, pictureSize),
+                            FullSizeImageUrl = pictureService.GetPictureUrl(picture)
+                        };
+                        //"title" attribute
+                        pictureModel.Title = (picture != null && !string.IsNullOrEmpty(picture.TitleAttribute)) ?
+                            picture.TitleAttribute :
+                            string.Format(localizationService.GetResource("Media.Plan.ImageLinkTitleFormat"), model.Name);
+                        //"alt" attribute
+                        pictureModel.AlternateText = (picture != null && !string.IsNullOrEmpty(picture.AltAttribute)) ?
+                            picture.AltAttribute :
+                            string.Format(localizationService.GetResource("Media.Plan.ImageAlternateTextFormat"), model.Name);
+
+                        return pictureModel;
+                    });
+
+                    #endregion
+                }
+
 
                 models.Add(model);
             }

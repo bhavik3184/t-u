@@ -1,0 +1,68 @@
+﻿<table class="adminContent">
+    <tr>
+        <td>
+
+            <div id="average-order-report-grid"></div>
+            <script>
+                $(document).ready(function () {
+                    $("#average-order-report-grid").kendoGrid({
+                        dataSource: {
+                            type: "json",
+                            transport: {
+                                read: {
+                                    url: "@Html.Raw(Url.Action("SubscriptionAverageReportList", "Subscription"))",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: addAntiForgeryToken
+                                }
+                            },
+                            schema: {
+                                data: "Data",
+                                total: "Total",
+                                errors: "Errors"
+                            },
+                            error: function(e) {
+                                display_kendoui_grid_error(e);
+                                // Cancel the changes
+                                this.cancelChanges();
+                            },
+                            serverPaging: true,
+                            serverFiltering: true,
+                            serverSorting: true
+                        },
+                        pageable: {
+                            refresh: true,
+                            numeric: false,
+                            previousNext: false,
+                            info: false
+                        },
+                        editable: {
+                            confirmation: false,
+                            mode: "inline"
+                        },
+                        scrollable: false,
+                        columns: [{
+                            field: "SubscriptionOrderStatus",
+                            title: "@T("Admin.SalesReport.Average.SubscriptionOrderStatus")"
+                        }, {
+                            field: "SumTodaySubscriptions",
+                            title: "@T("Admin.SalesReport.Average.SumTodaySubscriptions")"
+                        }, {
+                            field: "SumThisWeekSubscriptions",
+                            title: "@T("Admin.SalesReport.Average.SumThisWeekSubscriptions")"
+                        }, {
+                            field: "SumThisMonthSubscriptions",
+                            title: "@T("Admin.SalesReport.Average.SumThisMonthSubscriptions")"
+                        }, {
+                            field: "SumThisYearSubscriptions",
+                            title: "@T("Admin.SalesReport.Average.SumThisYearSubscriptions")"
+                        }, {
+                            field: "SumAllTimeSubscriptions",
+                            title: "@T("Admin.SalesReport.Average.SumAllTimeSubscriptions")"
+                        }]
+                    });
+                });
+            </script>
+        </td>
+    </tr>
+</table>

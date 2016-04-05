@@ -2,11 +2,11 @@
 @model OrderModel.AddOrderProductModel.ProductDetailsModel
 @{
     //page title
-    ViewBag.Title = string.Format(T("Admin.Orders.Products.AddNew.Title2").Text, Model.Name, Model.OrderId);
+    ViewBag.Title = string.Format(T("Admin.Orders.Products.AddNew.Title2").Text, Model.Name, Model.SubscriptionOrderId);
 }
 @*we add enctype = "multipart/form-data" because "File upload" attribute control type requires it*@
 @using (Html.BeginForm("AddProductToOrderDetails", "Order",
-    new RouteValueDictionary(new { orderId = Model.OrderId, productId = Model.ProductId }),
+    new RouteValueDictionary(new { orderId = Model.SubscriptionOrderId, productId = Model.ProductId }),
     FormMethod.Post,
     new Dictionary<string, Object> { { "enctype", "multipart/form-data" } }))
 {
@@ -15,8 +15,8 @@
     <div class="section-header">
         <div class="title">
             <img src="@Url.Content("~/Administration/Content/images/ico-sales.png")" alt="" />
-            @string.Format(T("Admin.Orders.Products.AddNew.Title2").Text, Model.Name, Model.OrderId)
-            @Html.ActionLink("(" + T("Admin.Orders.Products.AddNew.BackToList") + ")", "AddProductToOrder", new { orderId = Model.OrderId })
+            @string.Format(T("Admin.Orders.Products.AddNew.Title2").Text, Model.Name, Model.SubscriptionOrderId)
+            @Html.ActionLink("(" + T("Admin.Orders.Products.AddNew.BackToList") + ")", "AddProductToOrder", new { orderId = Model.SubscriptionOrderId })
         </div>
         <div class="options">
         </div>

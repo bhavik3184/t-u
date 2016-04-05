@@ -1,10 +1,20 @@
 ﻿@model SearchBoxModel
 @using Nop.Web.Models.Catalog;
+<script src="/Scripts/modernizr.custom.js"></script>
 @using (Html.BeginRouteForm("ProductSearch", FormMethod.Get, new { id = "small-search-box-form" }))
-{
-    <input type="text" class="search-box-text" id="small-searchterms" autocomplete="off" name="q" placeholder="@T("Search.SearchBox.Tooltip")" />
+{ 
+  <fieldset>
+      <div id="sb-search" class="sb-search" class="input-group">
+          <div class="inner-addon left-addon">
+              <i class="icon icon-search"></i>
+              <input class="searchfield form-control sb-search-input   search-box-text" placeholder="@T("Search.SearchBox.Tooltip")" type="text" value="" autocomplete="off" name="q" id="small-searchterms">
+          </div>
+      </div>
+</fieldset>
+ 
+     
     @Html.Widget("searchbox_before_search_button")
-    <input type="submit" class="button-1 search-box-button" value="@T("Search.Button")" />
+    
     if (Model.SearchTermMinimumLength > 0)
     {
         <script type="text/javascript">
@@ -48,3 +58,10 @@
     }
     @Html.Widget("searchbox")
 }
+
+
+<script src="/Scripts/classie.js"></script>
+<script src="/Scripts/uisearch.js"></script>
+<script>
+    new UISearch( document.getElementById( 'sb-search' ) );
+</script>

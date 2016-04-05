@@ -7,7 +7,7 @@ using Nop.Admin.Models.Affiliates;
 using Nop.Core;
 using Nop.Core.Domain.Affiliates;
 using Nop.Core.Domain.Directory;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Domain.Shipping;
 using Nop.Services.Affiliates;
@@ -16,7 +16,7 @@ using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
@@ -37,7 +37,7 @@ namespace Nop.Admin.Controllers
         private readonly IPriceFormatter _priceFormatter;
         private readonly IAffiliateService _affiliateService;
         private readonly ICustomerService _customerService;
-        private readonly IOrderService _orderService;
+        private readonly ISubscriptionOrderService _orderService;
         private readonly IPermissionService _permissionService;
 
         #endregion
@@ -48,7 +48,7 @@ namespace Nop.Admin.Controllers
             IWorkContext workContext, IDateTimeHelper dateTimeHelper, IWebHelper webHelper,
             ICountryService countryService, IStateProvinceService stateProvinceService,
             IPriceFormatter priceFormatter, IAffiliateService affiliateService,
-            ICustomerService customerService, IOrderService orderService,
+            ICustomerService customerService, ISubscriptionOrderService orderService,
             IPermissionService permissionService)
         {
             this._localizationService = localizationService;
@@ -304,8 +304,8 @@ namespace Nop.Admin.Controllers
             model.AffliateId = affiliateId;
 
             //order statuses
-            model.AvailableOrderStatuses = OrderStatus.Pending.ToSelectList(false).ToList();
-            model.AvailableOrderStatuses.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
+            model.AvailableSubscriptionOrderStatuses = SubscriptionOrderStatus.Pending.ToSelectList(false).ToList();
+            model.AvailableSubscriptionOrderStatuses.Insert(0, new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
             
             //payment statuses
             model.AvailablePaymentStatuses = PaymentStatus.Pending.ToSelectList(false).ToList();
@@ -333,11 +333,11 @@ namespace Nop.Admin.Controllers
             DateTime? endDateValue = (model.EndDate == null) ? null
                             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.EndDate.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
 
-            OrderStatus? orderStatus = model.OrderStatusId > 0 ? (OrderStatus?)(model.OrderStatusId) : null;
+            SubscriptionOrderStatus? orderStatus = model.SubscriptionOrderStatusId > 0 ? (SubscriptionOrderStatus?)(model.SubscriptionOrderStatusId) : null;
             PaymentStatus? paymentStatus = model.PaymentStatusId > 0 ? (PaymentStatus?)(model.PaymentStatusId) : null;
             ShippingStatus? shippingStatus = model.ShippingStatusId > 0 ? (ShippingStatus?)(model.ShippingStatusId) : null;
 
-            var orders = _orderService.SearchOrders(
+            var orders = _orderService.SearchSubscriptionOrders(
                 createdFromUtc: startDateValue,
                 createdToUtc: endDateValue,
                 os: orderStatus,
@@ -352,10 +352,10 @@ namespace Nop.Admin.Controllers
                     {
                         var orderModel = new AffiliateModel.AffiliatedOrderModel();
                         orderModel.Id = order.Id;
-                        orderModel.OrderStatus = order.OrderStatus.GetLocalizedEnum(_localizationService, _workContext);
+                        orderModel.SubscriptionOrderStatus = order.SubscriptionOrderStatus.GetLocalizedEnum(_localizationService, _workContext);
                         orderModel.PaymentStatus = order.PaymentStatus.GetLocalizedEnum(_localizationService, _workContext);
                         orderModel.ShippingStatus = order.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext);
-                        orderModel.OrderTotal = _priceFormatter.FormatPrice(order.OrderTotal, true, false);
+                        orderModel.OrderTotal = _priceFormatter.FormatPrice(order.SubscriptionOrderTotal, true, false);
                         orderModel.CreatedOn = _dateTimeHelper.ConvertToUserTime(order.CreatedOnUtc, DateTimeKind.Utc);
                         return orderModel;
                     }),

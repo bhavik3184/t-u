@@ -15,7 +15,7 @@ namespace Nop.Admin.Models.Orders
         [NopResourceDisplayName("Admin.Orders.Shipments.ID")]
         public override int Id { get; set; }
         [NopResourceDisplayName("Admin.Orders.Shipments.OrderID")]
-        public int OrderId { get; set; }
+        public int SubscriptionOrderId { get; set; }
         [NopResourceDisplayName("Admin.Orders.Shipments.TotalWeight")]
         public string TotalWeight { get; set; }
         [NopResourceDisplayName("Admin.Orders.Shipments.TrackingNumber")]

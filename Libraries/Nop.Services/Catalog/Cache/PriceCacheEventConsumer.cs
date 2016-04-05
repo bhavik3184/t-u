@@ -2,7 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Configuration;
 using Nop.Core.Domain.Discounts;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Events;
 using Nop.Core.Infrastructure;
 using Nop.Services.Events;
@@ -42,11 +42,9 @@ namespace Nop.Services.Catalog.Cache
         //tier prices
         IConsumer<EntityInserted<TierPrice>>,
         IConsumer<EntityUpdated<TierPrice>>,
-        IConsumer<EntityDeleted<TierPrice>>,
+        IConsumer<EntityDeleted<TierPrice>>
         //orders
-        IConsumer<EntityInserted<Order>>,
-        IConsumer<EntityUpdated<Order>>,
-        IConsumer<EntityDeleted<Order>>
+         
     {
         /// <summary>
         /// Key for product prices
@@ -237,18 +235,6 @@ namespace Nop.Services.Catalog.Cache
             _cacheManager.RemoveByPattern(PRODUCT_PRICE_PATTERN_KEY);
         }
 
-        //orders
-        public void HandleEvent(EntityInserted<Order> eventMessage)
-        {
-            _cacheManager.RemoveByPattern(PRODUCT_PRICE_PATTERN_KEY);
-        }
-        public void HandleEvent(EntityUpdated<Order> eventMessage)
-        {
-            _cacheManager.RemoveByPattern(PRODUCT_PRICE_PATTERN_KEY);
-        }
-        public void HandleEvent(EntityDeleted<Order> eventMessage)
-        {
-            _cacheManager.RemoveByPattern(PRODUCT_PRICE_PATTERN_KEY);
-        }
+        
     }
 }

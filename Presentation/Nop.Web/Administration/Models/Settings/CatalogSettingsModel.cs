@@ -210,13 +210,13 @@ namespace Nop.Admin.Models.Settings
         public bool DisplayTaxShippingInfoProductBoxes { get; set; }
         public bool DisplayTaxShippingInfoProductBoxes_OverrideForStore { get; set; }
 
-        [NopResourceDisplayName("Admin.Configuration.Settings.Catalog.DisplayTaxShippingInfoShoppingCart")]
-        public bool DisplayTaxShippingInfoShoppingCart { get; set; }
-        public bool DisplayTaxShippingInfoShoppingCart_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Admin.Configuration.Settings.Catalog.DisplayTaxShippingInfoBorrowCart")]
+        public bool DisplayTaxShippingInfoBorrowCart { get; set; }
+        public bool DisplayTaxShippingInfoBorrowCart_OverrideForStore { get; set; }
 
-        [NopResourceDisplayName("Admin.Configuration.Settings.Catalog.DisplayTaxShippingInfoWishlist")]
-        public bool DisplayTaxShippingInfoWishlist { get; set; }
-        public bool DisplayTaxShippingInfoWishlist_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Admin.Configuration.Settings.Catalog.DisplayTaxShippingInfoMyToyBox")]
+        public bool DisplayTaxShippingInfoMyToyBox { get; set; }
+        public bool DisplayTaxShippingInfoMyToyBox_OverrideForStore { get; set; }
 
         [NopResourceDisplayName("Admin.Configuration.Settings.Catalog.DisplayTaxShippingInfoOrderDetailsPage")]
         public bool DisplayTaxShippingInfoOrderDetailsPage { get; set; }

@@ -1,0 +1,92 @@
+﻿@model DashboardModel
+@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+}
+@section left
+{
+    @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.Dashboard })
+}
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="page account-page change-password-page article">
+        <div class="page-title">
+            <h1>My Dashboard</h1>
+        </div>
+        <div class="page-body">
+            <div class="fieldset">
+                <div class="form-fields">
+                    <div class="inputs col-sm-12">
+                        <div class="col-sm-4">
+                            Plan Name
+                        </div>
+                        <div class="col-sm-8">
+                             @Model.PlanName
+                        </div>
+                    </div>
+                    <div class="inputs col-sm-12">
+                        <div class="col-sm-4">
+                           Refundable Security Deposit
+                        </div>
+                        <div class="col-sm-8">
+                             @Model.SecurityDeposit
+                        </div>
+                    </div>
+                    <div class="inputs col-sm-12">
+                        <div class="col-sm-4">
+                            Onetime Registration Fees
+                        </div>
+                        <div class="col-sm-8">
+                             @Model.RegistrationFees
+                        </div>
+                    </div>
+                    <div class="inputs col-sm-12">
+                        <div class="col-sm-4">
+                            Subscription Fees
+                        </div>
+                        <div class="col-sm-8">
+                             @Model.SubscriptionFees
+                        </div>
+                    </div>
+                    <div class="inputs col-sm-12">
+                        <div class="col-sm-4">
+                            Plan Start Date
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.CreationDate
+                        </div>
+                    </div>
+                    <div class="inputs col-sm-12">
+                        <div class="col-sm-4">
+                            Plan End Date
+                        </div>
+                        <div class="col-sm-8">
+                             @Model.EndDate
+                        </div>
+                    </div>
+                    <div class="inputs col-sm-12">
+                        <div class="col-sm-4">
+                            Membership Plan Validity
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.MembershipPlanValidity
+                        </div>
+                    </div>
+                    <div class="inputs col-sm-12">
+                        <div class="col-sm-4">
+                            Remaining Days
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.RemainingDays
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+}

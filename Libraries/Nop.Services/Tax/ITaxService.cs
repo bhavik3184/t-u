@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Tax;
 
 namespace Nop.Services.Tax
@@ -31,8 +31,96 @@ namespace Nop.Services.Tax
         /// </summary>
         /// <returns>Tax providers</returns>
         IList<ITaxProvider> LoadAllTaxProviders();
+
+
+
+        /// <summary>
+        /// Gets checkout attribute value price
+        /// </summary>
+        /// <param name="cav">Checkout attribute value</param>
+        /// <returns>Price</returns>
+        decimal GetCheckoutAttributePrice(Nop.Core.Domain.SubscriptionOrders.CheckoutAttributeValue cav);
+
+        /// <summary>
+        /// Gets checkout attribute value price
+        /// </summary>
+        /// <param name="cav">Checkout attribute value</param>
+        /// <param name="customer">Customer</param>
+        /// <returns>Price</returns>
+        decimal GetCheckoutAttributePrice(Nop.Core.Domain.SubscriptionOrders.CheckoutAttributeValue cav, Customer customer);
+
+        /// <summary>
+        /// Gets checkout attribute value price
+        /// </summary>
+        /// <param name="cav">Checkout attribute value</param>
+        /// <param name="includingTax">A value indicating whether calculated price should include tax</param>
+        /// <param name="customer">Customer</param>
+        /// <returns>Price</returns>
+        decimal GetCheckoutAttributePrice(Nop.Core.Domain.SubscriptionOrders.CheckoutAttributeValue cav,
+            bool includingTax, Customer customer);
+
+        /// <summary>
+        /// Gets checkout attribute value price
+        /// </summary>
+        /// <param name="cav">Checkout attribute value</param>
+        /// <param name="includingTax">A value indicating whether calculated price should include tax</param>
+        /// <param name="customer">Customer</param>
+        /// <param name="taxRate">Tax rate</param>
+        /// <returns>Price</returns>
+        decimal GetCheckoutAttributePrice(Nop.Core.Domain.SubscriptionOrders.CheckoutAttributeValue cav,
+            bool includingTax, Customer customer, out decimal taxRate);
+
         
 
+
+
+        /// <summary>
+        /// Gets price
+        /// </summary>
+        /// <param name="product">Plan</param>
+        /// <param name="price">Price</param>
+        /// <param name="taxRate">Tax rate</param>
+        /// <returns>Price</returns>
+        decimal GetPlanPrice(Plan product, decimal price,
+            out decimal taxRate);
+
+        /// <summary>
+        /// Gets price
+        /// </summary>
+        /// <param name="product">Plan</param>
+        /// <param name="price">Price</param>
+        /// <param name="customer">Customer</param>
+        /// <param name="taxRate">Tax rate</param>
+        /// <returns>Price</returns>
+        decimal GetPlanPrice(Plan product, decimal price,
+            Customer customer, out decimal taxRate);
+
+        /// <summary>
+        /// Gets price
+        /// </summary>
+        /// <param name="product">Plan</param>
+        /// <param name="price">Price</param>
+        /// <param name="includingTax">A value indicating whether calculated price should include tax</param>
+        /// <param name="customer">Customer</param>
+        /// <param name="taxRate">Tax rate</param>
+        /// <returns>Price</returns>
+        decimal GetPlanPrice(Plan product, decimal price,
+            bool includingTax, Customer customer, out decimal taxRate);
+
+        /// <summary>
+        /// Gets price
+        /// </summary>
+        /// <param name="product">Plan</param>
+        /// <param name="taxCategoryId">Tax category identifier</param>
+        /// <param name="price">Price</param>
+        /// <param name="includingTax">A value indicating whether calculated price should include tax</param>
+        /// <param name="customer">Customer</param>
+        /// <param name="priceIncludesTax">A value indicating whether price already includes tax</param>
+        /// <param name="taxRate">Tax rate</param>
+        /// <returns>Price</returns>
+        decimal GetPlanPrice(Plan product, int taxCategoryId, decimal price,
+            bool includingTax, Customer customer,
+            bool priceIncludesTax, out decimal taxRate);
 
 
 
@@ -152,42 +240,7 @@ namespace Nop.Services.Tax
 
 
 
-        /// <summary>
-        /// Gets checkout attribute value price
-        /// </summary>
-        /// <param name="cav">Checkout attribute value</param>
-        /// <returns>Price</returns>
-        decimal GetCheckoutAttributePrice(CheckoutAttributeValue cav);
-
-        /// <summary>
-        /// Gets checkout attribute value price
-        /// </summary>
-        /// <param name="cav">Checkout attribute value</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Price</returns>
-        decimal GetCheckoutAttributePrice(CheckoutAttributeValue cav, Customer customer);
-
-        /// <summary>
-        /// Gets checkout attribute value price
-        /// </summary>
-        /// <param name="cav">Checkout attribute value</param>
-        /// <param name="includingTax">A value indicating whether calculated price should include tax</param>
-        /// <param name="customer">Customer</param>
-        /// <returns>Price</returns>
-        decimal GetCheckoutAttributePrice(CheckoutAttributeValue cav,
-            bool includingTax, Customer customer);
-
-        /// <summary>
-        /// Gets checkout attribute value price
-        /// </summary>
-        /// <param name="cav">Checkout attribute value</param>
-        /// <param name="includingTax">A value indicating whether calculated price should include tax</param>
-        /// <param name="customer">Customer</param>
-        /// <param name="taxRate">Tax rate</param>
-        /// <returns>Price</returns>
-        decimal GetCheckoutAttributePrice(CheckoutAttributeValue cav,
-            bool includingTax, Customer customer, out decimal taxRate);
-
+        
 
 
 

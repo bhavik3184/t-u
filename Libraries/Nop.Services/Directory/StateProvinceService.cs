@@ -150,6 +150,26 @@ namespace Nop.Services.Directory
             return stateProvinces;
         }
 
+        public virtual IList<StateProvince> GetStateProvincesByIds(int[] stateProvinceIds)
+        {
+            if (stateProvinceIds == null || stateProvinceIds.Length == 0)
+                return new List<StateProvince>();
+
+            var query = from c in _stateProvinceRepository.Table
+                        where stateProvinceIds.Contains(c.Id)
+                        select c;
+            var countries = query.ToList();
+            //sort by passed identifiers
+            var sortedCountries = new List<StateProvince>();
+            foreach (int id in stateProvinceIds)
+            {
+                var country = countries.Find(x => x.Id == id);
+                if (country != null)
+                    sortedCountries.Add(country);
+            }
+            return sortedCountries;
+        }
+
         /// <summary>
         /// Inserts a state/province
         /// </summary>

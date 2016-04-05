@@ -23,7 +23,7 @@ namespace Nop.Admin.Controllers
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly IEmailAccountService _emailAccountService;
         private readonly EmailAccountSettings _emailAccountSettings;
-        private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
+        private readonly INewsLetterSubscriptionService _newsLetterSubscriptionOrderService;
         private readonly ILocalizationService _localizationService;
         private readonly IMessageTokenProvider _messageTokenProvider;
         private readonly IStoreContext _storeContext;
@@ -34,7 +34,7 @@ namespace Nop.Admin.Controllers
             IDateTimeHelper dateTimeHelper, 
             IEmailAccountService emailAccountService,
             EmailAccountSettings emailAccountSettings,
-            INewsLetterSubscriptionService newsLetterSubscriptionService,
+            INewsLetterSubscriptionService newsLetterSubscriptionOrderService,
             ILocalizationService localizationService, 
             IMessageTokenProvider messageTokenProvider,
             IStoreContext storeContext,
@@ -45,7 +45,7 @@ namespace Nop.Admin.Controllers
             this._dateTimeHelper = dateTimeHelper;
             this._emailAccountService = emailAccountService;
             this._emailAccountSettings = emailAccountSettings;
-            this._newsLetterSubscriptionService = newsLetterSubscriptionService;
+            this._newsLetterSubscriptionOrderService = newsLetterSubscriptionOrderService;
             this._localizationService = localizationService;
             this._messageTokenProvider = messageTokenProvider;
             this._storeContext = storeContext;
@@ -228,7 +228,7 @@ namespace Nop.Admin.Controllers
                     throw new NopException("Email account could not be loaded");
 
 
-                var subscription = _newsLetterSubscriptionService.GetNewsLetterSubscriptionByEmailAndStoreId(model.TestEmail, _storeContext.CurrentStore.Id);
+                var subscription = _newsLetterSubscriptionOrderService.GetNewsLetterSubscriptionByEmailAndStoreId(model.TestEmail, _storeContext.CurrentStore.Id);
                 if (subscription != null)
                 {
                     //there's a subscription. let's use it
@@ -280,7 +280,7 @@ namespace Nop.Admin.Controllers
                 //subscribers of certain store?
                 var store = _storeService.GetStoreById(campaign.StoreId);
                 var storeId = store != null ? store.Id : 0;
-                var subscriptions = _newsLetterSubscriptionService.GetAllNewsLetterSubscriptions(storeId: storeId,
+                var subscriptions = _newsLetterSubscriptionOrderService.GetAllNewsLetterSubscriptions(storeId: storeId,
                     isActive: true);
                 var totalEmailsSent = _campaignService.SendCampaign(campaign, emailAccount, subscriptions);
                 SuccessNotification(string.Format(_localizationService.GetResource("Admin.Promotions.Campaigns.MassEmailSentToCustomers"), totalEmailsSent), false);

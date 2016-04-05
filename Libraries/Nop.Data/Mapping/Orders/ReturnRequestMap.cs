@@ -1,4 +1,4 @@
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Data.Mapping.Orders
 {

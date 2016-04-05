@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Nop.Core.Domain.Common;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Shipping;
 
 namespace Nop.Services.Shipping
@@ -140,9 +140,9 @@ namespace Nop.Services.Shipping
         /// <summary>
         /// Gets shopping cart item weight (of one item)
         /// </summary>
-        /// <param name="shoppingCartItem">Shopping cart item</param>
+        /// <param name="borrowCartItem">Shopping cart item</param>
         /// <returns>Shopping cart item weight</returns>
-        decimal GetShoppingCartItemWeight(ShoppingCartItem shoppingCartItem);
+        decimal GetBorrowCartItemWeight(BorrowCartItem borrowCartItem);
 
         /// <summary>
         /// Gets shopping cart weight
@@ -155,11 +155,11 @@ namespace Nop.Services.Shipping
         /// <summary>
         /// Get dimensions of associated products (for quantity 1)
         /// </summary>
-        /// <param name="shoppingCartItem">Shopping cart item</param>
+        /// <param name="borrowCartItem">Shopping cart item</param>
         /// <param name="width">Width</param>
         /// <param name="length">Length</param>
         /// <param name="height">Height</param>
-        void GetAssociatedProductDimensions(ShoppingCartItem shoppingCartItem,
+        void GetAssociatedProductDimensions(BorrowCartItem borrowCartItem,
             out decimal width, out decimal length, out decimal height);
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace Nop.Services.Shipping
         /// <param name="storeId">Load records allowed only in a specified store; pass 0 to load all records</param>
         /// <returns>Shipment packages (requests)</returns>
         /// <param name="shippingFromMultipleLocations">Value indicating whether shipping is done from multiple locations (warehouses)</param>
-        IList<GetShippingOptionRequest> CreateShippingOptionRequests(IList<ShoppingCartItem> cart,
+        IList<GetShippingOptionRequest> CreateShippingOptionRequests(IList<BorrowCartItem> cart,
             Address shippingAddress, int storeId, out bool shippingFromMultipleLocations);
 
         /// <summary>
@@ -199,7 +199,10 @@ namespace Nop.Services.Shipping
         /// <param name="allowedShippingRateComputationMethodSystemName">Filter by shipping rate computation method identifier; null to load shipping options of all shipping rate computation methods</param>
         /// <param name="storeId">Load records allowed only in a specified store; pass 0 to load all records</param>
         /// <returns>Shipping options</returns>
-        GetShippingOptionResponse GetShippingOptions(IList<ShoppingCartItem> cart, Address shippingAddress,
+        GetShippingOptionResponse GetShippingOptions(IList<BorrowCartItem> cart, Address shippingAddress,
             string allowedShippingRateComputationMethodSystemName = "", int storeId = 0);
+
+        GetShippingOptionResponse GetShippingOptions(IList<SubscriptionCartItem> cart, Address shippingAddress,
+           string allowedShippingRateComputationMethodSystemName = "", int storeId = 0);
     }
 }

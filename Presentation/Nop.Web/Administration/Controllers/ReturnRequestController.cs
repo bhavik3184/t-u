@@ -5,13 +5,13 @@ using Nop.Admin.Models.Orders;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Localization;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Services.Customers;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Security;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Kendoui;
@@ -23,7 +23,7 @@ namespace Nop.Admin.Controllers
         #region Fields
 
         private readonly IReturnRequestService _returnRequestService;
-        private readonly IOrderService _orderService;
+        private readonly ISubscriptionOrderService _orderService;
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly ICustomerService _customerService;
         private readonly ILocalizationService _localizationService;
@@ -38,7 +38,7 @@ namespace Nop.Admin.Controllers
         #region Constructors
 
         public ReturnRequestController(IReturnRequestService returnRequestService,
-            IOrderService orderService,
+            ISubscriptionOrderService orderService,
             ICustomerService customerService,
             IDateTimeHelper dateTimeHelper,
             ILocalizationService localizationService,
@@ -74,20 +74,23 @@ namespace Nop.Admin.Controllers
             if (returnRequest == null)
                 throw new ArgumentNullException("returnRequest");
 
-            var orderItem = _orderService.GetOrderItemById(returnRequest.OrderItemId);
-            if (orderItem == null)
+            var itemDetail = _orderService.GetItemDetailById(returnRequest.ItemDetailId);
+            if (itemDetail == null)
                 return false;
 
             model.Id = returnRequest.Id;
-            model.ProductId = orderItem.ProductId;
-            model.ProductName = orderItem.Product.Name;
-            model.OrderId = orderItem.OrderId;
+            model.ProductId = itemDetail.ProductId;
+            model.ProductName = itemDetail.Product.Name;
+            model.OrderItemId = itemDetail.OrderItemId;
+            model.SubscriptionOrderId = itemDetail.OrderItem.SubscriptionOrderId;
             model.CustomerId = returnRequest.CustomerId;
             var customer = returnRequest.Customer;
             model.CustomerInfo = customer.IsRegistered() ? customer.Email : _localizationService.GetResource("Admin.Customers.Guest");
             model.Quantity = returnRequest.Quantity;
             model.ReturnRequestStatusStr = returnRequest.ReturnRequestStatus.GetLocalizedEnum(_localizationService, _workContext);
             model.CreatedOn = _dateTimeHelper.ConvertToUserTime(returnRequest.CreatedOnUtc, DateTimeKind.Utc);
+            model.AvailableDateUtc = _dateTimeHelper.ConvertToUserTime(returnRequest.AvailableDateUtc, DateTimeKind.Utc);
+
             if (!excludeProperties)
             {
                 model.ReasonForReturn = returnRequest.ReasonForReturn;
@@ -177,6 +180,7 @@ namespace Nop.Admin.Controllers
                 returnRequest.CustomerComments = model.CustomerComments;
                 returnRequest.StaffNotes = model.StaffNotes;
                 returnRequest.ReturnRequestStatusId = model.ReturnRequestStatusId;
+                returnRequest.AvailableDateUtc = model.AvailableDateUtc;
                 returnRequest.UpdatedOnUtc = DateTime.UtcNow;
                 _customerService.UpdateCustomer(returnRequest.Customer);
 
@@ -206,7 +210,7 @@ namespace Nop.Admin.Controllers
                 return RedirectToAction("List");
 
             //var customer = returnRequest.Customer;
-            var orderItem = _orderService.GetOrderItemById(returnRequest.OrderItemId);
+            var orderItem = _orderService.GetOrderItemById(returnRequest.ItemDetailId);
             int queuedEmailId = _workflowMessageService.SendReturnRequestStatusChangedCustomerNotification(returnRequest, orderItem, _localizationSettings.DefaultAdminLanguageId);
             if (queuedEmailId > 0)
                 SuccessNotification(_localizationService.GetResource("Admin.ReturnRequests.Notified"));

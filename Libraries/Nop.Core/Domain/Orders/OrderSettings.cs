@@ -1,6 +1,6 @@
 ﻿using Nop.Core.Configuration;
 
-namespace Nop.Core.Domain.Orders
+namespace Nop.Core.Domain.SubscriptionOrders
 {
     public class OrderSettings : ISettings
     {
@@ -33,7 +33,7 @@ namespace Nop.Core.Domain.Orders
         /// <summary>
         /// Gets or sets a value indicating whether 'Terms of service' enabled on the shopping cart page
         /// </summary>
-        public bool TermsOfServiceOnShoppingCartPage { get; set; }
+        public bool TermsOfServiceOnBorrowCartPage { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether 'Terms of service' enabled on the order confirmation page
@@ -86,12 +86,12 @@ namespace Nop.Core.Domain.Orders
         /// <summary>
         ///  Gift cards are activated when the order status is
         /// </summary>
-        public int GiftCards_Activated_OrderStatusId { get; set; }
+        public int GiftCards_Activated_SubscriptionOrderStatusId { get; set; }
 
         /// <summary>
         ///  Gift cards are deactivated when the order status is
         /// </summary>
-        public int GiftCards_Deactivated_OrderStatusId { get; set; }
+        public int GiftCards_Deactivated_SubscriptionOrderStatusId { get; set; }
 
         /// <summary>
         /// Gets or sets an order placement interval in seconds (prevent 2 orders being placed within an X seconds time frame).

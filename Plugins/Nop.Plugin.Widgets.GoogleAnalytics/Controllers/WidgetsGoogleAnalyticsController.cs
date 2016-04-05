@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using Nop.Core;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Plugin.Widgets.GoogleAnalytics.Models;
 using Nop.Services.Catalog;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Stores;
 using Nop.Web.Framework.Controllers;
 
@@ -22,7 +22,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Controllers
         private readonly IStoreContext _storeContext;
         private readonly IStoreService _storeService;
         private readonly ISettingService _settingService;
-        private readonly IOrderService _orderService;
+        private readonly ISubscriptionOrderService _orderService;
         private readonly ILogger _logger;
         private readonly ICategoryService _categoryService;
         private readonly IProductAttributeParser _productAttributeParser;
@@ -32,7 +32,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Controllers
             IStoreContext storeContext, 
             IStoreService storeService,
             ISettingService settingService, 
-            IOrderService orderService, 
+            ISubscriptionOrderService orderService, 
             ILogger logger, 
             ICategoryService categoryService,
             IProductAttributeParser productAttributeParser,
@@ -159,9 +159,9 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Controllers
             return Content(globalScript);
         }
 
-        private Order GetLastOrder()
+        private SubscriptionOrder GetLastOrder()
         {
-            var order = _orderService.SearchOrders(storeId: _storeContext.CurrentStore.Id,
+            var order = _orderService.SearchSubscriptionOrders(storeId: _storeContext.CurrentStore.Id,
                 customerId: _workContext.CurrentCustomer.Id, pageSize: 1).FirstOrDefault();
             return order;
         }
@@ -224,7 +224,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Controllers
         //})(); 
 
         //</script>
-        private string GetEcommerceScript(Order order)
+        private string GetEcommerceScript(SubscriptionOrder order)
         {
             var googleAnalyticsSettings = _settingService.LoadSetting<GoogleAnalyticsSettings>(_storeContext.CurrentStore.Id);
             var usCulture = new CultureInfo("en-US");
@@ -237,9 +237,9 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Controllers
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{GOOGLEID}", googleAnalyticsSettings.GoogleId);
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{ORDERID}", order.Id.ToString());
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{SITE}", _storeContext.CurrentStore.Url.Replace("http://", "").Replace("/", ""));
-                analyticsEcommerceScript = analyticsEcommerceScript.Replace("{TOTAL}", order.OrderTotal.ToString("0.00", usCulture));
-                analyticsEcommerceScript = analyticsEcommerceScript.Replace("{TAX}", order.OrderTax.ToString("0.00", usCulture));
-                var orderShipping = googleAnalyticsSettings.IncludingTax ? order.OrderShippingInclTax : order.OrderShippingExclTax;
+                analyticsEcommerceScript = analyticsEcommerceScript.Replace("{TOTAL}", order.SubscriptionOrderTotal.ToString("0.00", usCulture));
+                analyticsEcommerceScript = analyticsEcommerceScript.Replace("{TAX}", order.SubscriptionOrderTax.ToString("0.00", usCulture));
+                var orderShipping = googleAnalyticsSettings.IncludingTax ? order.SubscriptionOrderShippingInclTax : order.SubscriptionOrderShippingExclTax;
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{SHIP}", orderShipping.ToString("0.00", usCulture));
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{CITY}", order.BillingAddress == null ? "" : FixIllegalJavaScriptChars(order.BillingAddress.City));
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{STATEPROVINCE}", order.BillingAddress == null || order.BillingAddress.StateProvince == null ? "" : FixIllegalJavaScriptChars(order.BillingAddress.StateProvince.Name));
@@ -248,21 +248,24 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Controllers
                 var sb = new StringBuilder();
                 foreach (var item in order.OrderItems)
                 {
-                    string analyticsEcommerceDetailScript = googleAnalyticsSettings.EcommerceDetailScript;
-                    //get category
-                    string category = "";
-                    var defaultProductCategory = _categoryService.GetProductCategoriesByProductId(item.ProductId).FirstOrDefault();
-                    if (defaultProductCategory != null)
-                        category = defaultProductCategory.Category.Name;
-                    analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{ORDERID}", item.OrderId.ToString());
-                    //The SKU code is a required parameter for every item that is added to the transaction
-                    analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{PRODUCTSKU}", FixIllegalJavaScriptChars(item.Product.FormatSku(item.AttributesXml, _productAttributeParser)));
-                    analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{PRODUCTNAME}", FixIllegalJavaScriptChars(item.Product.Name));
-                    analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{CATEGORYNAME}", FixIllegalJavaScriptChars(category));
-                    var unitPrice = googleAnalyticsSettings.IncludingTax ? item.UnitPriceInclTax : item.UnitPriceExclTax;
-                    analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{UNITPRICE}", unitPrice.ToString("0.00", usCulture));
-                    analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{QUANTITY}", item.Quantity.ToString());
-                    sb.AppendLine(analyticsEcommerceDetailScript);
+                    foreach (var itemDetail in item.ItemDetails)
+                    {
+                        string analyticsEcommerceDetailScript = googleAnalyticsSettings.EcommerceDetailScript;
+                        //get category
+                        string category = "";
+                        var defaultProductCategory = _categoryService.GetProductCategoriesByProductId(itemDetail.ProductId).FirstOrDefault();
+                        if (defaultProductCategory != null)
+                            category = defaultProductCategory.Category.Name;
+                        analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{ORDERID}", item.SubscriptionOrderId.ToString());
+                        //The SKU code is a required parameter for every item that is added to the transaction
+                        analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{PRODUCTSKU}", FixIllegalJavaScriptChars(itemDetail.Product.FormatSku(itemDetail.AttributesXml, _productAttributeParser)));
+                        analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{PRODUCTNAME}", FixIllegalJavaScriptChars(itemDetail.Product.Name));
+                        analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{CATEGORYNAME}", FixIllegalJavaScriptChars(category));
+                        var unitPrice = googleAnalyticsSettings.IncludingTax ? itemDetail.UnitPriceInclTax : itemDetail.UnitPriceExclTax;
+                        analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{UNITPRICE}", unitPrice.ToString("0.00", usCulture));
+                        analyticsEcommerceDetailScript = analyticsEcommerceDetailScript.Replace("{QUANTITY}", itemDetail.Quantity.ToString());
+                        sb.AppendLine(analyticsEcommerceDetailScript);
+                    }
                 }
 
                 analyticsEcommerceScript = analyticsEcommerceScript.Replace("{DETAILS}", sb.ToString());

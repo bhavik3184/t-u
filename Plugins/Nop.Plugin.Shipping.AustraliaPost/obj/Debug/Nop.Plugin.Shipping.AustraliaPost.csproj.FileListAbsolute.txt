@@ -1,0 +1,10 @@
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.AustraliaPost\Views\ShippingAustraliaPost\Configure.cshtml
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.AustraliaPost\Description.txt
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.AustraliaPost\web.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.AustraliaPost\logo.jpg
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.AustraliaPost\Nop.Plugin.Shipping.AustraliaPost.dll.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.AustraliaPost\Nop.Plugin.Shipping.AustraliaPost.dll
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.AustraliaPost\Nop.Plugin.Shipping.AustraliaPost.pdb
+C:\projects\NewToys\Plugins\Nop.Plugin.Shipping.AustraliaPost\obj\Debug\Nop.Plugin.Shipping.AustraliaPost.csprojResolveAssemblyReference.cache
+C:\projects\NewToys\Plugins\Nop.Plugin.Shipping.AustraliaPost\obj\Debug\Nop.Plugin.Shipping.AustraliaPost.dll
+C:\projects\NewToys\Plugins\Nop.Plugin.Shipping.AustraliaPost\obj\Debug\Nop.Plugin.Shipping.AustraliaPost.pdb

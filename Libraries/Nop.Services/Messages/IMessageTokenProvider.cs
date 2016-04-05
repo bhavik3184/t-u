@@ -5,7 +5,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Vendors;
@@ -16,13 +16,18 @@ namespace Nop.Services.Messages
     {
         void AddStoreTokens(IList<Token> tokens, Store store, EmailAccount emailAccount);
 
-        void AddOrderTokens(IList<Token> tokens, Order order, int languageId, int vendorId = 0);
+        void AddSubscriptionOrderTokens(IList<Token> tokens, SubscriptionOrder order, int languageId, int vendorId = 0);
 
-        void AddOrderRefundedTokens(IList<Token> tokens, Order order, decimal refundedAmount);
+        void AddSubscriptionOrderRefundedTokens(IList<Token> tokens, SubscriptionOrder order, decimal refundedAmount);
+        void AddSubscriptionOrderNoteTokens(IList<Token> tokens, SubscriptionOrderNote orderNote);
+
+        void AddOrderTokens(IList<Token> tokens, SubscriptionOrder order, int languageId, int vendorId = 0);
+
+        void AddOrderRefundedTokens(IList<Token> tokens, SubscriptionOrder order, decimal refundedAmount);
 
         void AddShipmentTokens(IList<Token> tokens, Shipment shipment, int languageId);
 
-        void AddOrderNoteTokens(IList<Token> tokens, OrderNote orderNote);
+        void AddOrderNoteTokens(IList<Token> tokens, SubscriptionOrderNote orderNote);
 
         void AddRecurringPaymentTokens(IList<Token> tokens, RecurringPayment recurringPayment);
 

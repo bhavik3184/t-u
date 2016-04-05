@@ -260,7 +260,7 @@ namespace Nop.Services.Customers
                     //if not found
                     if (!found)
                     {
-                        var notFoundWarning = string.Format(_localizationService.GetResource("ShoppingCart.SelectAttribute"), a2.GetLocalized(a => a.Name));
+                        var notFoundWarning = string.Format(_localizationService.GetResource("BorrowCart.SelectAttribute"), a2.GetLocalized(a => a.Name));
 
                         warnings.Add(notFoundWarning);
                     }

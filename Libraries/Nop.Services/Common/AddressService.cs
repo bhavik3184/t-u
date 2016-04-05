@@ -123,6 +123,30 @@ namespace Nop.Services.Common
             return query.Count();
         }
 
+
+        public virtual int GetAddressTotalByCityId(int cityId)
+        {
+            if (cityId == 0)
+                return 0;
+
+            var query = from a in _addressRepository.Table
+                        where a.CityId == cityId
+                        select a;
+            return query.Count();
+        }
+
+
+        public virtual int GetAddressTotalByLocalityId(int localityId)
+        {
+            if (localityId == 0)
+                return 0;
+
+            var query = from a in _addressRepository.Table
+                        where a.LocalityId == localityId
+                        select a;
+            return query.Count();
+        }
+
         /// <summary>
         /// Gets an address by address identifier
         /// </summary>
@@ -211,20 +235,20 @@ namespace Nop.Services.Common
                 String.IsNullOrWhiteSpace(address.Company))
                 return false;
 
-            if (_addressSettings.StreetAddressEnabled &&
-                _addressSettings.StreetAddressRequired &&
-                String.IsNullOrWhiteSpace(address.Address1))
-                return false;
+            //if (_addressSettings.StreetAddressEnabled &&
+            //    _addressSettings.StreetAddressRequired &&
+            //    String.IsNullOrWhiteSpace(address.Address1))
+            //    return false;
 
-            if (_addressSettings.StreetAddress2Enabled &&
-                _addressSettings.StreetAddress2Required &&
-                String.IsNullOrWhiteSpace(address.Address2))
-                return false;
+            //if (_addressSettings.StreetAddress2Enabled &&
+            //    _addressSettings.StreetAddress2Required &&
+            //    String.IsNullOrWhiteSpace(address.Address2))
+            //    return false;
 
-            if (_addressSettings.ZipPostalCodeEnabled &&
-                _addressSettings.ZipPostalCodeRequired &&
-                String.IsNullOrWhiteSpace(address.ZipPostalCode))
-                return false;
+            //if (_addressSettings.ZipPostalCodeEnabled &&
+            //    _addressSettings.ZipPostalCodeRequired &&
+            //    String.IsNullOrWhiteSpace(address.ZipPostalCode))
+            //    return false;
 
 
             if (_addressSettings.CountryEnabled)
@@ -251,20 +275,20 @@ namespace Nop.Services.Common
                 }
             }
 
-            if (_addressSettings.CityEnabled &&
-                _addressSettings.CityRequired &&
-                String.IsNullOrWhiteSpace(address.City))
-                return false;
+            //if (_addressSettings.CityEnabled &&
+            //    _addressSettings.CityRequired &&
+            //    String.IsNullOrWhiteSpace(address.City))
+            //    return false;
 
-            if (_addressSettings.PhoneEnabled &&
-                _addressSettings.PhoneRequired &&
-                String.IsNullOrWhiteSpace(address.PhoneNumber))
-                return false;
+            //////if (_addressSettings.PhoneEnabled &&
+            //////    _addressSettings.PhoneRequired &&
+            //////    String.IsNullOrWhiteSpace(address.PhoneNumber))
+            //////    return false;
 
-            if (_addressSettings.FaxEnabled &&
-                _addressSettings.FaxRequired &&
-                String.IsNullOrWhiteSpace(address.FaxNumber))
-                return false;
+            //////if (_addressSettings.FaxEnabled &&
+            //////    _addressSettings.FaxRequired &&
+            //////    String.IsNullOrWhiteSpace(address.FaxNumber))
+            //////    return false;
 
             var attributes = _addressAttributeService.GetAllAddressAttributes();
             if (attributes.Any(x => x.IsRequired))

@@ -51,10 +51,10 @@
     <table class="adminContent">
         <tr>
             <td class="adminTitle">
-                @Html.NopLabelFor(model => model.InitialOrderId):
+                @Html.NopLabelFor(model => model.InitialSubscriptionOrderId):
             </td>
             <td class="adminData">
-                @Html.ActionLink(T("Admin.Common.View").Text, "Edit", "Order", new { id = Model.InitialOrderId }, new { })
+                @Html.ActionLink(T("Admin.Common.View").Text, "Edit", "Order", new { id = Model.InitialSubscriptionOrderId }, new { })
             </td>
         </tr>
         <tr>
@@ -189,13 +189,13 @@
                             },
                             scrollable: false,
                             columns: [{
-                                field: "OrderId",
+                                field: "SubscriptionOrderId",
                                 title: "@T("Admin.RecurringPayments.History.Order")",
                                 width: 200,
-                                template: '<a href="@Url.Content("~/Admin/Order/Edit/")#=OrderId#">#=OrderId# - @T("Admin.Common.View")</a>'
+                                template: '<a href="@Url.Content("~/Admin/Order/Edit/")#=SubscriptionOrderId#">#=SubscriptionOrderId# - @T("Admin.Common.View")</a>'
                             }, {
-                                field: "OrderStatus",
-                                title: "@T("Admin.RecurringPayments.History.OrderStatus")",
+                                field: "SubscriptionOrderStatus",
+                                title: "@T("Admin.RecurringPayments.History.SubscriptionOrderStatus")",
                                 width: 200
                             }, {
                                 field: "PaymentStatus",

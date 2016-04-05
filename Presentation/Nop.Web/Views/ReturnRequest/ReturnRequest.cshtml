@@ -1,14 +1,24 @@
 ﻿@model SubmitReturnRequestModel
-@using Nop.Web.Models.Order;
+@using Nop.Web.Models.Customer
+@using Nop.Web.Models.Order
+
 @{
-    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
 
     //title
-    Html.AddTitleParts(T("PageTitle.ReturnItems").Text);
+    Html.AddTitleParts(T("PageTitle.Account").Text);
 }
-<div class="page return-request-page">
+@section left
+{
+    @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.ReturnRequests })
+}
+<link href="/Content/kendo/2014.1.318/kendo.default.min.css" rel="stylesheet" type="text/css" />
+<link href="/Content/kendo/2014.1.318/kendo.common.min.css" rel="stylesheet" type="text/css" />
+<script src="/Scripts/kendo/2014.1.318/kendo.web.min.js" type="text/javascript"></script>
+
+<div class="page return-request-page article">
     <div class="page-title">
-        <h1>@string.Format(T("ReturnRequests.Title").Text, Model.OrderId)</h1>
+        <h1>@string.Format(T("ReturnRequests.Title").Text, Model.SubscriptionOrderId)</h1>
     </div>
     <div class="page-body">
         @if (!String.IsNullOrEmpty(Model.Result))
@@ -82,28 +92,15 @@
                     <strong>@T("ReturnRequests.WhyReturning")</strong>
                 </div>
                 <div class="form-fields">
+
                     <div class="inputs">
-                        @{
-                            var reasonsSelectList = Model.AvailableReturnReasons.Select(x => new SelectListItem
-                            {
-                                Text = x.Name,
-                                Value = x.Id.ToString()
-                            }).ToList();
-                        }
-                        @Html.LabelFor(model => model.ReturnRequestReasonId, new {}, ":")
-                        @Html.DropDownListFor(model => model.ReturnRequestReasonId, reasonsSelectList, new {@class = "return-reasons"})
+                        @Html.LabelFor(model => model.AvailableDate, new { }, ":")
+                        @Html.EditorFor(model => model.AvailableDate, new { })
+                        @Html.ValidationMessageFor(model => model.AvailableDate)
                     </div>
-                    <div class="inputs">
-                        @{
-                            var actionsSelectList = Model.AvailableReturnActions.Select(x => new SelectListItem
-                            {
-                                Text = x.Name,
-                                Value = x.Id.ToString()
-                            }).ToList();
-                        }
-                        @Html.LabelFor(model => model.ReturnRequestActionId, new { }, ":")
-                        @Html.DropDownListFor(model => model.ReturnRequestActionId, actionsSelectList, new { @class = "return-actions" })
-                    </div>
+                </div>
+                <div class="form-fields">
+                    
                     <div class="inputs">
                         @Html.LabelFor(model => model.Comments, new { }, ":")
                         @Html.TextAreaFor(model => model.Comments, new { @class = "comment" })
@@ -112,7 +109,7 @@
                 </div>
             </div>
             <div class="buttons">
-                <input type="submit" name="submit-return-request" class="button-1 submit-return-request-button" value="@T("ReturnRequests.Submit")" />
+                <input type="submit" name="submit-return-request" class="btn btn-success bootstrap-touchspin-up button-2 product-box-add-to-cart-button" value="@T("ReturnRequests.Submit")" />
             </div>
             }
         }

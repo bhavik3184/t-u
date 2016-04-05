@@ -40,7 +40,7 @@ namespace Nop.Web.Models.Catalog
             public decimal PriceValue { get; set; }
 
             public bool DisableBuyButton { get; set; }
-            public bool DisableWishlistButton { get; set; }
+            public bool DisableMyToyBoxButton { get; set; }
             public bool DisableAddToCompareListButton { get; set; }
 
             public bool AvailableForPreOrder { get; set; }

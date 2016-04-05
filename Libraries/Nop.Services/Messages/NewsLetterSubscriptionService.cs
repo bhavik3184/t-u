@@ -49,10 +49,10 @@ namespace Nop.Services.Messages
         /// </summary>
         /// <param name="email">The email.</param>
         /// <param name="isSubscribe">if set to <c>true</c> [is subscribe].</param>
-        /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
-        private void PublishSubscriptionEvent(string email, bool isSubscribe, bool publishSubscriptionEvents)
+        /// <param name="publishSubscriptionOrderEvents">if set to <c>true</c> [publish subscription events].</param>
+        private void PublishSubscriptionOrderEvent(string email, bool isSubscribe, bool publishSubscriptionOrderEvents)
         {
-            if (publishSubscriptionEvents)
+            if (publishSubscriptionOrderEvents)
             {
                 if (isSubscribe)
                 {
@@ -71,122 +71,122 @@ namespace Nop.Services.Messages
         /// <summary>
         /// Inserts a newsletter subscription
         /// </summary>
-        /// <param name="newsLetterSubscription">NewsLetter subscription</param>
-        /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
-        public virtual void InsertNewsLetterSubscription(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
+        /// <param name="newsLetterSubscriptionOrder">NewsLetter subscription</param>
+        /// <param name="publishSubscriptionOrderEvents">if set to <c>true</c> [publish subscription events].</param>
+        public virtual void InsertNewsLetterSubscription(NewsLetterSubscription newsLetterSubscriptionOrder, bool publishSubscriptionOrderEvents = true)
         {
-            if (newsLetterSubscription == null)
+            if (newsLetterSubscriptionOrder == null)
             {
-                throw new ArgumentNullException("newsLetterSubscription");
+                throw new ArgumentNullException("newsLetterSubscriptionOrder");
             }
 
             //Handle e-mail
-            newsLetterSubscription.Email = CommonHelper.EnsureSubscriberEmailOrThrow(newsLetterSubscription.Email);
+            newsLetterSubscriptionOrder.Email = CommonHelper.EnsureSubscriberEmailOrThrow(newsLetterSubscriptionOrder.Email);
 
             //Persist
-            _subscriptionRepository.Insert(newsLetterSubscription);
+            _subscriptionRepository.Insert(newsLetterSubscriptionOrder);
 
             //Publish the subscription event 
-            if (newsLetterSubscription.Active)
+            if (newsLetterSubscriptionOrder.Active)
             {
-                PublishSubscriptionEvent(newsLetterSubscription.Email, true, publishSubscriptionEvents);
+                PublishSubscriptionOrderEvent(newsLetterSubscriptionOrder.Email, true, publishSubscriptionOrderEvents);
             }
 
             //Publish event
-            _eventPublisher.EntityInserted(newsLetterSubscription);
+            _eventPublisher.EntityInserted(newsLetterSubscriptionOrder);
         }
 
         /// <summary>
         /// Updates a newsletter subscription
         /// </summary>
-        /// <param name="newsLetterSubscription">NewsLetter subscription</param>
-        /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
-        public virtual void UpdateNewsLetterSubscription(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
+        /// <param name="newsLetterSubscriptionOrder">NewsLetter subscription</param>
+        /// <param name="publishSubscriptionOrderEvents">if set to <c>true</c> [publish subscription events].</param>
+        public virtual void UpdateNewsLetterSubscription(NewsLetterSubscription newsLetterSubscriptionOrder, bool publishSubscriptionOrderEvents = true)
         {
-            if (newsLetterSubscription == null)
+            if (newsLetterSubscriptionOrder == null)
             {
-                throw new ArgumentNullException("newsLetterSubscription");
+                throw new ArgumentNullException("newsLetterSubscriptionOrder");
             }
 
             //Handle e-mail
-            newsLetterSubscription.Email = CommonHelper.EnsureSubscriberEmailOrThrow(newsLetterSubscription.Email);
+            newsLetterSubscriptionOrder.Email = CommonHelper.EnsureSubscriberEmailOrThrow(newsLetterSubscriptionOrder.Email);
 
             //Get original subscription record
-            var originalSubscription = _context.LoadOriginalCopy(newsLetterSubscription);
+            var originalSubscriptionOrder = _context.LoadOriginalCopy(newsLetterSubscriptionOrder);
 
             //Persist
-            _subscriptionRepository.Update(newsLetterSubscription);
+            _subscriptionRepository.Update(newsLetterSubscriptionOrder);
 
             //Publish the subscription event 
-            if ((originalSubscription.Active == false && newsLetterSubscription.Active) ||
-                (newsLetterSubscription.Active && (originalSubscription.Email != newsLetterSubscription.Email)))
+            if ((originalSubscriptionOrder.Active == false && newsLetterSubscriptionOrder.Active) ||
+                (newsLetterSubscriptionOrder.Active && (originalSubscriptionOrder.Email != newsLetterSubscriptionOrder.Email)))
             {
                 //If the previous entry was false, but this one is true, publish a subscribe.
-                PublishSubscriptionEvent(newsLetterSubscription.Email, true, publishSubscriptionEvents);
+                PublishSubscriptionOrderEvent(newsLetterSubscriptionOrder.Email, true, publishSubscriptionOrderEvents);
             }
             
-            if ((originalSubscription.Active && newsLetterSubscription.Active) && 
-                (originalSubscription.Email != newsLetterSubscription.Email))
+            if ((originalSubscriptionOrder.Active && newsLetterSubscriptionOrder.Active) && 
+                (originalSubscriptionOrder.Email != newsLetterSubscriptionOrder.Email))
             {
                 //If the two emails are different publish an unsubscribe.
-                PublishSubscriptionEvent(originalSubscription.Email, false, publishSubscriptionEvents);
+                PublishSubscriptionOrderEvent(originalSubscriptionOrder.Email, false, publishSubscriptionOrderEvents);
             }
 
-            if ((originalSubscription.Active && !newsLetterSubscription.Active))
+            if ((originalSubscriptionOrder.Active && !newsLetterSubscriptionOrder.Active))
             {
                 //If the previous entry was true, but this one is false
-                PublishSubscriptionEvent(originalSubscription.Email, false, publishSubscriptionEvents);
+                PublishSubscriptionOrderEvent(originalSubscriptionOrder.Email, false, publishSubscriptionOrderEvents);
             }
 
             //Publish event
-            _eventPublisher.EntityUpdated(newsLetterSubscription);
+            _eventPublisher.EntityUpdated(newsLetterSubscriptionOrder);
         }
 
         /// <summary>
         /// Deletes a newsletter subscription
         /// </summary>
-        /// <param name="newsLetterSubscription">NewsLetter subscription</param>
-        /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
-        public virtual void DeleteNewsLetterSubscription(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
+        /// <param name="newsLetterSubscriptionOrder">NewsLetter subscription</param>
+        /// <param name="publishSubscriptionOrderEvents">if set to <c>true</c> [publish subscription events].</param>
+        public virtual void DeleteNewsLetterSubscription(NewsLetterSubscription newsLetterSubscriptionOrder, bool publishSubscriptionOrderEvents = true)
         {
-            if (newsLetterSubscription == null) throw new ArgumentNullException("newsLetterSubscription");
+            if (newsLetterSubscriptionOrder == null) throw new ArgumentNullException("newsLetterSubscriptionOrder");
 
-            _subscriptionRepository.Delete(newsLetterSubscription);
+            _subscriptionRepository.Delete(newsLetterSubscriptionOrder);
 
             //Publish the unsubscribe event 
-            PublishSubscriptionEvent(newsLetterSubscription.Email, false, publishSubscriptionEvents);
+            PublishSubscriptionOrderEvent(newsLetterSubscriptionOrder.Email, false, publishSubscriptionOrderEvents);
 
             //event notification
-            _eventPublisher.EntityDeleted(newsLetterSubscription);
+            _eventPublisher.EntityDeleted(newsLetterSubscriptionOrder);
         }
 
         /// <summary>
         /// Gets a newsletter subscription by newsletter subscription identifier
         /// </summary>
-        /// <param name="newsLetterSubscriptionId">The newsletter subscription identifier</param>
+        /// <param name="newsLetterSubscriptionOrderId">The newsletter subscription identifier</param>
         /// <returns>NewsLetter subscription</returns>
-        public virtual NewsLetterSubscription GetNewsLetterSubscriptionById(int newsLetterSubscriptionId)
+        public virtual NewsLetterSubscription GetNewsLetterSubscriptionById(int newsLetterSubscriptionOrderId)
         {
-            if (newsLetterSubscriptionId == 0) return null;
+            if (newsLetterSubscriptionOrderId == 0) return null;
 
-            return _subscriptionRepository.GetById(newsLetterSubscriptionId);
+            return _subscriptionRepository.GetById(newsLetterSubscriptionOrderId);
         }
 
         /// <summary>
         /// Gets a newsletter subscription by newsletter subscription GUID
         /// </summary>
-        /// <param name="newsLetterSubscriptionGuid">The newsletter subscription GUID</param>
+        /// <param name="newsLetterSubscriptionOrderGuid">The newsletter subscription GUID</param>
         /// <returns>NewsLetter subscription</returns>
-        public virtual NewsLetterSubscription GetNewsLetterSubscriptionByGuid(Guid newsLetterSubscriptionGuid)
+        public virtual NewsLetterSubscription GetNewsLetterSubscriptionByGuid(Guid newsLetterSubscriptionOrderGuid)
         {
-            if (newsLetterSubscriptionGuid == Guid.Empty) return null;
+            if (newsLetterSubscriptionOrderGuid == Guid.Empty) return null;
 
-            var newsLetterSubscriptions = from nls in _subscriptionRepository.Table
-                                          where nls.NewsLetterSubscriptionGuid == newsLetterSubscriptionGuid
+            var newsLetterSubscriptionOrders = from nls in _subscriptionRepository.Table
+                                          where nls.NewsLetterSubscriptionGuid == newsLetterSubscriptionOrderGuid
                                           orderby nls.Id
                                           select nls;
 
-            return newsLetterSubscriptions.FirstOrDefault();
+            return newsLetterSubscriptionOrders.FirstOrDefault();
         }
 
         /// <summary>
@@ -206,8 +206,10 @@ namespace Nop.Services.Messages
                                           where nls.Email == email && nls.StoreId == storeId
                                           orderby nls.Id
                                           select nls;
-
-            return newsLetterSubscriptions.FirstOrDefault();
+            if (newsLetterSubscriptions != null)
+                return newsLetterSubscriptions.FirstOrDefault();
+            else
+                return null;
         }
 
         /// <summary>

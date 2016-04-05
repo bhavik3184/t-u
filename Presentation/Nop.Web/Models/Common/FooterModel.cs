@@ -16,8 +16,8 @@ namespace Nop.Web.Models.Common
         public string TwitterLink { get; set; }
         public string YoutubeLink { get; set; }
         public string GooglePlusLink { get; set; }
-        public bool WishlistEnabled { get; set; }
-        public bool ShoppingCartEnabled { get; set; }
+        public bool MyToyBoxEnabled { get; set; }
+        public bool BorrowCartEnabled { get; set; }
         public bool SitemapEnabled { get; set; }
         public bool NewsEnabled { get; set; }
         public bool BlogEnabled { get; set; }

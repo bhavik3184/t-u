@@ -1,0 +1,10 @@
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.UPS\Views\ShippingUPS\Configure.cshtml
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.UPS\web.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.UPS\Description.txt
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.UPS\logo.jpg
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.UPS\Nop.Plugin.Shipping.UPS.dll.config
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.UPS\Nop.Plugin.Shipping.UPS.dll
+C:\projects\NewToys\Presentation\Nop.Web\Plugins\Shipping.UPS\Nop.Plugin.Shipping.UPS.pdb
+C:\projects\NewToys\Plugins\Nop.Plugin.Shipping.UPS\obj\Debug\Nop.Plugin.Shipping.UPS.csprojResolveAssemblyReference.cache
+C:\projects\NewToys\Plugins\Nop.Plugin.Shipping.UPS\obj\Debug\Nop.Plugin.Shipping.UPS.dll
+C:\projects\NewToys\Plugins\Nop.Plugin.Shipping.UPS\obj\Debug\Nop.Plugin.Shipping.UPS.pdb

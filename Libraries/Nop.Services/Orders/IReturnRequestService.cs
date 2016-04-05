@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Nop.Core;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
-namespace Nop.Services.Orders
+namespace Nop.Services.SubscriptionOrders
 {
     /// <summary>
     /// Return request service interface
@@ -33,11 +33,8 @@ namespace Nop.Services.Orders
         /// <param name="pageSize">Page size</param>
         /// <returns>Return requests</returns>
         IPagedList<ReturnRequest> SearchReturnRequests(int storeId = 0, int customerId = 0,
-            int orderItemId = 0, ReturnRequestStatus? rs = null, 
+            int itemDetailId = 0, ReturnRequestStatus? rs = null, 
             int pageIndex = 0, int pageSize = int.MaxValue);
-
-
-
 
 
 

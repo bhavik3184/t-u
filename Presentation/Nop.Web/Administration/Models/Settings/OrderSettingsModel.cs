@@ -12,8 +12,8 @@ namespace Nop.Admin.Models.Settings
     {
         public OrderSettingsModel()
         {
-            GiftCards_Activated_OrderStatuses = new List<SelectListItem>();
-            GiftCards_Deactivated_OrderStatuses = new List<SelectListItem>();
+            GiftCards_Activated_SubscriptionOrderStatuses = new List<SelectListItem>();
+            GiftCards_Deactivated_SubscriptionOrderStatuses = new List<SelectListItem>();
         }
 
         public int ActiveStoreScopeConfiguration { get; set; }
@@ -39,9 +39,9 @@ namespace Nop.Admin.Models.Settings
         public bool AnonymousCheckoutAllowed { get; set; }
         public bool AnonymousCheckoutAllowed_OverrideForStore { get; set; }
 
-        [NopResourceDisplayName("Admin.Configuration.Settings.Order.TermsOfServiceOnShoppingCartPage")]
-        public bool TermsOfServiceOnShoppingCartPage { get; set; }
-        public bool TermsOfServiceOnShoppingCartPage_OverrideForStore { get; set; }
+        [NopResourceDisplayName("Admin.Configuration.Settings.Order.TermsOfServiceOnBorrowCartPage")]
+        public bool TermsOfServiceOnBorrowCartPage { get; set; }
+        public bool TermsOfServiceOnBorrowCartPage_OverrideForStore { get; set; }
 
         [NopResourceDisplayName("Admin.Configuration.Settings.Order.TermsOfServiceOnOrderConfirmPage")]
         public bool TermsOfServiceOnOrderConfirmPage { get; set; }
@@ -84,16 +84,16 @@ namespace Nop.Admin.Models.Settings
         public bool NumberOfDaysReturnRequestAvailable_OverrideForStore { get; set; }
 
         [NopResourceDisplayName("Admin.Configuration.Settings.Order.GiftCards_Activated")]
-        public int GiftCards_Activated_OrderStatusId { get; set; }
-        public IList<SelectListItem> GiftCards_Activated_OrderStatuses { get; set; }
+        public int GiftCards_Activated_SubscriptionOrderStatusId { get; set; }
+        public IList<SelectListItem> GiftCards_Activated_SubscriptionOrderStatuses { get; set; }
 
         [NopResourceDisplayName("Admin.Configuration.Settings.Order.GiftCards_Deactivated")]
-        public int GiftCards_Deactivated_OrderStatusId { get; set; }
-        public IList<SelectListItem> GiftCards_Deactivated_OrderStatuses { get; set; }
+        public int GiftCards_Deactivated_SubscriptionOrderStatusId { get; set; }
+        public IList<SelectListItem> GiftCards_Deactivated_SubscriptionOrderStatuses { get; set; }
         
         public string PrimaryStoreCurrencyCode { get; set; }
 
-        [NopResourceDisplayName("Admin.Configuration.Settings.Order.OrderIdent")]
-        public int? OrderIdent { get; set; }
+        [NopResourceDisplayName("Admin.Configuration.Settings.Order.SubscriptionOrderIdent")]
+        public int? SubscriptionOrderIdent { get; set; }
     }
 }

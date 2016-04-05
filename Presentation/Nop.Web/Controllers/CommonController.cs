@@ -15,7 +15,7 @@ using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Vendors;
 using Nop.Services.Catalog;
@@ -26,7 +26,7 @@ using Nop.Services.Forums;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Topics;
@@ -383,23 +383,24 @@ namespace Nop.Web.Controllers
             var model = new HeaderLinksModel
             {
                 IsAuthenticated = customer.IsRegistered(),
+                CustomerName = customer.GetFullName(),
                 CustomerEmailUsername = customer.IsRegistered() ? (_customerSettings.UsernamesEnabled ? customer.Username : customer.Email) : "",
-                ShoppingCartEnabled = _permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart),
-                WishlistEnabled = _permissionService.Authorize(StandardPermissionProvider.EnableWishlist),
+                BorrowCartEnabled = _permissionService.Authorize(StandardPermissionProvider.EnableBorrowCart),
+                MyToyBoxEnabled = _permissionService.Authorize(StandardPermissionProvider.EnableMyToyBox),
                 AllowPrivateMessages = customer.IsRegistered() && _forumSettings.AllowPrivateMessages,
                 UnreadPrivateMessages = unreadMessage,
                 AlertMessage = alertMessage,
             };
-            //performance optimization (use "HasShoppingCartItems" property)
-            if (customer.HasShoppingCartItems)
+            //performance optimization (use "HasBorrowCartItems" property)
+            if (customer.HasBorrowCartItems)
             {
-                model.ShoppingCartItems = customer.ShoppingCartItems
-                    .Where(sci => sci.ShoppingCartType == ShoppingCartType.ShoppingCart)
+                model.BorrowCartItems = customer.BorrowCartItems
+                    .Where(sci => sci.BorrowCartType == BorrowCartType.BorrowCart)
                     .LimitPerStore(_storeContext.CurrentStore.Id)
                     .ToList()
                     .GetTotalProducts();
-                model.WishlistItems = customer.ShoppingCartItems
-                    .Where(sci => sci.ShoppingCartType == ShoppingCartType.Wishlist)
+                model.MyToyBoxItems = customer.BorrowCartItems
+                    .Where(sci => sci.BorrowCartType == BorrowCartType.MyToyBox)
                     .LimitPerStore(_storeContext.CurrentStore.Id)
                     .ToList()
                     .GetTotalProducts();
@@ -450,8 +451,8 @@ namespace Nop.Web.Controllers
             var model = new FooterModel
             {
                 StoreName = _storeContext.CurrentStore.GetLocalized(x => x.Name),
-                WishlistEnabled = _permissionService.Authorize(StandardPermissionProvider.EnableWishlist),
-                ShoppingCartEnabled = _permissionService.Authorize(StandardPermissionProvider.EnableShoppingCart),
+                MyToyBoxEnabled = _permissionService.Authorize(StandardPermissionProvider.EnableMyToyBox),
+                BorrowCartEnabled = _permissionService.Authorize(StandardPermissionProvider.EnableBorrowCart),
                 SitemapEnabled = _commonSettings.SitemapEnabled,
                 WorkingLanguageId = _workContext.WorkingLanguage.Id,
                 FacebookLink = _storeInformationSettings.FacebookLink,
@@ -911,7 +912,7 @@ namespace Nop.Web.Controllers
                     "/customer/downloadableproducts",
                     "/customer/info",
                     "/deletepm",
-                    "/emailwishlist",
+                    "/emailmytoybox",
                     "/inboxupdate",
                     "/newsletter/subscriptionactivation",
                     "/onepagecheckout",
@@ -925,13 +926,13 @@ namespace Nop.Web.Controllers
                     "/rewardpoints/history",
                     "/sendpm",
                     "/sentupdate",
-                    "/shoppingcart/*",
+                    "/borrowcart/*",
                     "/subscribenewsletter",
                     "/topic/authenticate",
                     "/viewpm",
                     "/uploadfileproductattribute",
                     "/uploadfilecheckoutattribute",
-                    "/wishlist",
+                    "/mytoybox",
                 };
 
 

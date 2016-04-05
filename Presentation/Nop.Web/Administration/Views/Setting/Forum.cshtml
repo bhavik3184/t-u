@@ -90,12 +90,12 @@
         </tr>
         <tr>
             <td class="adminTitle">
-                @Html.OverrideStoreCheckboxFor(model => model.AllowCustomersToManageSubscriptions_OverrideForStore, model => model.AllowCustomersToManageSubscriptions, Model.ActiveStoreScopeConfiguration)
-                @Html.NopLabelFor(model => model.AllowCustomersToManageSubscriptions):
+                @Html.OverrideStoreCheckboxFor(model => model.AllowCustomersToManageSubscriptionOrders_OverrideForStore, model => model.AllowCustomersToManageSubscriptionOrders, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.AllowCustomersToManageSubscriptionOrders):
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.AllowCustomersToManageSubscriptions)
-                @Html.ValidationMessageFor(model => model.AllowCustomersToManageSubscriptions)
+                @Html.EditorFor(model => model.AllowCustomersToManageSubscriptionOrders)
+                @Html.ValidationMessageFor(model => model.AllowCustomersToManageSubscriptionOrders)
             </td>
         </tr>
         <tr>

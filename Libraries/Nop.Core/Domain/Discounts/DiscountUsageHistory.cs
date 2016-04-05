@@ -1,5 +1,5 @@
 using System;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Core.Domain.Discounts
 {
@@ -16,7 +16,7 @@ namespace Nop.Core.Domain.Discounts
         /// <summary>
         /// Gets or sets the order identifier
         /// </summary>
-        public int OrderId { get; set; }
+        public int SubscriptionOrderId { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time of instance creation
@@ -32,6 +32,6 @@ namespace Nop.Core.Domain.Discounts
         /// <summary>
         /// Gets or sets the order
         /// </summary>
-        public virtual Order Order { get; set; }
+        public virtual SubscriptionOrder SubscriptionOrder { get; set; }
     }
 }

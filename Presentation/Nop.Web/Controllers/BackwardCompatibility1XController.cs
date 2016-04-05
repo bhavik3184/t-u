@@ -129,13 +129,13 @@ namespace Nop.Web.Controllers
                     {
                         return RedirectToRoutePermanent("NewProducts");
                     }
-                case "shoppingcart":
+                case "borrowcart":
                     {
-                        return RedirectToRoutePermanent("ShoppingCart");
+                        return RedirectToRoutePermanent("BorrowCart");
                     }
-                case "wishlist":
+                case "mytoybox":
                     {
-                        return RedirectToRoutePermanent("Wishlist");
+                        return RedirectToRoutePermanent("MyToyBox");
                     }
                 default:
                     break;

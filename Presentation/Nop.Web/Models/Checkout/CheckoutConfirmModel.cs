@@ -10,8 +10,8 @@ namespace Nop.Web.Models.Checkout
             Warnings = new List<string>();
         }
 
-        public bool TermsOfServiceOnOrderConfirmPage { get; set; }
-        public string MinOrderTotalWarning { get; set; }
+        public bool TermsOfServiceOnSubscriptionOrderConfirmPage { get; set; }
+        public string MinSubscriptionOrderTotalWarning { get; set; }
 
         public IList<string> Warnings { get; set; }
     }

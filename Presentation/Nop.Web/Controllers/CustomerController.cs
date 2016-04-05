@@ -12,7 +12,7 @@ using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Tax;
 using Nop.Services.Authentication;
@@ -26,7 +26,7 @@ using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Messages;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
 using Nop.Services.Tax;
@@ -39,6 +39,7 @@ using Nop.Web.Framework.Security.Honeypot;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Customer;
 using WebGrease.Css.Extensions;
+using Nop.Services.Catalog;
 
 namespace Nop.Web.Controllers
 {
@@ -46,6 +47,7 @@ namespace Nop.Web.Controllers
     {
         #region Fields
         private readonly IAuthenticationService _authenticationService;
+        private readonly IPriceFormatter _priceFormatter;
         private readonly IDateTimeHelper _dateTimeHelper;
         private readonly DateTimeSettings _dateTimeSettings;
         private readonly TaxSettings _taxSettings;
@@ -67,10 +69,12 @@ namespace Nop.Web.Controllers
         private readonly IAddressService _addressService;
         private readonly ICountryService _countryService;
         private readonly IStateProvinceService _stateProvinceService;
-        private readonly IOrderService _orderService;
+        private readonly ICityService _cityService;
+        private readonly ILocalityService _localityService;
+        private readonly ISubscriptionOrderService _orderService;
         private readonly IPictureService _pictureService;
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
-        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IBorrowCartService _borrowCartService;
         private readonly IOpenAuthenticationService _openAuthenticationService;
         private readonly IDownloadService _downloadService;
         private readonly IWebHelper _webHelper;
@@ -80,7 +84,6 @@ namespace Nop.Web.Controllers
         private readonly IAddressAttributeFormatter _addressAttributeFormatter;
         private readonly IReturnRequestService _returnRequestService;
         private readonly IEventPublisher _eventPublisher;
-
         private readonly MediaSettings _mediaSettings;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly LocalizationSettings _localizationSettings;
@@ -88,12 +91,15 @@ namespace Nop.Web.Controllers
         private readonly SecuritySettings _securitySettings;
         private readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
         private readonly StoreInformationSettings _storeInformationSettings;
+        private readonly IChildrenService _childrenService;
+        private readonly ISubscriptionOrderService _subscriptionOrderService;
 
         #endregion
 
         #region Ctor
 
         public CustomerController(IAuthenticationService authenticationService,
+            IPriceFormatter priceFormatter,
             IDateTimeHelper dateTimeHelper,
             DateTimeSettings dateTimeSettings, 
             TaxSettings taxSettings,
@@ -115,10 +121,12 @@ namespace Nop.Web.Controllers
             IAddressService addressService,
             ICountryService countryService,
             IStateProvinceService stateProvinceService,
-            IOrderService orderService,
+            ICityService cityService,
+            ILocalityService localityService,
+            ISubscriptionOrderService orderService,
             IPictureService pictureService, 
             INewsLetterSubscriptionService newsLetterSubscriptionService,
-            IShoppingCartService shoppingCartService,
+            IBorrowCartService borrowCartService,
             IOpenAuthenticationService openAuthenticationService,
             IDownloadService downloadService,
             IWebHelper webHelper,
@@ -134,9 +142,12 @@ namespace Nop.Web.Controllers
             CaptchaSettings captchaSettings,
             SecuritySettings securitySettings,
             ExternalAuthenticationSettings externalAuthenticationSettings,
-            StoreInformationSettings storeInformationSettings)
+            StoreInformationSettings storeInformationSettings,
+            IChildrenService childrenService,
+            ISubscriptionOrderService subscriptionOrderService)
         {
             this._authenticationService = authenticationService;
+            this._priceFormatter = priceFormatter;
             this._dateTimeHelper = dateTimeHelper;
             this._dateTimeSettings = dateTimeSettings;
             this._taxSettings = taxSettings;
@@ -158,10 +169,12 @@ namespace Nop.Web.Controllers
             this._addressService = addressService;
             this._countryService = countryService;
             this._stateProvinceService = stateProvinceService;
+            this._cityService = cityService;
+            this._localityService = localityService;
             this._orderService = orderService;
             this._pictureService = pictureService;
             this._newsLetterSubscriptionService = newsLetterSubscriptionService;
-            this._shoppingCartService = shoppingCartService;
+            this._borrowCartService = borrowCartService;
             this._openAuthenticationService = openAuthenticationService;
             this._downloadService = downloadService;
             this._webHelper = webHelper;
@@ -178,6 +191,8 @@ namespace Nop.Web.Controllers
             this._securitySettings = securitySettings;
             this._externalAuthenticationSettings = externalAuthenticationSettings;
             this._storeInformationSettings = storeInformationSettings;
+            this._childrenService = childrenService;
+            this._subscriptionOrderService = subscriptionOrderService;
         }
 
         #endregion
@@ -483,14 +498,31 @@ namespace Nop.Web.Controllers
             model.HoneypotEnabled = _securitySettings.HoneypotEnabled;
             model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnRegistrationPage;
             
+            for (int i = 1; i < 6; i++) { 
+                model.AvailableChildren.Add(new SelectListItem
+                {
+                    Text = i.ToString(),
+                    Value = i.ToString()
+                });
+            }
+
             //countries and states
             if (_customerSettings.CountryEnabled)
             {
                 model.AvailableCountries.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectCountry"), Value = "0" });
 
+                model.AvailableShippingCountries.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectCountry"), Value = "0" });
+
                 foreach (var c in _countryService.GetAllCountries(_workContext.WorkingLanguage.Id))
                 {
                     model.AvailableCountries.Add(new SelectListItem
+                    {
+                        Text = c.GetLocalized(x => x.Name),
+                        Value = c.Id.ToString(),
+                        Selected = c.Id == model.CountryId
+                    });
+
+                    model.AvailableShippingCountries.Add(new SelectListItem
                     {
                         Text = c.GetLocalized(x => x.Name),
                         Value = c.Id.ToString(),
@@ -506,10 +538,16 @@ namespace Nop.Web.Controllers
                     {
                         model.AvailableStates.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectState"), Value = "0" });
 
+                        model.AvailableShippingStates.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectState"), Value = "0" });
+
                         foreach (var s in states)
                         {
                             model.AvailableStates.Add(new SelectListItem { Text = s.GetLocalized(x => x.Name), Value = s.Id.ToString(), Selected = (s.Id == model.StateProvinceId) });
+
+                            model.AvailableShippingStates.Add(new SelectListItem { Text = s.GetLocalized(x => x.Name), Value = s.Id.ToString(), Selected = (s.Id == model.StateProvinceId) });
                         }
+                        
+
                     }
                     else
                     {
@@ -517,7 +555,75 @@ namespace Nop.Web.Controllers
 
                         model.AvailableStates.Add(new SelectListItem
                         {
-                            Text = _localizationService.GetResource(anyCountrySelected ? "Address.OtherNonUS" : "Address.SelectState"), 
+                            Text = "Select State",
+                            Value = "0"
+                        });
+
+                        model.AvailableShippingStates.Add(new SelectListItem
+                        {
+                            Text ="Select State" ,
+                            Value = "0"
+                        });
+                    }
+
+                    var cities = _cityService.GetCitysByStateProvinceId(model.StateProvinceId, _workContext.WorkingLanguage.Id).ToList();
+                    if (cities.Count > 0)
+                    {
+                        model.AvailableCities.Add(new SelectListItem { Text = "Select City", Value = "0" });
+
+                        model.AvailableShippingCities.Add(new SelectListItem { Text = "Select City", Value = "0" });
+
+                        foreach (var s in cities)
+                        {
+                            model.AvailableCities.Add(new SelectListItem { Text = s.GetLocalized(x => x.Name), Value = s.Id.ToString(), Selected = (s.Id == model.CityId) });
+
+                            model.AvailableShippingCities.Add(new SelectListItem { Text = s.GetLocalized(x => x.Name), Value = s.Id.ToString(), Selected = (s.Id == model.ShippingCityId) });
+                        }
+                    }
+                    else
+                    {
+                        bool anyStateSelected = model.AvailableCities.Any(x => x.Selected);
+
+                        model.AvailableCities.Add(new SelectListItem
+                        {
+                            Text = "Select City",
+                            Value = "0"
+                        });
+
+                        model.AvailableShippingCities.Add(new SelectListItem
+                        {
+                            Text = "Select City",
+                            Value = "0"
+                        });
+                    }
+
+                    var localities = _localityService.GetLocalitysByCityId(model.CityId, _workContext.WorkingLanguage.Id).ToList();
+                    if (localities.Count > 0)
+                    {
+                        model.AvailableLocalities.Add(new SelectListItem { Text = "Select Locality", Value = "0" });
+
+                        model.AvailableShippingLocalities.Add(new SelectListItem { Text = "Select Locality", Value = "0" });
+
+                        foreach (var s in localities)
+                        {
+                            model.AvailableLocalities.Add(new SelectListItem { Text = s.GetLocalized(x => x.Name), Value = s.Id.ToString(), Selected = (s.Id == model.LocalityId) });
+
+                            model.AvailableShippingLocalities.Add(new SelectListItem { Text = s.GetLocalized(x => x.Name), Value = s.Id.ToString(), Selected = (s.Id == model.ShippingLocalityId) });
+                        }
+                    }
+                    else
+                    {
+                        bool anylocalitySelected = model.AvailableLocalities.Any(x => x.Selected);
+
+                        model.AvailableLocalities.Add(new SelectListItem
+                        {
+                            Text = "Select Locality",
+                            Value = "0"
+                        });
+
+                        model.AvailableShippingLocalities.Add(new SelectListItem
+                        {
+                            Text = "Select Locality",
                             Value = "0"
                         });
                     }
@@ -609,6 +715,40 @@ namespace Nop.Web.Controllers
             return attributesXml;
         }
 
+
+        [NonAction]
+        protected virtual DashboardModel PrepareCustomerDashboardModel(DashboardModel model, SubscriptionOrder order)
+        {
+            if (model == null)
+                throw new ArgumentNullException("model");
+
+            if (order != null)
+            {
+                if(order.SubscriptionOrderItems.Count >0 ){
+               
+                var subsorderitem = order.SubscriptionOrderItems.FirstOrDefault();
+
+                model.PlanName = subsorderitem.Plan.Name;
+                    
+                model.CreationDate = subsorderitem.RentalStartDateUtc.HasValue ? subsorderitem.RentalStartDateUtc.Value.ToShortDateString() : "";
+                model.EndDate = subsorderitem.RentalEndDateUtc.HasValue ? subsorderitem.RentalEndDateUtc.Value.ToShortDateString() : "";
+
+                    //form fields
+                model.SecurityDeposit = _priceFormatter.FormatPrice(order.Customer.SecurityDepositBalance);
+                model.RegistrationFees = _priceFormatter.FormatPrice(order.Customer.RegistrationChargeBalance);
+                model.MembershipPlanValidity = subsorderitem.Plan.RentalPriceLength.ToString() + " " +  (RentalPricePeriod)subsorderitem.Plan.RentalPricePeriodId;
+                model.SubscriptionFees = _priceFormatter.FormatPrice(subsorderitem.PriceExclTax);
+
+                DateTime from = subsorderitem.RentalEndDateUtc ?? DateTime.Now;
+                DateTime to = DateTime.Now.Date;
+
+                model.RemainingDays = Math.Round((from-to).TotalDays).ToString();
+
+                }
+            }
+
+            return model;
+        }
         #endregion
 
         #region Login / logout
@@ -655,7 +795,7 @@ namespace Nop.Web.Controllers
                             var customer = _customerSettings.UsernamesEnabled ? _customerService.GetCustomerByUsername(model.Username) : _customerService.GetCustomerByEmail(model.Email);
 
                             //migrate shopping cart
-                            _shoppingCartService.MigrateShoppingCart(_workContext.CurrentCustomer, customer, true);
+                            _borrowCartService.MigrateBorrowCart(_workContext.CurrentCustomer, customer, true);
 
                             //sign in new customer
                             _authenticationService.SignIn(customer, model.RememberMe);
@@ -894,7 +1034,8 @@ namespace Nop.Web.Controllers
             //check whether registration is allowed
             if (_customerSettings.UserRegistrationType == UserRegistrationType.Disabled)
                 return RedirectToRoute("RegisterResult", new { resultId = (int)UserRegistrationType.Disabled });
-            
+            model.City = model.CityId.ToString();
+           // model.City = model.AvailableCities.Where(x => x.Value == model.CityId.ToString()).FirstOrDefault().Text ;
             if (_workContext.CurrentCustomer.IsRegistered())
             {
                 //Already registered customer. 
@@ -937,6 +1078,59 @@ namespace Nop.Web.Controllers
                 var registrationResult = _customerRegistrationService.RegisterCustomer(registrationRequest);
                 if (registrationResult.Success)
                 {
+                    for(int i =1;i <=model.NoOfChildren ;i++){
+                        if (i == 1 && model.BirthDate1 !=null)
+                        {
+                            Children ch = new Children();
+                            ch.Customer = customer;
+                            ch.Name = model.Name1;
+                            ch.DateOfBirth = model.BirthDate1 ??  DateTime.Now;
+                            ch.UpdatedOnUtc = DateTime.Now;
+                            ch.CreatedOnUtc = DateTime.Now;
+                            _childrenService.InsertChildren(ch);
+                        }
+                        if (i == 2 && model.BirthDate2 != null)
+                        {
+                            Children ch = new Children();
+                            ch.Customer = customer;
+                            ch.Name = model.Name2;
+                            ch.DateOfBirth = model.BirthDate1 ?? DateTime.Now;
+                            ch.UpdatedOnUtc = DateTime.Now;
+                            ch.CreatedOnUtc = DateTime.Now;
+                            _childrenService.InsertChildren(ch);
+                        }
+                        if (i == 3 && model.BirthDate3 != null)
+                        {
+                            Children ch = new Children();
+                            ch.Customer = customer;
+                            ch.Name = model.Name3;
+                            ch.DateOfBirth = model.BirthDate3 ?? DateTime.Now;
+                            ch.UpdatedOnUtc = DateTime.Now;
+                            ch.CreatedOnUtc = DateTime.Now;
+                            _childrenService.InsertChildren(ch);
+                        }
+                        if (i == 4 && model.BirthDate4 != null)
+                        {
+                            Children ch = new Children();
+                            ch.Customer = customer;
+                            ch.Name = model.Name4;
+                            ch.DateOfBirth = model.BirthDate4 ?? DateTime.Now;
+                            ch.UpdatedOnUtc = DateTime.Now;
+                            ch.CreatedOnUtc = DateTime.Now;
+                            _childrenService.InsertChildren(ch);
+                        }
+
+                        if (i == 5 && model.BirthDate5 != null)
+                        {
+                            Children ch = new Children();
+                            ch.Customer = customer;
+                            ch.Name = model.Name5;
+                            ch.DateOfBirth = model.BirthDate5 ??  DateTime.Now;
+                            ch.UpdatedOnUtc = DateTime.Now;
+                            ch.CreatedOnUtc = DateTime.Now;
+                            _childrenService.InsertChildren(ch);
+                        }
+                    }
                     //properties
                     if (_dateTimeSettings.AllowCustomersToSetTimeZone)
                     {
@@ -971,17 +1165,17 @@ namespace Nop.Web.Controllers
                     }
                     if (_customerSettings.CompanyEnabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.Company, model.Company);
-                    if (_customerSettings.StreetAddressEnabled)
+                    //if (_customerSettings.StreetAddressEnabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.StreetAddress, model.StreetAddress);
-                    if (_customerSettings.StreetAddress2Enabled)
+                    //if (_customerSettings.StreetAddress2Enabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.StreetAddress2, model.StreetAddress2);
-                    if (_customerSettings.ZipPostalCodeEnabled)
+                    //if (_customerSettings.ZipPostalCodeEnabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.ZipPostalCode, model.ZipPostalCode);
-                    if (_customerSettings.CityEnabled)
+                    //if (_customerSettings.CityEnabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.City, model.City);
-                    if (_customerSettings.CountryEnabled)
+                    //if (_customerSettings.CountryEnabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.CountryId, model.CountryId);
-                    if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
+                    //if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.StateProvinceId, model.StateProvinceId);
                     if (_customerSettings.PhoneEnabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.Phone, model.Phone);
@@ -1031,6 +1225,8 @@ namespace Nop.Web.Controllers
 
                     //associated with external account (if possible)
                     TryAssociateAccountWithExternalAccount(customer);
+
+                
                     
                     //insert default address (if possible)
                     var defaultAddress = new Address
@@ -1044,6 +1240,10 @@ namespace Nop.Web.Controllers
                         StateProvinceId = customer.GetAttribute<int>(SystemCustomerAttributeNames.StateProvinceId) > 0 ?
                             (int?)customer.GetAttribute<int>(SystemCustomerAttributeNames.StateProvinceId) : null,
                         City = customer.GetAttribute<string>(SystemCustomerAttributeNames.City),
+                        CityId = model.CityId > 0 ?
+                              (int?)model.CityId : null,
+                        LocalityId = model.LocalityId > 0 ?
+                        (int?)model.LocalityId : null,
                         Address1 = customer.GetAttribute<string>(SystemCustomerAttributeNames.StreetAddress),
                         Address2 = customer.GetAttribute<string>(SystemCustomerAttributeNames.StreetAddress2),
                         ZipPostalCode = customer.GetAttribute<string>(SystemCustomerAttributeNames.ZipPostalCode),
@@ -1051,6 +1251,7 @@ namespace Nop.Web.Controllers
                         FaxNumber = customer.GetAttribute<string>(SystemCustomerAttributeNames.Fax),
                         CreatedOnUtc = customer.CreatedOnUtc
                     };
+
                     if (this._addressService.IsAddressValid(defaultAddress))
                     {
                         //some validation
@@ -1061,9 +1262,62 @@ namespace Nop.Web.Controllers
                         //set default address
                         customer.Addresses.Add(defaultAddress);
                         customer.BillingAddress = defaultAddress;
-                        customer.ShippingAddress = defaultAddress;
                         _customerService.UpdateCustomer(customer);
                     }
+
+                    if (model.chkshippingaddress)
+                    {
+                        var defaultAddress1 = new Address
+                        {
+                            FirstName = model.FirstName,
+                            LastName = model.LastName,
+                            Email = customer.Email,
+                            Company = model.Company,
+                            CountryId = model.ShippingCountryId > 0 ?
+                                (int?)model.ShippingCountryId : null,
+                            StateProvinceId = model.ShippingStateProvinceId > 0 ?
+                                (int?)model.ShippingStateProvinceId : null,
+                            CityId = model.ShippingCityId > 0 ?
+                                 (int?)model.ShippingCityId : null,
+                            LocalityId = model.ShippingLocalityId > 0 ?
+                            (int?)model.ShippingLocalityId : null,
+                            City = model.City,
+                            Address1 = model.ShippingStreetAddress,
+                            Address2 = model.ShippingStreetAddress2,
+                            ZipPostalCode = model.ShippingZipPostalCode,
+                            PhoneNumber = model.Phone,
+                            FaxNumber = model.Fax,
+                            CreatedOnUtc = customer.CreatedOnUtc
+                        };
+                        if (this._addressService.IsAddressValid(defaultAddress1))
+                        {
+                            //some validation
+                            if (defaultAddress.CountryId == 0)
+                                defaultAddress.CountryId = null;
+                            if (defaultAddress.StateProvinceId == 0)
+                                defaultAddress.StateProvinceId = null;
+                            //set default address
+                            customer.Addresses.Add(defaultAddress1);
+                            customer.ShippingAddress = defaultAddress1;
+                            _customerService.UpdateCustomer(customer);
+                        }
+                    }
+                    else
+                    {
+                        if (this._addressService.IsAddressValid(defaultAddress))
+                        {
+                            //some validation
+                            if (defaultAddress.CountryId == 0)
+                                defaultAddress.CountryId = null;
+                            if (defaultAddress.StateProvinceId == 0)
+                                defaultAddress.StateProvinceId = null;
+                            //set default address
+                            customer.Addresses.Add(defaultAddress);
+                            customer.ShippingAddress = defaultAddress;
+                            _customerService.UpdateCustomer(customer);
+                        }
+                    }
+
 
                     //notifications
                     if (_customerSettings.NotifyNewCustomerRegistration)
@@ -1213,7 +1467,7 @@ namespace Nop.Web.Controllers
             var model = new CustomerNavigationModel();
             model.HideAvatar = !_customerSettings.AllowCustomersToUploadAvatars;
             model.HideRewardPoints = !_rewardPointsSettings.Enabled;
-            model.HideForumSubscriptions = !_forumSettings.ForumsEnabled || !_forumSettings.AllowCustomersToManageSubscriptions;
+            model.HideForumSubscriptions = !_forumSettings.ForumsEnabled || !_forumSettings.AllowCustomersToManageSubscriptionOrders;
             model.HideReturnRequests = !_orderSettings.ReturnRequestsEnabled ||
                 _returnRequestService.SearchReturnRequests(_storeContext.CurrentStore.Id, _workContext.CurrentCustomer.Id, 0, null, 0, 1).Count == 0;
             model.HideDownloadableProducts = _customerSettings.HideDownloadableProductsTab;
@@ -1620,20 +1874,19 @@ namespace Nop.Web.Controllers
                 var itemModel = new CustomerDownloadableProductsModel.DownloadableProductsModel
                 {
                     OrderItemGuid = item.OrderItemGuid,
-                    OrderId = item.OrderId,
-                    CreatedOn = _dateTimeHelper.ConvertToUserTime(item.Order.CreatedOnUtc, DateTimeKind.Utc),
-                    ProductName = item.Product.GetLocalized(x => x.Name),
-                    ProductSeName = item.Product.GetSeName(),
-                    ProductAttributes = item.AttributeDescription,
-                    ProductId = item.ProductId
+                    SubscriptionOrderId = item.SubscriptionOrderId,
+                    CreatedOn = _dateTimeHelper.ConvertToUserTime(item.SubscriptionOrder.CreatedOnUtc, DateTimeKind.Utc),
+                    //ProductName = item.Product.GetLocalized(x => x.Name),
+                    //ProductSeName = item.Product.GetSeName(),
+                   // ProductAttributes = item.AttributeDescription,
+                   // ProductId = item.ProductId
                 };
                 model.Items.Add(itemModel);
 
-                if (_downloadService.IsDownloadAllowed(item))
-                    itemModel.DownloadId = item.Product.DownloadId;
+                //if (_downloadService.IsDownloadAllowed(item))
+                //    itemModel.DownloadId = item.Product.DownloadId;
 
-                if (_downloadService.IsLicenseDownloadAllowed(item))
-                    itemModel.LicenseId = item.LicenseDownloadId.HasValue ? item.LicenseDownloadId.Value : 0;
+                
             }
 
             return View(model);
@@ -1645,13 +1898,12 @@ namespace Nop.Web.Controllers
             if (orderItem == null)
                 return RedirectToRoute("HomePage");
 
-            var product = orderItem.Product;
-            if (product == null || !product.HasUserAgreement)
-                return RedirectToRoute("HomePage");
+            //var product = orderItem.Product;
+            //if (product == null || !product.HasUserAgreement)
+            //    return RedirectToRoute("HomePage");
 
             var model = new UserAgreementModel();
-            model.UserAgreementText = product.UserAgreementText;
-            model.OrderItemGuid = orderItemId;
+          
 
             return View(model);
         }
@@ -1693,6 +1945,55 @@ namespace Nop.Web.Controllers
                 //errors
                 foreach (var error in changePasswordResult.Errors)
                     ModelState.AddModelError("", error);
+            }
+
+
+            //If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        #endregion
+
+        #region Dashboard
+
+        [NopHttpsRequirement(SslRequirement.Yes)]
+        public ActionResult Dashboard()
+        {
+            if (!_workContext.CurrentCustomer.IsRegistered())
+                return new HttpUnauthorizedResult();
+            var model = new DashboardModel();
+
+            var customer = _workContext.CurrentCustomer;
+            if (customer != null) { 
+                var currentorder = _subscriptionOrderService.GetCurrentSubscribedOrder(customer.Id);
+                model=   PrepareCustomerDashboardModel(model, currentorder);
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        [PublicAntiForgery]
+        public ActionResult Dashboard(DashboardModel model)
+        {
+            if (!_workContext.CurrentCustomer.IsRegistered())
+                return new HttpUnauthorizedResult();
+
+            var customer = _workContext.CurrentCustomer;
+
+            if (ModelState.IsValid)
+            {
+                //var changePasswordRequest = new ChangePasswordRequest(customer.Email,
+                //    true, _customerSettings.DefaultPasswordFormat, model.NewPassword, model.OldPassword);
+                //var changePasswordResult = _customerRegistrationService.ChangePassword(changePasswordRequest);
+                //if (changePasswordResult.Success)
+                //{
+                //    model.Result = _localizationService.GetResource("Account.ChangePassword.Success");
+                //    return View(model);
+                //}
+
+                ////errors
+                //foreach (var error in changePasswordResult.Errors)
+                //    ModelState.AddModelError("", error);
             }
 
 

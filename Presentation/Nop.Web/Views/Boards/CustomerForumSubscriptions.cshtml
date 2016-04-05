@@ -62,7 +62,7 @@
                                         <input type="checkbox" name="fs@(item.Id)" class="rowcheckbox" />
                                     </td>
                                     <td class="info">
-                                        @if (item.TopicSubscription)
+                                        @if (item.TopicSubscriptionOrder)
                                         {
                                             @Html.RouteLink(item.Title, "TopicSlug", new { Id = item.ForumTopicId, slug = item.Slug })
                                         }
@@ -94,7 +94,7 @@
         else
         {
             <div class="no-data">
-                @T("Account.ForumSubscriptions.NoSubscriptions")
+                @T("Account.ForumSubscriptions.NoSubscriptionOrders")
             </div>
         }
     </div>

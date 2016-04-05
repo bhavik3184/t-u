@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Web.Routing;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Plugins;
 
 namespace Nop.Services.Payments
@@ -31,14 +31,14 @@ namespace Nop.Services.Payments
         /// </summary>
         /// <param name="cart">Shoping cart</param>
         /// <returns>true - hide; false - display.</returns>
-        bool HidePaymentMethod(IList<ShoppingCartItem> cart);
+        bool HidePaymentMethod(IList<SubscriptionCartItem> cart);
 
         /// <summary>
         /// Gets additional handling fee
         /// </summary>
         /// <param name="cart">Shoping cart</param>
         /// <returns>Additional handling fee</returns>
-        decimal GetAdditionalHandlingFee(IList<ShoppingCartItem> cart);
+        decimal GetAdditionalHandlingFee(IList<SubscriptionCartItem> cart);
 
         /// <summary>
         /// Captures payment
@@ -78,9 +78,9 @@ namespace Nop.Services.Payments
         /// <summary>
         /// Gets a value indicating whether customers can complete a payment after order is placed but not completed (for redirection payment methods)
         /// </summary>
-        /// <param name="order">Order</param>
+        /// <param name="order">SubscriptionOrder</param>
         /// <returns>Result</returns>
-        bool CanRePostProcessPayment(Order order);
+        bool CanRePostProcessPayment(SubscriptionOrder order);
 
         /// <summary>
         /// Gets a route for provider configuration

@@ -3,7 +3,7 @@ using System.Linq;
 using Nop.Core;
 using Nop.Core.Data;
 using Nop.Core.Domain.Affiliates;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Services.Events;
 
 namespace Nop.Services.Affiliates
@@ -16,7 +16,7 @@ namespace Nop.Services.Affiliates
         #region Fields
 
         private readonly IRepository<Affiliate> _affiliateRepository;
-        private readonly IRepository<Order> _orderRepository;
+        private readonly IRepository<SubscriptionOrder> _orderRepository;
         private readonly IEventPublisher _eventPublisher;
 
         #endregion
@@ -30,7 +30,7 @@ namespace Nop.Services.Affiliates
         /// <param name="orderRepository">Order repository</param>
         /// <param name="eventPublisher">Event published</param>
         public AffiliateService(IRepository<Affiliate> affiliateRepository,
-            IRepository<Order> orderRepository,
+            IRepository<SubscriptionOrder> orderRepository,
             IEventPublisher eventPublisher)
         {
             this._affiliateRepository = affiliateRepository;

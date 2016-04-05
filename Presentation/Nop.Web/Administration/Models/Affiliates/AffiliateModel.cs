@@ -40,8 +40,8 @@ namespace Nop.Admin.Models.Affiliates
             [NopResourceDisplayName("Admin.Affiliates.Orders.Order")]
             public override int Id { get; set; }
 
-            [NopResourceDisplayName("Admin.Affiliates.Orders.OrderStatus")]
-            public string OrderStatus { get; set; }
+            [NopResourceDisplayName("Admin.Affiliates.Orders.SubscriptionOrderStatus")]
+            public string SubscriptionOrderStatus { get; set; }
 
             [NopResourceDisplayName("Admin.Affiliates.Orders.PaymentStatus")]
             public string PaymentStatus { get; set; }

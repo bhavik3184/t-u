@@ -19,12 +19,12 @@
     int shippingMethodStepNumber = 3;
     int paymentMethodStepNumber = 4;
     int paymentInfoStepNumber = 5;
-    int confirmOrderStepNumber = 6;
+    int confirmSubscriptionOrderStepNumber = 6;
     if (!Model.ShippingRequired)
     {
         paymentMethodStepNumber = paymentMethodStepNumber - 2;
         paymentInfoStepNumber = paymentInfoStepNumber - 2;
-        confirmOrderStepNumber = confirmOrderStepNumber - 2;
+        confirmSubscriptionOrderStepNumber = confirmSubscriptionOrderStepNumber - 2;
     }
     if (Model.DisableBillingAddressCheckoutStep)
     {
@@ -32,10 +32,10 @@
         shippingMethodStepNumber--;
         paymentMethodStepNumber--;
         paymentInfoStepNumber--;
-        confirmOrderStepNumber--;
+        confirmSubscriptionOrderStepNumber--;
     }
 }
-<div class="page checkout-page">
+<div class="page checkout-page article">
     <div class="page-title">
         <h1>@T("Checkout")</h1>
     </div>
@@ -166,21 +166,21 @@
             </li>
             <li id="opc-confirm_order" class="tab-section">
                 <div class="step-title">
-                    <span class="number">@confirmOrderStepNumber</span>
-                    <h2 class="title">@T("Checkout.ConfirmOrder")</h2>
+                    <span class="number">@confirmSubscriptionOrderStepNumber</span>
+                    <h2 class="title">@T("Checkout.ConfirmSubscriptionOrder")</h2>
                 </div>
                 <div id="checkout-step-confirm-order" class="step a-item" style="display: none;">
                     <div id="checkout-confirm-order-load">
                         @*confirm order content will be loaded here*@
                     </div>
                     <script type="text/javascript">
-                        ConfirmOrder.init('@(storeLocation)checkout/OpcConfirmOrder/', '@(storeLocation)checkout/completed/');
+                        ConfirmSubscriptionOrder.init('@(storeLocation)checkout/OpcConfirmSubscriptionOrder/', '@(storeLocation)checkout/completed/');
                     </script>
                     <div class="buttons" id="confirm-order-buttons-container">
                         <p class="back-link">
                             <a href="#" onclick="Checkout.back(); return false;"><small>&laquo; </small>@T("Common.Back")</a></p>
-                        <input type="button" class="button-1 confirm-order-next-step-button" onclick="ConfirmOrder.save()" value="@T("Common.Confirm")" />
-                        <span class="please-wait" id="confirm-order-please-wait" style="display: none;">@T("Checkout.SubmittingOrder")</span>
+                        <input type="button" class="button-1 confirm-order-next-step-button" onclick="ConfirmSubscriptionOrder.save()" value="@T("Common.Confirm")" />
+                        <span class="please-wait" id="confirm-order-please-wait" style="display: none;">@T("Checkout.SubmittingSubscriptionOrder")</span>
                     </div>
                 </div>
             </li>

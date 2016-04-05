@@ -206,7 +206,7 @@ namespace Nop.Services.Catalog
         public virtual string FormatPrice(decimal price, bool showCurrency, 
             Currency targetCurrency, Language language, bool priceIncludesTax, bool showTax)
         {
-            //we should round it no matter of "ShoppingCartSettings.RoundPricesDuringCalculation" setting
+            //we should round it no matter of "BorrowCartSettings.RoundPricesDuringCalculation" setting
             price = RoundingHelper.RoundPrice(price);
             
             string currencyString = GetCurrencyString(price, showCurrency, targetCurrency);

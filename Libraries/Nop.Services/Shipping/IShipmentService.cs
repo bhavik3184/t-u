@@ -32,7 +32,7 @@ namespace Nop.Services.Shipping
         /// <param name="pageIndex">Page index</param>
         /// <param name="pageSize">Page size</param>
         /// <returns>Shipments</returns>
-        IPagedList<Shipment> GetAllShipments(int vendorId = 0, int warehouseId = 0,
+        IPagedList<Shipment> GetAllShipments(int vendorId = 0, int customerId = 0, int warehouseId = 0,
             int shippingCountryId = 0,
             int shippingStateId = 0,
             string shippingCity = null,
@@ -40,7 +40,15 @@ namespace Nop.Services.Shipping
             bool loadNotShipped = false,
             DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
             int pageIndex = 0, int pageSize = int.MaxValue);
-        
+
+        IPagedList<ShipmentItem> GetAllShipmentItems(int OrderId, int OrderItemId, int customerId = 0,
+           DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
+           int pageIndex = 0, int pageSize = int.MaxValue);
+
+
+        IPagedList<ShipmentItem> GetAllShipmentItemsByStatus(int OrderId, int OrderItemId, int customerId = 0, Boolean deliveryStatus = false,
+   DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
+   int pageIndex = 0, int pageSize = int.MaxValue);
         /// <summary>
         /// Get shipment by identifiers
         /// </summary>

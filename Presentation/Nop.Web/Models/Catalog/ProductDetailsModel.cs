@@ -70,7 +70,7 @@ namespace Nop.Web.Models.Catalog
 
         public string StockAvailability { get; set; }
 
-        public bool DisplayBackInStockSubscription { get; set; }
+        public bool DisplayBackInStockSubscriptionOrder { get; set; }
 
         public bool EmailAFriendEnabled { get; set; }
         public bool CompareProductsEnabled { get; set; }
@@ -138,7 +138,7 @@ namespace Nop.Web.Models.Catalog
             public String CustomerEnteredPriceRange { get; set; }
 
             public bool DisableBuyButton { get; set; }
-            public bool DisableWishlistButton { get; set; }
+            public bool DisableMyToyBoxButton { get; set; }
 
             //rental
             public bool IsRental { get; set; }
@@ -148,7 +148,7 @@ namespace Nop.Web.Models.Catalog
             public DateTime? PreOrderAvailabilityStartDateTimeUtc { get; set; }
 
             //updating existing shopping cart item?
-            public int UpdatedShoppingCartItemId { get; set; }
+            public int UpdatedBorrowCartItemId { get; set; }
         }
 
         public partial class ProductPriceModel : BaseNopModel

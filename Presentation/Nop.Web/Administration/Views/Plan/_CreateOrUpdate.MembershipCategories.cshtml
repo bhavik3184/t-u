@@ -1,0 +1,160 @@
+﻿@model PlanModel
+
+
+@if (Model.Id > 0)
+{
+    if (Model.AvailableMembershipCategories.Count > 0)
+    {
+        <div id="planmembershipcategories-grid"></div>
+
+        <script>
+            $(document).ready(function () {
+                $("#planmembershipcategories-grid").kendoGrid({
+                    dataSource: {
+                        type: "json",
+                        transport: {
+                            read: {
+                                url: "@Html.Raw(Url.Action("PlanMembershipCategoryList", "Plan", new { planId = Model.Id }))",
+                                type: "POST",
+                                dataType: "json",
+                                data: addAntiForgeryToken
+                            },
+                            create: {
+                                url: "@Html.Raw(Url.Action("PlanMembershipCategoryInsert", "Plan", new { planId = Model.Id }))",
+                                type: "POST",
+                                dataType: "json",
+                                data: addAntiForgeryToken
+                            },
+                            update: {
+                                url:"@Html.Raw(Url.Action("PlanMembershipCategoryUpdate", "Plan"))",
+                                type: "POST",
+                                dataType: "json",
+                                data: addAntiForgeryToken
+                            },
+                            destroy: {
+                                url: "@Html.Raw(Url.Action("PlanMembershipCategoryDelete", "Plan"))",
+                                type: "POST",
+                                dataType: "json",
+                                data: addAntiForgeryToken
+                            }
+                        },
+                        schema: {
+                            data: "Data",
+                            total: "Total",
+                            errors: "Errors",
+                            model: {
+                                id: "Id",
+                                fields: {
+                                    MembershipCategory: { editable: true, type: "string" },
+                                    //PlanId: { editable: false, type: "number" },
+                                    MembershipCategoryId: { editable: true, type: "number" },
+                                    DisplayOrder: { editable: true, type: "number" },
+                                    Id: { editable: false, type: "number" }
+                                }
+                            }
+                        },
+                        requestEnd: function (e) {
+                            if (e.type == "create" || e.type == "update") {
+                                this.read();
+                            }
+                        },
+                        error: function (e) {
+                            display_kendoui_grid_error(e);
+                            // Cancel the changes
+                            this.cancelChanges();
+                        },
+                        serverPaging: true,
+                        serverFiltering: true,
+                        serverSorting: true
+                    },
+                    pageable: {
+                        refresh: true,
+                        numeric: false,
+                        previousNext: false,
+                        info: false
+                    },
+                    toolbar: [{ name: "create", text: "@T("Admin.Common.AddNewRecord")" }],
+                    edit: function(e) {
+                        if (e.model.isNew()) {
+                            //little hack here
+                            //pre-select the first value of kendoui dropdownlist datasource
+                            //for some reasons (maybe, bug) it always sends 0
+                            //if no value has been selected (changed) in the dropdownlist
+                            if (allMembershipCategories.length > 0) {
+                                e.model.MembershipCategoryId = allMembershipCategories[0].Id;
+                            }
+                        }
+                    },
+                    editable: {
+                        confirmation: false,
+                        mode: "inline"
+                    },
+                    scrollable: false,
+                    columns: [{
+                            field: "MembershipCategoryId",
+                            title: "@T("Admin.Catalog.Plans.Categories.Fields.Category")",
+                            width: 200,
+                            editor: membershipCategoryDropDownEditor,
+                            template: "#:MembershipCategory#"
+                        },
+                    {
+                        field: "DisplayOrder",
+                        title: "@T("Admin.Catalog.Plans.Categories.Fields.DisplayOrder")",
+                        width: 200,
+                        //integer format
+                        format: "{0:0}"
+                    }, {
+                        command: [{
+                            name: "edit",
+                            text: {
+                                edit: "@T("Admin.Common.Edit")",
+                                update: "@T("Admin.Common.Update")",
+                                cancel: "@T("Admin.Common.Cancel")"
+                            }
+                        }, {
+                            name: "destroy",
+                            text: "@T("Admin.Common.Delete")"
+                        }],
+                        width: 200
+                    }]
+                });
+            });
+
+            //local datasource
+            var allMembershipCategories = [
+                @for (int i = 0; i < Model.AvailableMembershipCategories.Count; i++)
+                {
+                    var categoryItem = Model.AvailableMembershipCategories[i];
+                    <text>
+                        {
+                            Id: @(categoryItem.Value),
+                            Name: "@(Html.Raw(HttpUtility.JavaScriptStringEncode(categoryItem.Text)))"
+                        }
+                        </text>
+                    if (i != Model.AvailableMembershipCategories.Count - 1)
+                    {
+                        <text>,</text>
+                    }
+                }
+            ];
+
+            function membershipCategoryDropDownEditor(container, options) {
+                $('<input required data-text-field="Name" data-value-field="Id" data-bind="value:MembershipCategoryId"/>')
+                    .appendTo(container)
+                    .kendoDropDownList({
+                        autoBind: false,
+                        dataSource: allMembershipCategories
+                    });
+            }
+        </script>
+    }
+    else
+    {
+    @T("Admin.Catalog.Plans.Categories.NoCategoriesAvailable")
+    }
+}
+else
+{
+    @T("Admin.Catalog.Plans.Categories.SaveBeforeEdit")
+}
+

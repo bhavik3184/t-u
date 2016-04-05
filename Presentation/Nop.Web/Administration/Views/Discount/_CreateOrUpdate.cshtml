@@ -873,10 +873,10 @@
                     type: "date",
                     format: "{0:G}"
                 }, {
-                    field: "OrderId",
+                    field: "SubscriptionOrderId",
                     title: "@T("Admin.Promotions.Discounts.History.Order")",
                     width: 200,
-                    template: '<a href="@Url.Content("~/Admin/Order/Edit/")#=OrderId#">#=OrderId# - @T("Admin.Common.View")</a>'
+                    template: '<a href="@Url.Content("~/Admin/Order/Edit/")#=SubscriptionOrderId#">#=SubscriptionOrderId# - @T("Admin.Common.View")</a>'
                 }, {
                     field: "OrderTotal",
                     title: "@T("Admin.Promotions.Discounts.History.OrderTotal")",

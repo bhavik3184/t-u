@@ -23,7 +23,7 @@ using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Payments;
 using Nop.Services.Security;
 using Nop.Services.Seo;
@@ -41,7 +41,7 @@ namespace Nop.Admin.Controllers
 
         private readonly IPaymentService _paymentService;
         private readonly IShippingService _shippingService;
-        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IBorrowCartService _borrowCartService;
         private readonly ICurrencyService _currencyService;
         private readonly IMeasureService _measureService;
         private readonly ICustomerService _customerService;
@@ -67,7 +67,7 @@ namespace Nop.Admin.Controllers
 
         public CommonController(IPaymentService paymentService, 
             IShippingService shippingService,
-            IShoppingCartService shoppingCartService, 
+            IBorrowCartService borrowCartService, 
             ICurrencyService currencyService, 
             IMeasureService measureService,
             ICustomerService customerService, 
@@ -89,7 +89,7 @@ namespace Nop.Admin.Controllers
         {
             this._paymentService = paymentService;
             this._shippingService = shippingService;
-            this._shoppingCartService = shoppingCartService;
+            this._borrowCartService = borrowCartService;
             this._currencyService = currencyService;
             this._measureService = measureService;
             this._customerService = customerService;
@@ -429,7 +429,7 @@ namespace Nop.Admin.Controllers
 
             var model = new MaintenanceModel();
             model.DeleteGuests.EndDate = DateTime.UtcNow.AddDays(-7);
-            model.DeleteGuests.OnlyWithoutShoppingCart = true;
+            model.DeleteGuests.OnlyWithoutBorrowCart = true;
             model.DeleteAbandonedCarts.OlderThan = DateTime.UtcNow.AddDays(-182);
             return View(model);
         }
@@ -446,7 +446,7 @@ namespace Nop.Admin.Controllers
             DateTime? endDateValue = (model.DeleteGuests.EndDate == null) ? null
                             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(model.DeleteGuests.EndDate.Value, _dateTimeHelper.CurrentTimeZone).AddDays(1);
 
-            model.DeleteGuests.NumberOfDeletedCustomers = _customerService.DeleteGuestCustomers(startDateValue, endDateValue, model.DeleteGuests.OnlyWithoutShoppingCart);
+            model.DeleteGuests.NumberOfDeletedCustomers = _customerService.DeleteGuestCustomers(startDateValue, endDateValue, model.DeleteGuests.OnlyWithoutBorrowCart);
 
             return View(model);
         }
@@ -459,7 +459,7 @@ namespace Nop.Admin.Controllers
 
             var olderThanDateValue = _dateTimeHelper.ConvertToUtcTime(model.DeleteAbandonedCarts.OlderThan, _dateTimeHelper.CurrentTimeZone);
 
-            model.DeleteAbandonedCarts.NumberOfDeletedItems = _shoppingCartService.DeleteExpiredShoppingCartItems(olderThanDateValue);
+            model.DeleteAbandonedCarts.NumberOfDeletedItems = _borrowCartService.DeleteExpiredBorrowCartItems(olderThanDateValue);
             return View(model);
         }
         [HttpPost, ActionName("Maintenance")]

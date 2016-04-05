@@ -1,5 +1,5 @@
 using System;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Core.Domain.Customers
 {
@@ -46,7 +46,7 @@ namespace Nop.Core.Domain.Customers
         /// <summary>
         /// Gets or sets the order for which points were redeemed as a payment (spent by a customer when placing this order)
         /// </summary>
-        public virtual Order UsedWithOrder { get; set; }
+        public virtual SubscriptionOrder UsedWithSubscriptionOrder { get; set; }
 
         /// <summary>
         /// Gets or sets the customer

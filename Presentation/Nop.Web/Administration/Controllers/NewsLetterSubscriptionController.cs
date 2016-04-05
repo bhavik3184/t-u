@@ -20,7 +20,7 @@ namespace Nop.Admin.Controllers
 {
 	public partial class NewsLetterSubscriptionController : BaseAdminController
 	{
-		private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
+		private readonly INewsLetterSubscriptionService _newsLetterSubscriptionOrderService;
 		private readonly IDateTimeHelper _dateTimeHelper;
         private readonly ILocalizationService _localizationService;
         private readonly IPermissionService _permissionService;
@@ -29,7 +29,7 @@ namespace Nop.Admin.Controllers
         private readonly IExportManager _exportManager;
         private readonly IImportManager _importManager;
 
-		public NewsLetterSubscriptionController(INewsLetterSubscriptionService newsLetterSubscriptionService,
+		public NewsLetterSubscriptionController(INewsLetterSubscriptionService newsLetterSubscriptionOrderService,
 			IDateTimeHelper dateTimeHelper,
             ILocalizationService localizationService,
             IPermissionService permissionService,
@@ -38,7 +38,7 @@ namespace Nop.Admin.Controllers
             IExportManager exportManager,
             IImportManager importManager)
 		{
-			this._newsLetterSubscriptionService = newsLetterSubscriptionService;
+			this._newsLetterSubscriptionOrderService = newsLetterSubscriptionOrderService;
 			this._dateTimeHelper = dateTimeHelper;
             this._localizationService = localizationService;
             this._permissionService = permissionService;
@@ -58,7 +58,7 @@ namespace Nop.Admin.Controllers
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageNewsletterSubscribers))
                 return AccessDeniedView();
 
-            var model = new NewsLetterSubscriptionListModel();
+            var model = new NewsLetterSubscriptionOrderListModel();
 
             //stores
             model.AvailableStores.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "0" });
@@ -91,7 +91,7 @@ namespace Nop.Admin.Controllers
 		}
 
 		[HttpPost]
-		public ActionResult SubscriptionList(DataSourceRequest command, NewsLetterSubscriptionListModel model)
+		public ActionResult SubscriptionOrderList(DataSourceRequest command, NewsLetterSubscriptionOrderListModel model)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageNewsletterSubscribers))
                 return AccessDeniedView();
@@ -102,13 +102,13 @@ namespace Nop.Admin.Controllers
             else if (model.ActiveId == 2)
                 isActive = false;
 
-            var newsletterSubscriptions = _newsLetterSubscriptionService.GetAllNewsLetterSubscriptions(model.SearchEmail,
+            var newsletterSubscriptionOrders = _newsLetterSubscriptionOrderService.GetAllNewsLetterSubscriptions(model.SearchEmail,
                 model.StoreId, isActive, model.CustomerRoleId,
                 command.Page - 1, command.PageSize);
 
             var gridModel = new DataSourceResult
             {
-                Data = newsletterSubscriptions.Select(x =>
+                Data = newsletterSubscriptionOrders.Select(x =>
 				{
 					var m = x.ToModel();
 				    var store = _storeService.GetStoreById(x.StoreId);
@@ -116,14 +116,14 @@ namespace Nop.Admin.Controllers
 					m.CreatedOn = _dateTimeHelper.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc);
 					return m;
 				}),
-                Total = newsletterSubscriptions.TotalCount
+                Total = newsletterSubscriptionOrders.TotalCount
             };
 
             return Json(gridModel);
 		}
 
         [HttpPost]
-        public ActionResult SubscriptionUpdate([Bind(Exclude = "CreatedOn")] NewsLetterSubscriptionModel model)
+        public ActionResult SubscriptionOrderUpdate([Bind(Exclude = "CreatedOn")] NewsLetterSubscriptionOrderModel model)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageNewsletterSubscribers))
                 return AccessDeniedView();
@@ -133,31 +133,31 @@ namespace Nop.Admin.Controllers
                 return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
             }
 
-            var subscription = _newsLetterSubscriptionService.GetNewsLetterSubscriptionById(model.Id);
+            var subscription = _newsLetterSubscriptionOrderService.GetNewsLetterSubscriptionById(model.Id);
             subscription.Email = model.Email;
             subscription.Active = model.Active;
-            _newsLetterSubscriptionService.UpdateNewsLetterSubscription(subscription);
+            _newsLetterSubscriptionOrderService.UpdateNewsLetterSubscription(subscription);
 
             return new NullJsonResult();
         }
 
         [HttpPost]
-        public ActionResult SubscriptionDelete(int id)
+        public ActionResult SubscriptionOrderDelete(int id)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageNewsletterSubscribers))
                 return AccessDeniedView();
 
-            var subscription = _newsLetterSubscriptionService.GetNewsLetterSubscriptionById(id);
+            var subscription = _newsLetterSubscriptionOrderService.GetNewsLetterSubscriptionById(id);
             if (subscription == null)
                 throw new ArgumentException("No subscription found with the specified id");
-            _newsLetterSubscriptionService.DeleteNewsLetterSubscription(subscription);
+            _newsLetterSubscriptionOrderService.DeleteNewsLetterSubscription(subscription);
 
             return new NullJsonResult();
         }
 
         [HttpPost, ActionName("List")]
         [FormValueRequired("exportcsv")]
-		public ActionResult ExportCsv(NewsLetterSubscriptionListModel model)
+		public ActionResult ExportCsv(NewsLetterSubscriptionOrderListModel model)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageNewsletterSubscribers))
                 return AccessDeniedView();
@@ -168,7 +168,7 @@ namespace Nop.Admin.Controllers
             else if (model.ActiveId == 2)
                 isActive = false;
 
-			var subscriptions = _newsLetterSubscriptionService.GetAllNewsLetterSubscriptions(model.SearchEmail,
+			var subscriptions = _newsLetterSubscriptionOrderService.GetAllNewsLetterSubscriptions(model.SearchEmail,
                 model.StoreId, isActive, model.CustomerRoleId);
 
 		    string result = _exportManager.ExportNewsletterSubscribersToTxt(subscriptions);

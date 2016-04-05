@@ -17,7 +17,7 @@ using Nop.Core.Domain.Forums;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Media;
 using Nop.Core.Domain.News;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Seo;
 using Nop.Core.Domain.Shipping;
@@ -31,7 +31,7 @@ using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Media;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Services.Tax;
@@ -59,7 +59,7 @@ namespace Nop.Admin.Controllers
         private readonly IPictureService _pictureService;
         private readonly ILocalizationService _localizationService;
         private readonly IDateTimeHelper _dateTimeHelper;
-        private readonly IOrderService _orderService;
+        private readonly ISubscriptionOrderService _orderService;
         private readonly IEncryptionService _encryptionService;
         private readonly IThemeProvider _themeProvider;
         private readonly ICustomerService _customerService;
@@ -87,7 +87,7 @@ namespace Nop.Admin.Controllers
             IPictureService pictureService, 
             ILocalizationService localizationService, 
             IDateTimeHelper dateTimeHelper,
-            IOrderService orderService,
+            ISubscriptionOrderService orderService,
             IEncryptionService encryptionService,
             IThemeProvider themeProvider,
             ICustomerService customerService, 
@@ -363,7 +363,7 @@ namespace Nop.Admin.Controllers
                 model.AllowGuestsToCreateTopics_OverrideForStore = _settingService.SettingExists(forumSettings, x => x.AllowGuestsToCreateTopics, storeScope);
                 model.AllowCustomersToEditPosts_OverrideForStore = _settingService.SettingExists(forumSettings, x => x.AllowCustomersToEditPosts, storeScope);
                 model.AllowCustomersToDeletePosts_OverrideForStore = _settingService.SettingExists(forumSettings, x => x.AllowCustomersToDeletePosts, storeScope);
-                model.AllowCustomersToManageSubscriptions_OverrideForStore = _settingService.SettingExists(forumSettings, x => x.AllowCustomersToManageSubscriptions, storeScope);
+                model.AllowCustomersToManageSubscriptionOrders_OverrideForStore = _settingService.SettingExists(forumSettings, x => x.AllowCustomersToManageSubscriptionOrders, storeScope);
                 model.TopicsPageSize_OverrideForStore = _settingService.SettingExists(forumSettings, x => x.TopicsPageSize, storeScope);
                 model.PostsPageSize_OverrideForStore = _settingService.SettingExists(forumSettings, x => x.PostsPageSize, storeScope);
                 model.ForumEditor_OverrideForStore = _settingService.SettingExists(forumSettings, x => x.ForumEditor, storeScope);
@@ -432,10 +432,10 @@ namespace Nop.Admin.Controllers
             else if (storeScope > 0)
                 _settingService.DeleteSetting(forumSettings, x => x.AllowCustomersToDeletePosts, storeScope);
             
-            if (model.AllowCustomersToManageSubscriptions_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(forumSettings, x => x.AllowCustomersToManageSubscriptions, storeScope, false);
+            if (model.AllowCustomersToManageSubscriptionOrders_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(forumSettings, x => x.AllowCustomersToManageSubscriptionOrders, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(forumSettings, x => x.AllowCustomersToManageSubscriptions, storeScope);
+                _settingService.DeleteSetting(forumSettings, x => x.AllowCustomersToManageSubscriptionOrders, storeScope);
             
             if (model.TopicsPageSize_OverrideForStore || storeScope == 0)
                 _settingService.SaveSetting(forumSettings, x => x.TopicsPageSize, storeScope, false);
@@ -1071,8 +1071,8 @@ namespace Nop.Admin.Controllers
                 model.DisplayTaxShippingInfoFooter_OverrideForStore = _settingService.SettingExists(catalogSettings, x => x.DisplayTaxShippingInfoFooter, storeScope);
                 model.DisplayTaxShippingInfoProductDetailsPage_OverrideForStore = _settingService.SettingExists(catalogSettings, x => x.DisplayTaxShippingInfoProductDetailsPage, storeScope);
                 model.DisplayTaxShippingInfoProductBoxes_OverrideForStore = _settingService.SettingExists(catalogSettings, x => x.DisplayTaxShippingInfoProductBoxes, storeScope);
-                model.DisplayTaxShippingInfoShoppingCart_OverrideForStore = _settingService.SettingExists(catalogSettings, x => x.DisplayTaxShippingInfoShoppingCart, storeScope);
-                model.DisplayTaxShippingInfoWishlist_OverrideForStore = _settingService.SettingExists(catalogSettings, x => x.DisplayTaxShippingInfoWishlist, storeScope);
+                model.DisplayTaxShippingInfoBorrowCart_OverrideForStore = _settingService.SettingExists(catalogSettings, x => x.DisplayTaxShippingInfoBorrowCart, storeScope);
+                model.DisplayTaxShippingInfoMyToyBox_OverrideForStore = _settingService.SettingExists(catalogSettings, x => x.DisplayTaxShippingInfoMyToyBox, storeScope);
                 model.DisplayTaxShippingInfoOrderDetailsPage_OverrideForStore = _settingService.SettingExists(catalogSettings, x => x.DisplayTaxShippingInfoOrderDetailsPage, storeScope);
             }
             return View(model);
@@ -1342,15 +1342,15 @@ namespace Nop.Admin.Controllers
             else if (storeScope > 0)
                 _settingService.DeleteSetting(catalogSettings, x => x.DisplayTaxShippingInfoProductBoxes, storeScope);
 
-            if (model.DisplayTaxShippingInfoShoppingCart_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(catalogSettings, x => x.DisplayTaxShippingInfoShoppingCart, storeScope, false);
+            if (model.DisplayTaxShippingInfoBorrowCart_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(catalogSettings, x => x.DisplayTaxShippingInfoBorrowCart, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(catalogSettings, x => x.DisplayTaxShippingInfoShoppingCart, storeScope);
+                _settingService.DeleteSetting(catalogSettings, x => x.DisplayTaxShippingInfoBorrowCart, storeScope);
 
-            if (model.DisplayTaxShippingInfoWishlist_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(catalogSettings, x => x.DisplayTaxShippingInfoWishlist, storeScope, false);
+            if (model.DisplayTaxShippingInfoMyToyBox_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(catalogSettings, x => x.DisplayTaxShippingInfoMyToyBox, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(catalogSettings, x => x.DisplayTaxShippingInfoWishlist, storeScope);
+                _settingService.DeleteSetting(catalogSettings, x => x.DisplayTaxShippingInfoMyToyBox, storeScope);
 
             if (model.DisplayTaxShippingInfoOrderDetailsPage_OverrideForStore || storeScope == 0)
                 _settingService.SaveSetting(catalogSettings, x => x.DisplayTaxShippingInfoOrderDetailsPage, storeScope, false);
@@ -1504,7 +1504,7 @@ namespace Nop.Admin.Controllers
                 model.MinOrderSubtotalAmountIncludingTax_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.MinOrderSubtotalAmountIncludingTax, storeScope);
                 model.MinOrderTotalAmount_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.MinOrderTotalAmount, storeScope);
                 model.AnonymousCheckoutAllowed_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.AnonymousCheckoutAllowed, storeScope);
-                model.TermsOfServiceOnShoppingCartPage_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.TermsOfServiceOnShoppingCartPage, storeScope);
+                model.TermsOfServiceOnBorrowCartPage_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.TermsOfServiceOnBorrowCartPage, storeScope);
                 model.TermsOfServiceOnOrderConfirmPage_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.TermsOfServiceOnOrderConfirmPage, storeScope);
                 model.OnePageCheckoutEnabled_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.OnePageCheckoutEnabled, storeScope);
                 model.OnePageCheckoutDisplayOrderTotalsOnPaymentInfoTab_OverrideForStore = _settingService.SettingExists(orderSettings, x => x.OnePageCheckoutDisplayOrderTotalsOnPaymentInfoTab, storeScope);
@@ -1521,13 +1521,13 @@ namespace Nop.Admin.Controllers
             model.PrimaryStoreCurrencyCode = _currencyService.GetCurrencyById(currencySettings.PrimaryStoreCurrencyId).CurrencyCode;
 
             //gift card activation/deactivation
-            model.GiftCards_Activated_OrderStatuses = OrderStatus.Pending.ToSelectList(false).ToList();
-            model.GiftCards_Activated_OrderStatuses.Insert(0, new SelectListItem { Text = "---", Value = "0" });
-            model.GiftCards_Deactivated_OrderStatuses = OrderStatus.Pending.ToSelectList(false).ToList();
-            model.GiftCards_Deactivated_OrderStatuses.Insert(0, new SelectListItem { Text = "---", Value = "0" });
+            model.GiftCards_Activated_SubscriptionOrderStatuses = SubscriptionOrderStatus.Pending.ToSelectList(false).ToList();
+            model.GiftCards_Activated_SubscriptionOrderStatuses.Insert(0, new SelectListItem { Text = "---", Value = "0" });
+            model.GiftCards_Deactivated_SubscriptionOrderStatuses = SubscriptionOrderStatus.Pending.ToSelectList(false).ToList();
+            model.GiftCards_Deactivated_SubscriptionOrderStatuses.Insert(0, new SelectListItem { Text = "---", Value = "0" });
             
             //order ident
-            model.OrderIdent = _maintenanceService.GetTableIdent<Order>();
+            model.SubscriptionOrderIdent = _maintenanceService.GetTableIdent<SubscriptionOrder>();
 
             return View(model);
         }
@@ -1572,10 +1572,10 @@ namespace Nop.Admin.Controllers
                 else if (storeScope > 0)
                     _settingService.DeleteSetting(orderSettings, x => x.AnonymousCheckoutAllowed, storeScope);
 
-                if (model.TermsOfServiceOnShoppingCartPage_OverrideForStore || storeScope == 0)
-                    _settingService.SaveSetting(orderSettings, x => x.TermsOfServiceOnShoppingCartPage, storeScope, false);
+                if (model.TermsOfServiceOnBorrowCartPage_OverrideForStore || storeScope == 0)
+                    _settingService.SaveSetting(orderSettings, x => x.TermsOfServiceOnBorrowCartPage, storeScope, false);
                 else if (storeScope > 0)
-                    _settingService.DeleteSetting(orderSettings, x => x.TermsOfServiceOnShoppingCartPage, storeScope);
+                    _settingService.DeleteSetting(orderSettings, x => x.TermsOfServiceOnBorrowCartPage, storeScope);
 
                 if (model.TermsOfServiceOnOrderConfirmPage_OverrideForStore || storeScope == 0)
                     _settingService.SaveSetting(orderSettings, x => x.TermsOfServiceOnOrderConfirmPage, storeScope, false);
@@ -1627,8 +1627,8 @@ namespace Nop.Admin.Controllers
                 else if (storeScope > 0)
                     _settingService.DeleteSetting(orderSettings, x => x.NumberOfDaysReturnRequestAvailable, storeScope);
 
-                _settingService.SaveSetting(orderSettings, x => x.GiftCards_Activated_OrderStatusId, 0, false);
-                _settingService.SaveSetting(orderSettings, x => x.GiftCards_Deactivated_OrderStatusId, 0, false);
+                _settingService.SaveSetting(orderSettings, x => x.GiftCards_Activated_SubscriptionOrderStatusId, 0, false);
+                _settingService.SaveSetting(orderSettings, x => x.GiftCards_Deactivated_SubscriptionOrderStatusId, 0, false);
 
                 if (model.ReturnRequestsEnabled_OverrideForStore || storeScope == 0)
                     _settingService.SaveSetting(orderSettings, x => x.ReturnRequestsEnabled, storeScope, false);
@@ -1639,11 +1639,11 @@ namespace Nop.Admin.Controllers
                 _settingService.ClearCache();
                 
                 //order ident
-                if (model.OrderIdent.HasValue)
+                if (model.SubscriptionOrderIdent.HasValue)
                 {
                     try
                     {
-                        _maintenanceService.SetTableIdent<Order>(model.OrderIdent.Value);
+                        _maintenanceService.SetTableIdent<SubscriptionOrder>(model.SubscriptionOrderIdent.Value);
                     }
                     catch (Exception exc)
                     {
@@ -1926,136 +1926,136 @@ namespace Nop.Admin.Controllers
 
 
 
-        public ActionResult ShoppingCart()
+        public ActionResult BorrowCart()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
                 return AccessDeniedView();
 
             //load settings for a chosen store scope
             var storeScope = this.GetActiveStoreScopeConfiguration(_storeService, _workContext);
-            var shoppingCartSettings = _settingService.LoadSetting<ShoppingCartSettings>(storeScope);
-            var model = shoppingCartSettings.ToModel();
+            var borrowCartSettings = _settingService.LoadSetting<BorrowCartSettings>(storeScope);
+            var model = borrowCartSettings.ToModel();
             model.ActiveStoreScopeConfiguration = storeScope;
             if (storeScope > 0)
             {
-                model.DisplayCartAfterAddingProduct_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.DisplayCartAfterAddingProduct, storeScope);
-                model.DisplayWishlistAfterAddingProduct_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.DisplayWishlistAfterAddingProduct, storeScope);
-                model.MaximumShoppingCartItems_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MaximumShoppingCartItems, storeScope);
-                model.MaximumWishlistItems_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MaximumWishlistItems, storeScope);
-                model.AllowOutOfStockItemsToBeAddedToWishlist_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.AllowOutOfStockItemsToBeAddedToWishlist, storeScope);
-                model.MoveItemsFromWishlistToCart_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MoveItemsFromWishlistToCart, storeScope);
-                model.ShowProductImagesOnShoppingCart_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowProductImagesOnShoppingCart, storeScope);
-                model.ShowProductImagesOnWishList_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowProductImagesOnWishList, storeScope);
-                model.ShowDiscountBox_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowDiscountBox, storeScope);
-                model.ShowGiftCardBox_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowGiftCardBox, storeScope);
-                model.CrossSellsNumber_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.CrossSellsNumber, storeScope);
-                model.EmailWishlistEnabled_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.EmailWishlistEnabled, storeScope);
-                model.AllowAnonymousUsersToEmailWishlist_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.AllowAnonymousUsersToEmailWishlist, storeScope);
-                model.MiniShoppingCartEnabled_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MiniShoppingCartEnabled, storeScope);
-                model.ShowProductImagesInMiniShoppingCart_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.ShowProductImagesInMiniShoppingCart, storeScope);
-                model.MiniShoppingCartProductNumber_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.MiniShoppingCartProductNumber, storeScope);
-                model.AllowCartItemEditing_OverrideForStore = _settingService.SettingExists(shoppingCartSettings, x => x.AllowCartItemEditing, storeScope);
+                model.DisplayCartAfterAddingProduct_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.DisplayCartAfterAddingProduct, storeScope);
+                model.DisplayMyToyBoxAfterAddingProduct_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.DisplayMyToyBoxAfterAddingProduct, storeScope);
+                model.MaximumBorrowCartItems_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.MaximumBorrowCartItems, storeScope);
+                model.MaximumMyToyBoxItems_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.MaximumMyToyBoxItems, storeScope);
+                model.AllowOutOfStockItemsToBeAddedToMyToyBox_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.AllowOutOfStockItemsToBeAddedToMyToyBox, storeScope);
+                model.MoveItemsFromMyToyBoxToCart_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.MoveItemsFromMyToyBoxToCart, storeScope);
+                model.ShowProductImagesOnBorrowCart_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.ShowProductImagesOnBorrowCart, storeScope);
+                model.ShowProductImagesOnWishList_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.ShowProductImagesOnWishList, storeScope);
+                model.ShowDiscountBox_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.ShowDiscountBox, storeScope);
+                model.ShowGiftCardBox_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.ShowGiftCardBox, storeScope);
+                model.CrossSellsNumber_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.CrossSellsNumber, storeScope);
+                model.EmailMyToyBoxEnabled_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.EmailMyToyBoxEnabled, storeScope);
+                model.AllowAnonymousUsersToEmailMyToyBox_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.AllowAnonymousUsersToEmailMyToyBox, storeScope);
+                model.MiniBorrowCartEnabled_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.MiniBorrowCartEnabled, storeScope);
+                model.ShowProductImagesInMiniBorrowCart_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.ShowProductImagesInMiniBorrowCart, storeScope);
+                model.MiniBorrowCartProductNumber_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.MiniBorrowCartProductNumber, storeScope);
+                model.AllowCartItemEditing_OverrideForStore = _settingService.SettingExists(borrowCartSettings, x => x.AllowCartItemEditing, storeScope);
             }
             return View(model);
         }
         [HttpPost]
-        public ActionResult ShoppingCart(ShoppingCartSettingsModel model)
+        public ActionResult BorrowCart(BorrowCartSettingsModel model)
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageSettings))
                 return AccessDeniedView();
 
             //load settings for a chosen store scope
             var storeScope = this.GetActiveStoreScopeConfiguration(_storeService, _workContext);
-            var shoppingCartSettings = _settingService.LoadSetting<ShoppingCartSettings>(storeScope);
-            shoppingCartSettings = model.ToEntity(shoppingCartSettings);
+            var borrowCartSettings = _settingService.LoadSetting<BorrowCartSettings>(storeScope);
+            borrowCartSettings = model.ToEntity(borrowCartSettings);
 
             /* We do not clear cache after each setting update.
              * This behavior can increase performance because cached settings will not be cleared 
              * and loaded from database after each update */
             if (model.DisplayCartAfterAddingProduct_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.DisplayCartAfterAddingProduct, storeScope, false);
+                _settingService.SaveSetting(borrowCartSettings, x => x.DisplayCartAfterAddingProduct, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.DisplayCartAfterAddingProduct, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.DisplayCartAfterAddingProduct, storeScope);
             
-            if (model.DisplayWishlistAfterAddingProduct_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.DisplayWishlistAfterAddingProduct, storeScope, false);
+            if (model.DisplayMyToyBoxAfterAddingProduct_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.DisplayMyToyBoxAfterAddingProduct, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.DisplayWishlistAfterAddingProduct, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.DisplayMyToyBoxAfterAddingProduct, storeScope);
             
-            if (model.MaximumShoppingCartItems_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.MaximumShoppingCartItems, storeScope, false);
+            if (model.MaximumBorrowCartItems_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.MaximumBorrowCartItems, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.MaximumShoppingCartItems, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.MaximumBorrowCartItems, storeScope);
             
-            if (model.MaximumWishlistItems_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.MaximumWishlistItems, storeScope, false);
+            if (model.MaximumMyToyBoxItems_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.MaximumMyToyBoxItems, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.MaximumWishlistItems, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.MaximumMyToyBoxItems, storeScope);
             
-            if (model.AllowOutOfStockItemsToBeAddedToWishlist_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.AllowOutOfStockItemsToBeAddedToWishlist, storeScope, false);
+            if (model.AllowOutOfStockItemsToBeAddedToMyToyBox_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.AllowOutOfStockItemsToBeAddedToMyToyBox, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.AllowOutOfStockItemsToBeAddedToWishlist, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.AllowOutOfStockItemsToBeAddedToMyToyBox, storeScope);
             
-            if (model.MoveItemsFromWishlistToCart_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.MoveItemsFromWishlistToCart, storeScope, false);
+            if (model.MoveItemsFromMyToyBoxToCart_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.MoveItemsFromMyToyBoxToCart, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.MoveItemsFromWishlistToCart, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.MoveItemsFromMyToyBoxToCart, storeScope);
             
-            if (model.ShowProductImagesOnShoppingCart_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.ShowProductImagesOnShoppingCart, storeScope, false);
+            if (model.ShowProductImagesOnBorrowCart_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.ShowProductImagesOnBorrowCart, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.ShowProductImagesOnShoppingCart, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.ShowProductImagesOnBorrowCart, storeScope);
             
             if (model.ShowProductImagesOnWishList_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.ShowProductImagesOnWishList, storeScope, false);
+                _settingService.SaveSetting(borrowCartSettings, x => x.ShowProductImagesOnWishList, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.ShowProductImagesOnWishList, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.ShowProductImagesOnWishList, storeScope);
             
             if (model.ShowDiscountBox_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.ShowDiscountBox, storeScope, false);
+                _settingService.SaveSetting(borrowCartSettings, x => x.ShowDiscountBox, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.ShowDiscountBox, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.ShowDiscountBox, storeScope);
             
             if (model.ShowGiftCardBox_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.ShowGiftCardBox, storeScope, false);
+                _settingService.SaveSetting(borrowCartSettings, x => x.ShowGiftCardBox, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.ShowGiftCardBox, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.ShowGiftCardBox, storeScope);
             
             if (model.CrossSellsNumber_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.CrossSellsNumber, storeScope, false);
+                _settingService.SaveSetting(borrowCartSettings, x => x.CrossSellsNumber, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.CrossSellsNumber, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.CrossSellsNumber, storeScope);
             
-            if (model.EmailWishlistEnabled_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.EmailWishlistEnabled, storeScope, false);
+            if (model.EmailMyToyBoxEnabled_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.EmailMyToyBoxEnabled, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.EmailWishlistEnabled, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.EmailMyToyBoxEnabled, storeScope);
             
-            if (model.AllowAnonymousUsersToEmailWishlist_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.AllowAnonymousUsersToEmailWishlist, storeScope, false);
+            if (model.AllowAnonymousUsersToEmailMyToyBox_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.AllowAnonymousUsersToEmailMyToyBox, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.AllowAnonymousUsersToEmailWishlist, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.AllowAnonymousUsersToEmailMyToyBox, storeScope);
             
-            if (model.MiniShoppingCartEnabled_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.MiniShoppingCartEnabled, storeScope, false);
+            if (model.MiniBorrowCartEnabled_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.MiniBorrowCartEnabled, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.MiniShoppingCartEnabled, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.MiniBorrowCartEnabled, storeScope);
             
-            if (model.ShowProductImagesInMiniShoppingCart_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.ShowProductImagesInMiniShoppingCart, storeScope, false);
+            if (model.ShowProductImagesInMiniBorrowCart_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.ShowProductImagesInMiniBorrowCart, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.ShowProductImagesInMiniShoppingCart, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.ShowProductImagesInMiniBorrowCart, storeScope);
 
-            if (model.MiniShoppingCartProductNumber_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.MiniShoppingCartProductNumber, storeScope, false);
+            if (model.MiniBorrowCartProductNumber_OverrideForStore || storeScope == 0)
+                _settingService.SaveSetting(borrowCartSettings, x => x.MiniBorrowCartProductNumber, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.MiniShoppingCartProductNumber, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.MiniBorrowCartProductNumber, storeScope);
 
             if (model.AllowCartItemEditing_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(shoppingCartSettings, x => x.AllowCartItemEditing, storeScope, false);
+                _settingService.SaveSetting(borrowCartSettings, x => x.AllowCartItemEditing, storeScope, false);
             else if (storeScope > 0)
-                _settingService.DeleteSetting(shoppingCartSettings, x => x.AllowCartItemEditing, storeScope);
+                _settingService.DeleteSetting(borrowCartSettings, x => x.AllowCartItemEditing, storeScope);
 
             //now clear settings cache
             _settingService.ClearCache();
@@ -2065,7 +2065,7 @@ namespace Nop.Admin.Controllers
             _customerActivityService.InsertActivity("EditSettings", _localizationService.GetResource("ActivityLog.EditSettings"));
 
             SuccessNotification(_localizationService.GetResource("Admin.Configuration.Updated"));
-            return RedirectToAction("ShoppingCart");
+            return RedirectToAction("BorrowCart");
         }
 
 
@@ -2390,7 +2390,7 @@ namespace Nop.Admin.Controllers
             model.SecuritySettings.CaptchaShowOnLoginPage = captchaSettings.ShowOnLoginPage;
             model.SecuritySettings.CaptchaShowOnRegistrationPage = captchaSettings.ShowOnRegistrationPage;
             model.SecuritySettings.CaptchaShowOnContactUsPage = captchaSettings.ShowOnContactUsPage;
-            model.SecuritySettings.CaptchaShowOnEmailWishlistToFriendPage = captchaSettings.ShowOnEmailWishlistToFriendPage;
+            model.SecuritySettings.CaptchaShowOnEmailMyToyBoxToFriendPage = captchaSettings.ShowOnEmailMyToyBoxToFriendPage;
             model.SecuritySettings.CaptchaShowOnEmailProductToFriendPage = captchaSettings.ShowOnEmailProductToFriendPage;
             model.SecuritySettings.CaptchaShowOnBlogCommentPage = captchaSettings.ShowOnBlogCommentPage;
             model.SecuritySettings.CaptchaShowOnNewsCommentPage = captchaSettings.ShowOnNewsCommentPage;
@@ -2629,7 +2629,7 @@ namespace Nop.Admin.Controllers
             captchaSettings.ShowOnLoginPage = model.SecuritySettings.CaptchaShowOnLoginPage;
             captchaSettings.ShowOnRegistrationPage = model.SecuritySettings.CaptchaShowOnRegistrationPage;
             captchaSettings.ShowOnContactUsPage = model.SecuritySettings.CaptchaShowOnContactUsPage;
-            captchaSettings.ShowOnEmailWishlistToFriendPage = model.SecuritySettings.CaptchaShowOnEmailWishlistToFriendPage;
+            captchaSettings.ShowOnEmailMyToyBoxToFriendPage = model.SecuritySettings.CaptchaShowOnEmailMyToyBoxToFriendPage;
             captchaSettings.ShowOnEmailProductToFriendPage = model.SecuritySettings.CaptchaShowOnEmailProductToFriendPage;
             captchaSettings.ShowOnBlogCommentPage = model.SecuritySettings.CaptchaShowOnBlogCommentPage;
             captchaSettings.ShowOnNewsCommentPage = model.SecuritySettings.CaptchaShowOnNewsCommentPage;
@@ -2745,7 +2745,7 @@ namespace Nop.Admin.Controllers
                     throw new NopException(_localizationService.GetResource("Admin.Configuration.Settings.GeneralCommon.EncryptionKey.TheSame"));
 
                 //update encrypted order info
-                var orders = _orderService.SearchOrders();
+                var orders = _orderService.SearchSubscriptionOrders();
                 foreach (var order in orders)
                 {
                     string decryptedCardType = _encryptionService.DecryptText(order.CardType, oldEncryptionPrivateKey);
@@ -2771,7 +2771,7 @@ namespace Nop.Admin.Controllers
                     order.CardCvv2 = encryptedCardCvv2;
                     order.CardExpirationMonth = encryptedCardExpirationMonth;
                     order.CardExpirationYear = encryptedCardExpirationYear;
-                    _orderService.UpdateOrder(order);
+                    _orderService.UpdateSubscriptionOrder(order);
                 }
 
                 //update user information

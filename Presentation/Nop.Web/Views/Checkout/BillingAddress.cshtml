@@ -6,7 +6,7 @@
     //title
     Html.AddTitleParts(T("PageTitle.Checkout").Text);
 }
-<div class="page checkout-page billing-address-page">
+<div class="page checkout-page billing-address-page article">
     @Html.Action("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Address })
     <div class="page-title">
         <h1>@T("Checkout.BillingAddress")</h1>
@@ -122,18 +122,18 @@
                     </div>
                     <div class="enter-address">
                         @{
-                            var validationSummary = Html.ValidationSummary(true);
+            var validationSummary = Html.ValidationSummary(true);
                         }
                         @if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
                         {
                             <div class="message-error">@validationSummary</div>
                         }
                         @{
-                            var dataDictAddress = new ViewDataDictionary();
-                            //Merge ModelState (required for validation)
-                            dataDictAddress.ModelState.Merge(ViewData.ModelState);
-                            dataDictAddress.TemplateInfo.HtmlFieldPrefix = "NewAddress";
-                            @Html.Partial("_CreateOrUpdateAddress", Model.NewAddress, dataDictAddress)
+                        var dataDictAddress = new ViewDataDictionary();
+                        //Merge ModelState (required for validation)
+                        dataDictAddress.ModelState.Merge(ViewData.ModelState);
+                        dataDictAddress.TemplateInfo.HtmlFieldPrefix = "NewAddress";
+                        @Html.Partial("_CreateOrUpdateAddress", Model.NewAddress, dataDictAddress)
                         }
                     </div>
                 </div>
@@ -145,9 +145,10 @@
         }
         <div class="section order-summary">
             <div class="title">
-                <strong>@T("Checkout.OrderSummary")</strong>
+                <strong>@T("Checkout.SubscriptionOrderSummary")</strong>
             </div>
-            @Html.Action("OrderSummary", "ShoppingCart")
+            @Html.Action("SubscriptionOrderSummary", "SubscriptionCart")
         </div>
     </div>
 </div>
+

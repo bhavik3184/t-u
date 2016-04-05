@@ -11,7 +11,7 @@ namespace Nop.Admin.Models.Orders
     {
         public OrderListModel()
         {
-            AvailableOrderStatuses = new List<SelectListItem>();
+            AvailableSubscriptionOrderStatuses = new List<SelectListItem>();
             AvailablePaymentStatuses = new List<SelectListItem>();
             AvailableShippingStatuses = new List<SelectListItem>();
             AvailableStores = new List<SelectListItem>();
@@ -28,8 +28,8 @@ namespace Nop.Admin.Models.Orders
         [NopResourceDisplayName("Admin.Orders.List.EndDate")]
         [UIHint("DateNullable")]
         public DateTime? EndDate { get; set; }
-        [NopResourceDisplayName("Admin.Orders.List.OrderStatus")]
-        public int OrderStatusId { get; set; }
+        [NopResourceDisplayName("Admin.Orders.List.SubscriptionOrderStatus")]
+        public int SubscriptionOrderStatusId { get; set; }
         [NopResourceDisplayName("Admin.Orders.List.PaymentStatus")]
         public int PaymentStatusId { get; set; }
         [NopResourceDisplayName("Admin.Orders.List.ShippingStatus")]
@@ -65,9 +65,9 @@ namespace Nop.Admin.Models.Orders
         [AllowHtml]
         public string OrderNotes { get; set; }
 
-        [NopResourceDisplayName("Admin.Orders.List.OrderGuid")]
+        [NopResourceDisplayName("Admin.Orders.List.SubscriptionOrderGuid")]
         [AllowHtml]
-        public string OrderGuid { get; set; }
+        public string SubscriptionOrderGuid { get; set; }
 
         [NopResourceDisplayName("Admin.Orders.List.GoDirectlyToNumber")]
         [AllowHtml]
@@ -76,7 +76,7 @@ namespace Nop.Admin.Models.Orders
         public bool IsLoggedInAsVendor { get; set; }
 
 
-        public IList<SelectListItem> AvailableOrderStatuses { get; set; }
+        public IList<SelectListItem> AvailableSubscriptionOrderStatuses { get; set; }
         public IList<SelectListItem> AvailablePaymentStatuses { get; set; }
         public IList<SelectListItem> AvailableShippingStatuses { get; set; }
         public IList<SelectListItem> AvailableStores { get; set; }

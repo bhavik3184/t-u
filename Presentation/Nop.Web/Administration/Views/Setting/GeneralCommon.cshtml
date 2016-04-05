@@ -361,7 +361,7 @@
             $('#ssCaptchaShowOnLoginPagepnl').show();
             $('#ssCaptchaShowOnRegistrationPagepnl').show();
             $('#ssCaptchaShowOnContactUsPagepnl').show();
-            $('#ssCaptchaShowOnEmailWishlistToFriendPagepnl').show();
+            $('#ssCaptchaShowOnEmailMyToyBoxToFriendPagepnl').show();
             $('#ssCaptchaShowOnEmailProductToFriendPagepnl').show();
             $('#ssCaptchaShowOnBlogCommentPagepnl').show();
             $('#ssCaptchaShowOnNewsCommentPagepnl').show();
@@ -374,7 +374,7 @@
             $('#ssCaptchaShowOnLoginPagepnl').hide();
             $('#ssCaptchaShowOnRegistrationPagepnl').hide();
             $('#ssCaptchaShowOnContactUsPagepnl').hide();
-            $('#ssCaptchaShowOnEmailWishlistToFriendPagepnl').hide();
+            $('#ssCaptchaShowOnEmailMyToyBoxToFriendPagepnl').hide();
             $('#ssCaptchaShowOnEmailProductToFriendPagepnl').hide();
             $('#ssCaptchaShowOnBlogCommentPagepnl').hide();
             $('#ssCaptchaShowOnNewsCommentPagepnl').hide();
@@ -490,13 +490,13 @@
                 @Html.ValidationMessageFor(model => model.SecuritySettings.CaptchaShowOnContactUsPage)
             </td>
         </tr>
-        <tr id="ssCaptchaShowOnEmailWishlistToFriendPagepnl">
+        <tr id="ssCaptchaShowOnEmailMyToyBoxToFriendPagepnl">
             <td class="adminTitle">
-                @Html.NopLabelFor(model => model.SecuritySettings.CaptchaShowOnEmailWishlistToFriendPage):
+                @Html.NopLabelFor(model => model.SecuritySettings.CaptchaShowOnEmailMyToyBoxToFriendPage):
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.SecuritySettings.CaptchaShowOnEmailWishlistToFriendPage)
-                @Html.ValidationMessageFor(model => model.SecuritySettings.CaptchaShowOnEmailWishlistToFriendPage)
+                @Html.EditorFor(model => model.SecuritySettings.CaptchaShowOnEmailMyToyBoxToFriendPage)
+                @Html.ValidationMessageFor(model => model.SecuritySettings.CaptchaShowOnEmailMyToyBoxToFriendPage)
             </td>
         </tr>
         <tr id="ssCaptchaShowOnEmailProductToFriendPagepnl">

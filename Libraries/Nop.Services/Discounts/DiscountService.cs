@@ -6,14 +6,14 @@ using Nop.Core.Caching;
 using Nop.Core.Data;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Discounts;
-using Nop.Core.Domain.Orders;
+using Nop.Core.Domain.SubscriptionOrders;
 using Nop.Core.Infrastructure;
 using Nop.Core.Plugins;
 using Nop.Services.Common;
 using Nop.Services.Discounts.Cache;
 using Nop.Services.Events;
 using Nop.Services.Localization;
-using Nop.Services.Orders;
+using Nop.Services.SubscriptionOrders;
 
 namespace Nop.Services.Discounts
 {
@@ -329,18 +329,18 @@ namespace Nop.Services.Discounts
 
             //Do not allow discounts applied to order subtotal or total when a customer has gift cards in the cart.
             //Otherwise, this customer can purchase gift cards with discount and get more than paid ("free money").
-            if (discount.DiscountType == DiscountType.AssignedToOrderSubTotal ||
-                discount.DiscountType == DiscountType.AssignedToOrderTotal)
+            if (discount.DiscountType == DiscountType.AssignedToSubscriptionOrderSubTotal ||
+                discount.DiscountType == DiscountType.AssignedToSubscriptionOrderTotal)
             {
-                var cart = customer.ShoppingCartItems
-                    .Where(sci => sci.ShoppingCartType == ShoppingCartType.ShoppingCart)
+                var cart = customer.SubscriptionCartItems
+                    .Where(sci => sci.SubscriptionCartType == SubscriptionCartType.SubscriptionCart)
                     .LimitPerStore(_storeContext.CurrentStore.Id)
                     .ToList();
 
-                var hasGiftCards = cart.Any(x => x.Product.IsGiftCard);
+                var hasGiftCards = cart.Any(x => x.Plan.IsGiftCard);
                 if (hasGiftCards)
                 {
-                    result.UserError = _localizationService.GetResource("ShoppingCart.Discount.CannotBeUsedWithGiftCards");
+                    result.UserError = _localizationService.GetResource("SubscriptionCart.Discount.CannotBeUsedWithGiftCards");
                     return result;
                 }
             }
@@ -352,7 +352,7 @@ namespace Nop.Services.Discounts
                 DateTime startDate = DateTime.SpecifyKind(discount.StartDateUtc.Value, DateTimeKind.Utc);
                 if (startDate.CompareTo(now) > 0)
                 {
-                    result.UserError = _localizationService.GetResource("ShoppingCart.Discount.NotStartedYet");
+                    result.UserError = _localizationService.GetResource("SubscriptionCart.Discount.NotStartedYet");
                     return result;
                 }
             }
@@ -361,7 +361,7 @@ namespace Nop.Services.Discounts
                 DateTime endDate = DateTime.SpecifyKind(discount.EndDateUtc.Value, DateTimeKind.Utc);
                 if (endDate.CompareTo(now) < 0)
                 {
-                    result.UserError = _localizationService.GetResource("ShoppingCart.Discount.Expired");
+                    result.UserError = _localizationService.GetResource("SubscriptionCart.Discount.Expired");
                     return result;
                 }
             }
@@ -383,7 +383,7 @@ namespace Nop.Services.Discounts
                             var usedTimes = GetAllDiscountUsageHistory(discount.Id, customer.Id, null, 0, 1).TotalCount;
                             if (usedTimes >= discount.LimitationTimes)
                             {
-                                result.UserError = _localizationService.GetResource("ShoppingCart.Discount.CannotBeUsedAnymore");
+                                result.UserError = _localizationService.GetResource("SubscriptionCart.Discount.CannotBeUsedAnymore");
                                 return result;
                             }
                         }
@@ -456,7 +456,7 @@ namespace Nop.Services.Discounts
         /// </summary>
         /// <param name="discountId">Discount identifier; null to load all records</param>
         /// <param name="customerId">Customer identifier; null to load all records</param>
-        /// <param name="orderId">Order identifier; null to load all records</param>
+        /// <param name="orderId">SubscriptionOrder identifier; null to load all records</param>
         /// <param name="pageIndex">Page index</param>
         /// <param name="pageSize">Page size</param>
         /// <returns>Discount usage history records</returns>
@@ -468,9 +468,9 @@ namespace Nop.Services.Discounts
             if (discountId.HasValue && discountId.Value > 0)
                 query = query.Where(duh => duh.DiscountId == discountId.Value);
             if (customerId.HasValue && customerId.Value > 0)
-                query = query.Where(duh => duh.Order != null && duh.Order.CustomerId == customerId.Value);
+                query = query.Where(duh => duh.SubscriptionOrder != null && duh.SubscriptionOrder.CustomerId == customerId.Value);
             if (orderId.HasValue && orderId.Value > 0)
-                query = query.Where(duh => duh.OrderId == orderId.Value);
+                query = query.Where(duh => duh.SubscriptionOrderId == orderId.Value);
             query = query.OrderByDescending(c => c.CreatedOnUtc);
             return new PagedList<DiscountUsageHistory>(query, pageIndex, pageSize);
         }
