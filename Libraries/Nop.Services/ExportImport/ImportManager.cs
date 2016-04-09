@@ -12,6 +12,8 @@ using Nop.Services.Media;
 using Nop.Services.Messages;
 using Nop.Services.Seo;
 using OfficeOpenXml;
+using Nop.Services.SubscriptionOrders;
+using Nop.Core.Domain.SubscriptionOrders;
 
 namespace Nop.Services.ExportImport
 {
@@ -24,6 +26,9 @@ namespace Nop.Services.ExportImport
 
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
+        private readonly ISpecificationAttributeService _specificationAttributeService;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IGiftCardService _giftCardService;
         private readonly IManufacturerService _manufacturerService;
         private readonly IPictureService _pictureService;
         private readonly IUrlRecordService _urlRecordService;
@@ -41,6 +46,9 @@ namespace Nop.Services.ExportImport
 
         public ImportManager(IProductService productService, 
             ICategoryService categoryService,
+            ISpecificationAttributeService specificationAttributeService,
+            IProductAttributeService productAttributeService,
+            IGiftCardService giftCardService,
             IManufacturerService manufacturerService,
             IPictureService pictureService,
             IUrlRecordService urlRecordService,
@@ -52,6 +60,9 @@ namespace Nop.Services.ExportImport
             ILocalityService localityService)
         {
             this._productService = productService;
+            this._specificationAttributeService = specificationAttributeService;
+            this._productAttributeService = productAttributeService;
+            this._giftCardService = giftCardService;
             this._categoryService = categoryService;
             this._manufacturerService = manufacturerService;
             this._pictureService = pictureService;
@@ -104,6 +115,119 @@ namespace Nop.Services.ExportImport
         #endregion
 
         #region Methods
+
+
+        public virtual void ImportManufacturersFromXlsx(Stream stream)
+        {
+            // ok, we can run the real code of the sample now
+            using (var xlPackage = new ExcelPackage(stream))
+            {
+                // get the first worksheet in the workbook
+                var worksheet = xlPackage.Workbook.Worksheets.FirstOrDefault();
+                if (worksheet == null)
+                    throw new NopException("No worksheet found");
+
+                //the columns
+                var properties = new[]
+                {
+                    "Id",
+                    "Name",
+                    "Description",
+                    "ManufacturerTemplateId",
+                    "MetaKeywords",
+                    "MetaDescription",
+                    "MetaTitle",
+                    "PictureId",
+                    "PageSize",
+                    "AllowCustomersToSelectPageSize",
+                    "PageSizeOptions",
+                    "PriceRanges",
+                    "HasDiscountsApplied",
+                    "SubjectToAcl",
+                    "LimitedToStores",
+                    "Published",
+                    "Deleted",
+                    "DisplayOrder"
+                   
+                };
+
+
+                int iRow = 2;
+                while (true)
+                {
+                    bool allColumnsAreEmpty = true;
+                    for (var i = 1; i <= properties.Length; i++)
+                        if (worksheet.Cells[iRow, i].Value != null && !String.IsNullOrEmpty(worksheet.Cells[iRow, i].Value.ToString()))
+                        {
+                            allColumnsAreEmpty = false;
+                            break;
+                        }
+                    if (allColumnsAreEmpty)
+                        break;
+
+                    int Id = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "Id")].Value);
+                    string Name = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Name")].Value);
+                    string Description = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Description")].Value);
+                    int ManufacturerTemplateId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "ManufacturerTemplateId")].Value);
+                    string MetaKeywords = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaKeywords")].Value);
+                    string MetaDescription = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaDescription")].Value);
+                    string MetaTitle = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaTitle")].Value);
+                    int PictureId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "PictureId")].Value);
+                    int PageSize = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "PageSize")].Value);
+                    bool AllowCustomersToSelectPageSize = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "AllowCustomersToSelectPageSize")].Value);
+                    string PageSizeOptions = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "PageSizeOptions")].Value);
+                    string PriceRanges = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "PriceRanges")].Value);
+                    bool HasDiscountsApplied = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "HasDiscountsApplied")].Value);
+                    bool SubjectToAcl = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "SubjectToAcl")].Value);
+                    bool LimitedToStores = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "LimitedToStores")].Value);
+                    bool Published = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "Published")].Value);
+                    bool Deleted = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "Deleted")].Value);
+                    int DisplayOrder = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "DisplayOrder")].Value);
+
+                    //DateTime createdOnUtc = DateTime.FromOADate(Convert.ToDouble(worksheet.Cells[iRow, GetColumnIndex(properties, "CreatedOnUtc")].Value));
+
+                    var manufacturer = _manufacturerService.GetManufacturerById(Id);
+
+                    bool newMan = false;
+                    if (manufacturer == null)
+                    {
+                        manufacturer = new Manufacturer();
+                        newMan = true;
+                    }
+
+                    manufacturer.Name = Name;
+                    manufacturer.Description = Description;
+                    manufacturer.ManufacturerTemplateId = ManufacturerTemplateId;
+                    manufacturer.Description = MetaKeywords;
+                    manufacturer.MetaDescription = MetaDescription;
+                    manufacturer.MetaTitle = MetaTitle;
+                    manufacturer.PictureId = PictureId;
+                    manufacturer.PageSize = PageSize;
+                    manufacturer.AllowCustomersToSelectPageSize = AllowCustomersToSelectPageSize;
+                    manufacturer.PageSizeOptions = PageSizeOptions;
+                    manufacturer.PriceRanges = PriceRanges;
+                  //  manufacturer.HasDiscountsApplied = HasDiscountsApplied;
+                    manufacturer.SubjectToAcl = SubjectToAcl;
+                    manufacturer.LimitedToStores = LimitedToStores;
+                    manufacturer.Published = Published;
+                    manufacturer.Deleted = Deleted;
+                    manufacturer.DisplayOrder = DisplayOrder;
+                    manufacturer.UpdatedOnUtc = DateTime.Now;
+                    manufacturer.CreatedOnUtc = DateTime.Now;
+
+                    if (newMan)
+                    {
+                        _manufacturerService.InsertManufacturer(manufacturer);
+                    }
+                    else
+                    {
+                        _manufacturerService.UpdateManufacturer(manufacturer);
+                    }
+
+                    iRow++;
+                }
+            }
+        }
 
         public virtual void ImportCategoriesFromXlsx(Stream stream)
         {
@@ -703,6 +827,892 @@ namespace Nop.Services.ExportImport
             }
         }
 
+
+        public virtual void ImportSimpleProductsFromXlsx(Stream stream)
+        {
+            // ok, we can run the real code of the sample now
+            using (var xlPackage = new ExcelPackage(stream))
+            {
+                // get the first worksheet in the workbook
+                var worksheet = xlPackage.Workbook.Worksheets.FirstOrDefault();
+                if (worksheet == null)
+                    throw new NopException("No worksheet found");
+
+                //the columns
+                var properties = new[]
+                {
+                    "Name",
+                    "FullDescription",
+                    "VendorId",
+                    "MetaKeywords",
+                    "MetaDescription",
+                    "MetaTitle",
+                    "SeName",
+                    "Published",
+                    "SKU",
+                    "AdditionalShippingCharge",
+                    "TaxCategoryId",
+                    "StockQuantity",
+                    "MinStockQuantity",
+                    "NotifyAdminForQuantityBelow",
+                    "Price",
+                    "OldPrice",
+                    "ProductCost",
+                    "SpecialPrice",
+                    "SpecialPriceStartDateTimeUtc",
+                    "SpecialPriceEndDateTimeUtc",
+                    "Weight",
+                    "CategoryIds",
+                    "ManufacturerIds",
+                    "Picture1",
+                    "Picture2",
+                    "Picture3",
+                    "Picture4",
+                    "Picture5",
+                    "Picture6",
+                    "Picture7",
+                    "Picture8",
+                    "Picture9",
+                    "AttributeColor",
+                    "Color",
+                    "ColorType",
+                    "Player",
+                    "PlayerType",
+                    "Dimension",
+                    "DimensionType",
+                    "Age",
+                    "AgeType",
+                    "Gender",
+                    "GenderType",
+                    "Power",
+                    "PowerType",
+                    "Light",
+                    "LightType",
+                    "Material",
+                    "MaterialType" 
+                    
+                };
+
+                string prevsku = "";
+                int iRow = 2;
+                while (true)
+                {
+
+                    bool allColumnsAreEmpty = true;
+                    for (var i = 1; i <= properties.Length; i++)
+                        if (worksheet.Cells[iRow, i].Value != null && !String.IsNullOrEmpty(worksheet.Cells[iRow, i].Value.ToString()))
+                        {
+                            allColumnsAreEmpty = false;
+                            break;
+                        }
+                    if (allColumnsAreEmpty)
+                        break;
+
+                    int productTypeId = 5;
+                    int parentGroupedProductId = 0;
+                    bool visibleIndividually = true;
+                    string name = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Name")].Value);
+                    string shortDescription = name;
+                    string fullDescription = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "FullDescription")].Value);
+                    int vendorId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "VendorId")].Value);
+                    int productTemplateId = 1;
+                    bool showOnHomePage = true;
+                    string metaKeywords = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaKeywords")].Value);
+                    string metaDescription = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaDescription")].Value);
+                    string metaTitle = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaTitle")].Value);
+                    string seName = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "SeName")].Value);
+                    bool allowCustomerReviews = true;
+                    bool published = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "Published")].Value);
+                    string sku = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "SKU")].Value);
+                    string manufacturerPartNumber = "";
+                    string gtin = "";
+                    bool isGiftCard = false;
+                    int giftCardTypeId = 1;
+                    bool requireOtherProducts = false;
+                    string requiredProductIds = "";
+                    bool automaticallyAddRequiredProducts = false;
+                    bool isDownload = false;
+                    int downloadId = 0;
+                    bool unlimitedDownloads = false;
+                    int maxNumberOfDownloads = 0;
+                    int downloadActivationTypeId = 0;
+                    bool hasSampleDownload = false;
+                    int sampleDownloadId = 0;
+                    bool hasUserAgreement = false;
+                    string userAgreementText = "";
+                    bool isRecurring = false;
+                    int recurringCycleLength = 0;
+                    int recurringCyclePeriodId = 0;
+                    int recurringTotalCycles = 0;
+                    bool isRental = false;
+                    int rentalPriceLength = 0;
+                    int rentalPricePeriodId = 0;
+                    bool isShipEnabled = true;
+                    bool isFreeShipping = false;
+                    bool shipSeparately = false;
+                    decimal additionalShippingCharge = Convert.ToDecimal(worksheet.Cells[iRow, GetColumnIndex(properties, "AdditionalShippingCharge")].Value);
+                    int deliveryDateId = 1;
+                    bool isTaxExempt = false;
+                    int taxCategoryId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "TaxCategoryId")].Value);
+                    bool isTelecommunicationsOrBroadcastingOrElectronicServices = false;
+                    int manageInventoryMethodId = 1;
+                    bool useMultipleWarehouses = false;
+                    int warehouseId = 0;
+                    int stockQuantity = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "StockQuantity")].Value);
+                    bool displayStockAvailability = true;
+                    bool displayStockQuantity = false;
+                    int minStockQuantity = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "MinStockQuantity")].Value);
+                    int lowStockActivityId = 0;
+                    int notifyAdminForQuantityBelow = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "NotifyAdminForQuantityBelow")].Value);
+                    int backorderModeId = 0;
+                    bool allowBackInStockSubscriptions = false;
+                    int orderMinimumQuantity = 1;
+                    int orderMaximumQuantity = 1000;
+                    string allowedQuantities = "";
+                    bool allowAddingOnlyExistingAttributeCombinations = false;
+                    bool disableBuyButton = false;
+                    bool disableWishlistButton = true;
+                    bool availableForPreOrder = true;
+                    DateTime? preOrderAvailabilityStartDateTimeUtc = null;
+
+                    bool callForPrice = false;
+                    decimal price = Convert.ToDecimal(worksheet.Cells[iRow, GetColumnIndex(properties, "Price")].Value);
+                    decimal oldPrice = Convert.ToDecimal(worksheet.Cells[iRow, GetColumnIndex(properties, "OldPrice")].Value);
+                    decimal productCost = Convert.ToDecimal(worksheet.Cells[iRow, GetColumnIndex(properties, "ProductCost")].Value);
+                    decimal? specialPrice = null;
+                    var specialPriceExcel = worksheet.Cells[iRow, GetColumnIndex(properties, "SpecialPrice")].Value;
+                    if (specialPriceExcel != null)
+                        specialPrice = Convert.ToDecimal(specialPriceExcel);
+                    DateTime? specialPriceStartDateTimeUtc = null;
+                    var specialPriceStartDateTimeUtcExcel = worksheet.Cells[iRow, GetColumnIndex(properties, "SpecialPriceStartDateTimeUtc")].Value;
+                    if (specialPriceStartDateTimeUtcExcel != null)
+                        specialPriceStartDateTimeUtc = DateTime.FromOADate(Convert.ToDouble(specialPriceStartDateTimeUtcExcel));
+                    DateTime? specialPriceEndDateTimeUtc = null;
+                    var specialPriceEndDateTimeUtcExcel = worksheet.Cells[iRow, GetColumnIndex(properties, "SpecialPriceEndDateTimeUtc")].Value;
+                    if (specialPriceEndDateTimeUtcExcel != null)
+                        specialPriceEndDateTimeUtc = DateTime.FromOADate(Convert.ToDouble(specialPriceEndDateTimeUtcExcel));
+
+                    bool customerEntersPrice = false;
+                    decimal minimumCustomerEnteredPrice = 0;
+                    decimal maximumCustomerEnteredPrice = 0;
+                    bool basepriceEnabled = false;
+                    decimal basepriceAmount = 0;
+                    int basepriceUnitId = 1;
+                    decimal basepriceBaseAmount = 0;
+                    int basepriceBaseUnitId = 1;
+                    decimal weight = Convert.ToDecimal(worksheet.Cells[iRow, GetColumnIndex(properties, "Weight")].Value);
+                    decimal length = 0;
+                    decimal width = 0;
+                    decimal height = 0;
+                    DateTime createdOnUtc = DateTime.Now;
+                    string categoryIds = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "CategoryIds")].Value);
+                    string manufacturerIds = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "ManufacturerIds")].Value);
+                    string picture1 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture1")].Value);
+                    string picture2 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture2")].Value);
+                    string picture3 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture3")].Value);
+                    string picture4 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture4")].Value);
+                    string picture5 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture5")].Value);
+                    string picture6 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture6")].Value);
+                    string picture7 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture7")].Value);
+                    string picture8 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture8")].Value);
+                    string picture9 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture9")].Value);
+                    string attributeColor = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "AttributeColor")].Value);
+                    string color = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Color")].Value);
+                    int colorType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "ColorType")].Value);
+                    string player = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Player")].Value);
+                    int playerType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "PlayerType")].Value);
+                    string dimension = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Dimension")].Value);
+                    int dimensionType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "DimensionType")].Value);
+                    string age = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Age")].Value);
+                    int ageType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "AgeType")].Value);
+                    string gender = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Gender")].Value);
+                    int genderType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "GenderType")].Value);
+                    string power = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Power")].Value);
+                    int powerType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "PowerType")].Value);
+                    string light = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Light")].Value);
+                    int lightType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "LightType")].Value);
+                    string material = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Material")].Value);
+                    int materialType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "MaterialType")].Value);
+                   
+
+                    if (sku == null && attributeColor != null)
+                    {
+                        if (attributeColor.Length > 0)
+                        {
+                            var product1 = _productService.GetProductBySku(prevsku);
+
+                            //pictures
+                            foreach (var picturePath in new[] { picture1, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9 })
+                            {
+
+                                if (String.IsNullOrEmpty(picturePath))
+                                    continue;
+
+                                String ext = System.IO.Path.GetExtension(picturePath);
+                                string picturePath1 = "";
+                                if (ext.ToLower() != ".jpg" && ext.ToLower() != ".png" && ext.ToLower() != ".bmp" && ext.ToLower() != ".gif" && ext.ToLower() != ".jpeg")
+                                {
+                                    picturePath1 = "F:\\KhiloonaImport\\Import\\Product\\" + picturePath + ".jpg";
+                                    // picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath + ".jpg";
+
+                                }
+                                else
+                                {
+                                    picturePath1 = "F:\\KhiloonaImport\\Import\\Product\\" + picturePath;
+                                    //  picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath;
+                                }
+
+
+                                if (System.IO.File.Exists(picturePath1))
+                                {
+                                    var mimeType = GetMimeTypeFromFilePath(picturePath1);
+                                    var newPictureBinary = File.ReadAllBytes(picturePath1);
+                                    var pictureAlreadyExists = false;
+
+                                    //compare with existing product pictures
+                                    var existingPictures = _pictureService.GetPicturesByProductId(product1.Id);
+                                    foreach (var existingPicture in existingPictures)
+                                    {
+                                        var existingBinary = _pictureService.LoadPictureBinary(existingPicture);
+                                        //picture binary after validation (like in database)
+                                        var validatedPictureBinary = _pictureService.ValidatePicture(newPictureBinary, mimeType);
+                                        if (existingBinary.SequenceEqual(validatedPictureBinary))
+                                        {
+                                            //the same picture content
+                                            pictureAlreadyExists = true;
+                                            break;
+                                        }
+                                    }
+
+
+                                    if (!pictureAlreadyExists)
+                                    {
+                                        if (attributeColor != null)
+                                            if (attributeColor.Length > 0)
+                                            {
+                                                product1.ProductPictures.Add(new ProductPicture
+                                                {
+                                                    Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product1.Name), attributeColor, _pictureService.GetPictureSeName(product1.Name)),
+                                                    DisplayOrder = 1,
+                                                });
+                                            }
+                                            else
+                                            {
+                                                product1.ProductPictures.Add(new ProductPicture
+                                                {
+                                                    Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product1.Name)),
+                                                    DisplayOrder = 1,
+                                                });
+                                            }
+                                        // _productService.UpdateProduct(product);
+                                    }
+                                }
+
+                                //update "HasTierPrices" and "HasDiscountsApplied" properties
+                                //  _productService.UpdateHasTierPricesProperty(product);
+                                // _productService.UpdateHasDiscountsApplied(product);
+
+
+                            }
+                            SaveProductAttributes("Color", attributeColor, product1);
+                            iRow++;
+                        }
+                    }
+                    else
+                    {
+                        sku = sku.Trim();
+                        prevsku = sku;
+                        var product = _productService.GetProductBySku(sku);
+                        bool newProduct = false;
+                        if (product == null)
+                        {
+                            product = new Product();
+                            newProduct = true;
+                            product.CreatedOnUtc = createdOnUtc;
+                        }
+                        product.ProductTypeId = productTypeId;
+                        product.ParentGroupedProductId = parentGroupedProductId;
+                        product.VisibleIndividually = visibleIndividually;
+                        product.Name = name;
+                        product.ShortDescription = shortDescription;
+                        product.FullDescription = fullDescription;
+                        product.VendorId = vendorId;
+                        product.ProductTemplateId = productTemplateId;
+                        product.ShowOnHomePage = showOnHomePage;
+                        product.MetaKeywords = metaKeywords;
+                        product.MetaDescription = metaDescription;
+                        product.MetaTitle = metaTitle;
+                        product.AllowCustomerReviews = allowCustomerReviews;
+                        product.Sku = sku;
+                        product.ManufacturerPartNumber = manufacturerPartNumber;
+                        product.Gtin = gtin;
+                        product.IsGiftCard = isGiftCard;
+                        product.GiftCardTypeId = giftCardTypeId;
+                        product.RequireOtherProducts = requireOtherProducts;
+                        product.RequiredProductIds = requiredProductIds;
+                        product.AutomaticallyAddRequiredProducts = automaticallyAddRequiredProducts;
+                        product.IsDownload = isDownload;
+                        product.DownloadId = downloadId;
+                        product.UnlimitedDownloads = unlimitedDownloads;
+                        product.MaxNumberOfDownloads = maxNumberOfDownloads;
+                        product.DownloadActivationTypeId = downloadActivationTypeId;
+                        product.HasSampleDownload = hasSampleDownload;
+                        product.SampleDownloadId = sampleDownloadId;
+                        product.HasUserAgreement = hasUserAgreement;
+                        product.UserAgreementText = userAgreementText;
+                        product.IsRecurring = isRecurring;
+                        product.RecurringCycleLength = recurringCycleLength;
+                        product.RecurringCyclePeriodId = recurringCyclePeriodId;
+                        product.RecurringTotalCycles = recurringTotalCycles;
+                        product.IsRental = isRental;
+                        product.RentalPriceLength = rentalPriceLength;
+                        product.RentalPricePeriodId = rentalPricePeriodId;
+                        product.IsShipEnabled = isShipEnabled;
+                        product.IsFreeShipping = isFreeShipping;
+                        product.ShipSeparately = shipSeparately;
+                        product.AdditionalShippingCharge = additionalShippingCharge;
+                        product.DeliveryDateId = deliveryDateId;
+                        product.IsTaxExempt = isTaxExempt;
+                        product.TaxCategoryId = taxCategoryId;
+                        product.IsTelecommunicationsOrBroadcastingOrElectronicServices = isTelecommunicationsOrBroadcastingOrElectronicServices;
+                        product.ManageInventoryMethodId = manageInventoryMethodId;
+                        product.UseMultipleWarehouses = useMultipleWarehouses;
+                        product.WarehouseId = warehouseId;
+                        product.StockQuantity = stockQuantity;
+                        product.DisplayStockAvailability = displayStockAvailability;
+                        product.DisplayStockQuantity = displayStockQuantity;
+                        product.MinStockQuantity = minStockQuantity;
+                        product.LowStockActivityId = lowStockActivityId;
+                        product.NotifyAdminForQuantityBelow = notifyAdminForQuantityBelow;
+                        product.BackorderModeId = backorderModeId;
+                        product.AllowBackInStockSubscriptions = allowBackInStockSubscriptions;
+                        product.OrderMinimumQuantity = orderMinimumQuantity;
+                        product.OrderMaximumQuantity = orderMaximumQuantity;
+                        product.AllowedQuantities = allowedQuantities;
+                        product.AllowAddingOnlyExistingAttributeCombinations = allowAddingOnlyExistingAttributeCombinations;
+                        product.DisableBuyButton = disableBuyButton;
+                        product.DisableMyToyBoxButton = disableWishlistButton;
+                        product.AvailableForPreOrder = availableForPreOrder;
+                        product.PreOrderAvailabilityStartDateTimeUtc = preOrderAvailabilityStartDateTimeUtc;
+                        product.CallForPrice = callForPrice;
+                        product.Price = price;
+                        product.OldPrice = oldPrice;
+                        product.ProductCost = productCost;
+                        product.SpecialPrice = specialPrice;
+                        product.SpecialPriceStartDateTimeUtc = specialPriceStartDateTimeUtc;
+                        product.SpecialPriceEndDateTimeUtc = specialPriceEndDateTimeUtc;
+                        product.CustomerEntersPrice = customerEntersPrice;
+                        product.MinimumCustomerEnteredPrice = minimumCustomerEnteredPrice;
+                        product.MaximumCustomerEnteredPrice = maximumCustomerEnteredPrice;
+                        product.BasepriceEnabled = basepriceEnabled;
+                        product.BasepriceAmount = basepriceAmount;
+                        product.BasepriceUnitId = basepriceUnitId;
+                        product.BasepriceBaseAmount = basepriceBaseAmount;
+                        product.BasepriceBaseUnitId = basepriceBaseUnitId;
+                        product.Weight = weight;
+                        product.Length = length;
+                        product.Width = width;
+                        product.Height = height;
+                        product.Published = published;
+                        product.UpdatedOnUtc = DateTime.UtcNow;
+                        if (newProduct)
+                        {
+                            _productService.InsertProduct(product);
+                        }
+                        else
+                        {
+                            _productService.UpdateProduct(product);
+                        }
+
+                        //search engine name
+                        _urlRecordService.SaveSlug(product, product.ValidateSeName(seName, product.Name, true), 0);
+
+                        //category mappings
+                        if (!String.IsNullOrEmpty(categoryIds))
+                        {
+                            foreach (var id in categoryIds.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt32(x.Trim())))
+                            {
+                                if (product.ProductCategories.FirstOrDefault(x => x.CategoryId == id) == null)
+                                {
+                                    //ensure that category exists
+                                    var category = _categoryService.GetCategoryById(id);
+                                    if (category != null)
+                                    {
+                                        var productCategory = new ProductCategory
+                                        {
+                                            ProductId = product.Id,
+                                            CategoryId = category.Id,
+                                            IsFeaturedProduct = false,
+                                            DisplayOrder = 1
+                                        };
+                                        _categoryService.InsertProductCategory(productCategory);
+                                    }
+                                }
+                            }
+                        }
+
+                        //manufacturer mappings
+                        if (!String.IsNullOrEmpty(manufacturerIds))
+                        {
+                            foreach (var id in manufacturerIds.Split(new[] { ';' }))
+                            {
+                                if (product.ProductManufacturers.FirstOrDefault(x => x.Manufacturer.Name == id) == null)
+                                {
+                                    if (id.Length > 0)
+                                    {
+                                        //ensure that manufacturer exists
+                                        var manufacturer = _manufacturerService.GetAllManufacturers(id).FirstOrDefault();
+                                        if (manufacturer != null)
+                                        {
+                                            var productManufacturer = new ProductManufacturer
+                                            {
+                                                ProductId = product.Id,
+                                                ManufacturerId = manufacturer.Id,
+                                                IsFeaturedProduct = false,
+                                                DisplayOrder = 1
+                                            };
+                                            _manufacturerService.InsertProductManufacturer(productManufacturer);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
+                        //pictures
+                        foreach (var picturePath in new[] { picture1, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9 })
+                        {
+
+                            if (String.IsNullOrEmpty(picturePath))
+                                continue;
+
+                            String ext = System.IO.Path.GetExtension(picturePath);
+                            string picturePath1 = "";
+                            if (ext.ToLower() != ".jpg" && ext.ToLower() != ".png" && ext.ToLower() != ".bmp" && ext.ToLower() != ".gif" && ext.ToLower() != ".jpeg")
+                            {
+                                picturePath1 = "F:\\KhiloonaImport\\Import\\Product\\" + picturePath + ".jpg";
+                                //picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath + ".jpg";
+
+                            }
+                            else
+                            {
+                                picturePath1 = "F:\\KhiloonaImport\\Import\\Product\\" + picturePath;
+                                //picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath;
+                            }
+
+
+                            if (System.IO.File.Exists(picturePath1))
+                            {
+                                var mimeType = GetMimeTypeFromFilePath(picturePath1);
+                                var newPictureBinary = File.ReadAllBytes(picturePath1);
+                                var pictureAlreadyExists = false;
+                                if (!newProduct)
+                                {
+                                    //compare with existing product pictures
+                                    var existingPictures = _pictureService.GetPicturesByProductId(product.Id);
+                                    foreach (var existingPicture in existingPictures)
+                                    {
+                                        var existingBinary = _pictureService.LoadPictureBinary(existingPicture);
+                                        //picture binary after validation (like in database)
+                                        var validatedPictureBinary = _pictureService.ValidatePicture(newPictureBinary, mimeType);
+                                        if (existingBinary.SequenceEqual(validatedPictureBinary))
+                                        {
+                                            //the same picture content
+                                            pictureAlreadyExists = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+
+                                if (!pictureAlreadyExists)
+                                {
+                                    if (attributeColor != null)
+                                    {
+                                        if (attributeColor.Length > 0)
+                                        {
+                                            product.ProductPictures.Add(new ProductPicture
+                                            {
+                                                Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product.Name), attributeColor, _pictureService.GetPictureSeName(product.Name)),
+                                                DisplayOrder = 1,
+                                            });
+                                        }
+                                        else
+                                        {
+                                            product.ProductPictures.Add(new ProductPicture
+                                            {
+                                                Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product.Name)),
+                                                DisplayOrder = 1,
+                                            });
+                                        }
+                                    }
+                                    else
+                                    {
+                                        product.ProductPictures.Add(new ProductPicture
+                                        {
+                                            Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product.Name)),
+                                            DisplayOrder = 1,
+                                        });
+                                    }
+                                    // _productService.UpdateProduct(product);
+                                }
+                            }
+
+                            //update "HasTierPrices" and "HasDiscountsApplied" properties
+                            //  _productService.UpdateHasTierPricesProperty(product);
+                            // _productService.UpdateHasDiscountsApplied(product);
+
+
+                        }
+
+                        if (product != null)
+                        {
+                            if (color != null)
+                                if (color.Length > 0)
+                                    SaveSpecificationAttributes("Color", color, colorType, product);
+
+                            if (player != null)
+                                if (player.Length > 0)
+                                    SaveSpecificationAttributes("Player", player, playerType, product);
+
+                            if (dimension != null)
+                                if (dimension.Length > 0)
+                                    SaveSpecificationAttributes("Dimension", dimension, dimensionType, product);
+
+                            if (age != null)
+                                if (age.Length > 0)
+                                    SaveSpecificationAttributes("Age", age, ageType, product);
+
+                            if (gender != null)
+                                if (gender.Length > 0)
+                                    SaveSpecificationAttributes("Gender", gender, genderType, product);
+
+                            if (power != null)
+                                if (power.Length > 0)
+                                    SaveSpecificationAttributes("Power", power, powerType, product);
+
+                            if (light != null)
+                                if (light.Length > 0)
+                                    SaveSpecificationAttributes("Light", light, lightType, product);
+
+                            if (material != null)
+                                if (material.Length > 0)
+                                    SaveSpecificationAttributes("Material", material, materialType, product);
+
+
+                            if (attributeColor != null)
+                                if (attributeColor.Length > 0)
+                                    SaveProductAttributes("Color", attributeColor, product);
+                        }
+
+                        //next product
+                        iRow++;
+                    }
+                }
+
+            }
+
+        }
+
+        public void SaveSpecificationAttributes(string Specification, string SpecificationValue, int AttributeTypeId, Product product)
+        {
+
+            if (SpecificationValue.Length > 0)
+            {
+                if (product != null)
+                {
+                    var specificationAttribute = _specificationAttributeService.GetSpecificationAttributeByName(Specification);
+
+                    if (specificationAttribute.Count > 0)
+                    {
+
+                        if (AttributeTypeId == 0)
+                        {
+
+                            var specificationAttributeOption = _specificationAttributeService.GetSpecificationAttributeOptionBySpecificationIdAndValue(specificationAttribute.ElementAt(0).Id, SpecificationValue);
+
+                            _specificationAttributeService.DeleteProductSpecificationAttributeByProductId(product.Id, specificationAttribute.FirstOrDefault().Id);
+
+                            var productSpecificationAttribute = _specificationAttributeService.GetProductSpecificationAttributesOne(product.Id, specificationAttributeOption.Id);
+
+                            bool newProduct = false;
+
+                            if (productSpecificationAttribute == null)
+                            {
+                                productSpecificationAttribute = new ProductSpecificationAttribute();
+                                newProduct = true;
+                            }
+
+                            productSpecificationAttribute.ProductId = product.Id;
+                            productSpecificationAttribute.AttributeTypeId = AttributeTypeId;
+
+                            if (AttributeTypeId == 0)
+                            {
+                                productSpecificationAttribute.SpecificationAttributeOptionId = specificationAttributeOption.Id;
+                                productSpecificationAttribute.CustomValue = "";
+                                productSpecificationAttribute.AllowFiltering = true;
+                                productSpecificationAttribute.ShowOnProductPage = true;
+                                productSpecificationAttribute.DisplayOrder = 0;
+                            }
+                            else
+                            {
+                                productSpecificationAttribute.SpecificationAttributeOptionId = 0;
+                                productSpecificationAttribute.CustomValue = SpecificationValue;
+
+                                productSpecificationAttribute.AllowFiltering = false;
+                                productSpecificationAttribute.ShowOnProductPage = true;
+                                productSpecificationAttribute.DisplayOrder = 0;
+                            }
+
+
+                            if (newProduct)
+                            {
+                                _specificationAttributeService.InsertProductSpecificationAttribute(productSpecificationAttribute);
+                            }
+                            else
+                            {
+                                _specificationAttributeService.UpdateProductSpecificationAttribute(productSpecificationAttribute);
+                            }
+                        }
+
+                        else
+                        {
+                            var specificationAttributeOption = _specificationAttributeService.GetSpecificationAttributeOptionBySpecificationIdAndValue(specificationAttribute.ElementAt(0).Id, SpecificationValue);
+
+                            _specificationAttributeService.DeleteProductSpecificationAttributeByProductId(product.Id, specificationAttribute.FirstOrDefault().Id);
+
+                            var productSpecificationAttribute = _specificationAttributeService.GetProductSpecificationAttributesByCustomValue(product.Id, specificationAttribute.FirstOrDefault().Id, SpecificationValue);
+
+                            bool newProduct = false;
+
+                            if (productSpecificationAttribute == null)
+                            {
+                                productSpecificationAttribute = new ProductSpecificationAttribute();
+                                newProduct = true;
+                            }
+
+                            productSpecificationAttribute.ProductId = product.Id;
+                            productSpecificationAttribute.AttributeTypeId = AttributeTypeId;
+
+                            var s = _specificationAttributeService.GetSpecificationAttributeOptionsBySpecificationAttribute(specificationAttribute.FirstOrDefault().Id);
+
+                            if (AttributeTypeId == 0)
+                            {
+                                var a = s.Where(psa => psa.Name == SpecificationValue);
+                                productSpecificationAttribute.SpecificationAttributeOptionId = a.FirstOrDefault().Id;
+                                productSpecificationAttribute.CustomValue = "";
+
+                                productSpecificationAttribute.AllowFiltering = true;
+                                productSpecificationAttribute.ShowOnProductPage = true;
+                                productSpecificationAttribute.DisplayOrder = 0;
+                            }
+                            else
+                            {
+                                productSpecificationAttribute.SpecificationAttributeOptionId = s.FirstOrDefault().Id;
+                                productSpecificationAttribute.CustomValue = SpecificationValue;
+                                productSpecificationAttribute.AllowFiltering = false;
+                                productSpecificationAttribute.ShowOnProductPage = true;
+                                productSpecificationAttribute.DisplayOrder = 0;
+                            }
+
+                            if (newProduct)
+                            {
+                                _specificationAttributeService.InsertProductSpecificationAttribute(productSpecificationAttribute);
+                            }
+                            else
+                            {
+                                _specificationAttributeService.UpdateProductSpecificationAttribute(productSpecificationAttribute);
+                            }
+
+                        }
+                        //search engine name
+                        //  _urlRecordService.SaveSlug(product, product.ValidateSeName(seName, product.Name, true), 0);
+
+                        //category mappings
+
+
+                        //update "HasTierPrices" and "HasDiscountsApplied" properties
+                        //   _productService.UpdateHasTierPricesProperty(product);
+                        //  _productService.UpdateHasDiscountsApplied(product);
+                    }
+
+                }
+            }
+
+        }
+
+        public void SaveProductAttributes(string Attribute, string AttributeValue, Product product)
+        {
+            var productAttribute = _productAttributeService.GetProductAttributeByName(Attribute);
+
+            if (productAttribute.Count > 0)
+            {
+                var productAttributeMapping = _productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
+                if (productAttributeMapping.Count == 0)
+                {
+                    var productAttributeMapping1 = new ProductAttributeMapping
+                    {
+                        ProductId = product.Id,
+                        ProductAttributeId = productAttribute.FirstOrDefault().Id,
+                        TextPrompt = null,
+                        IsRequired = true,
+                        AttributeControlTypeId = 1,
+                        DisplayOrder = 1
+                    };
+                    _productAttributeService.InsertProductAttributeMapping(productAttributeMapping1);
+                    productAttributeMapping = _productAttributeService.GetProductAttributeMappingsByProductId(product.Id);
+                }
+
+
+                var predefinedValues = _productAttributeService.GetPredefinedProductAttributeValueByName(AttributeValue);
+                if (predefinedValues.Count == 0)
+                {
+                    var ppav = new PredefinedProductAttributeValue
+                    {
+                        ProductAttributeId = productAttribute.FirstOrDefault().Id,
+                        Name = AttributeValue,
+                        PriceAdjustment = 0,
+                        WeightAdjustment = 0,
+                        Cost = 0,
+                        IsPreSelected = false,
+                        DisplayOrder = 0
+                    };
+                    _productAttributeService.InsertPredefinedProductAttributeValue(ppav);
+
+                    var pav = new ProductAttributeValue
+                    {
+                        ProductAttributeMappingId = productAttributeMapping.FirstOrDefault().Id,
+                        AttributeValueType = AttributeValueType.Simple,
+                        Name = ppav.Name,
+                        PriceAdjustment = ppav.PriceAdjustment,
+                        WeightAdjustment = ppav.WeightAdjustment,
+                        Cost = ppav.Cost,
+                        IsPreSelected = ppav.IsPreSelected,
+                        DisplayOrder = ppav.DisplayOrder
+                    };
+                    _productAttributeService.InsertProductAttributeValue(pav);
+                }
+                else
+                {
+                    var t = _productAttributeService.GetProductAttributeValuesByProductAndByName(product.Id, AttributeValue);
+                    if (t.Count == 0)
+                    {
+                        foreach (var predefinedValue in predefinedValues)
+                        {
+                            if (predefinedValue.Name.ToLower() == AttributeValue.ToLower())
+                            {
+                                var pav = new ProductAttributeValue
+                                {
+                                    ProductAttributeMappingId = productAttributeMapping.FirstOrDefault().Id,
+                                    AttributeValueType = AttributeValueType.Simple,
+                                    Name = predefinedValue.Name,
+                                    PriceAdjustment = predefinedValue.PriceAdjustment,
+                                    WeightAdjustment = predefinedValue.WeightAdjustment,
+                                    Cost = predefinedValue.Cost,
+                                    IsPreSelected = predefinedValue.IsPreSelected,
+                                    DisplayOrder = predefinedValue.DisplayOrder
+                                };
+                                _productAttributeService.InsertProductAttributeValue(pav);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+        public virtual void ImportGiftCardsFromXlsx(Stream stream)
+        {
+            // ok, we can run the real code of the sample now
+            using (var xlPackage = new ExcelPackage(stream))
+            {
+                // get the first worksheet in the workbook
+                var worksheet = xlPackage.Workbook.Worksheets.FirstOrDefault();
+                if (worksheet == null)
+                    throw new NopException("No worksheet found");
+
+                //the columns
+                var properties = new[]
+                {
+                    "GiftCardTypeId",
+                    "PurchasedWithOrderId",
+                    "Amount",
+                    "IsGiftCardActivated",
+                    "GiftCardCouponCode",
+                    "RecipientName",
+                    "RecipientEmail",
+                    "SenderName",
+                    "SenderEmail",
+                    "Message",
+           
+                };
+
+
+                int iRow = 2;
+                while (true)
+                {
+                    bool allColumnsAreEmpty = true;
+                    for (var i = 1; i <= properties.Length; i++)
+                        if (worksheet.Cells[iRow, i].Value != null && !String.IsNullOrEmpty(worksheet.Cells[iRow, i].Value.ToString()))
+                        {
+                            allColumnsAreEmpty = false;
+                            break;
+                        }
+                    if (allColumnsAreEmpty)
+                        break;
+
+                    int giftCardTypeId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "GiftCardTypeId")].Value);
+                    decimal amount = Convert.ToDecimal(worksheet.Cells[iRow, GetColumnIndex(properties, "Amount")].Value);
+                    int purchasedWithOrderItemId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "PurchasedWithOrderId")].Value);
+                    bool isGiftCardActivated = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "IsGiftCardActivated")].Value);
+                    string giftCardCouponCode = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "GiftCardCouponCode")].Value);
+                    string recipientName = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "RecipientName")].Value);
+                    string recipientEmail = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "RecipientEmail")].Value);
+                    string senderEmail = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "SenderEmail")].Value);
+                    string senderName = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "SenderName")].Value);
+                    string message = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Message")].Value);
+
+
+                    var gc = _giftCardService.GetGiftCardByCouponCode(giftCardCouponCode);
+                    bool newGc = false;
+                    if (gc == null)
+                    {
+                        gc = new GiftCard();
+                        newGc = true;
+                    }
+
+                    gc.GiftCardTypeId = giftCardTypeId;
+                    gc.PurchasedWithSubscriptionOrderItemId = purchasedWithOrderItemId == 0 ? (int?)null : purchasedWithOrderItemId;
+                    gc.Amount = amount;
+                    gc.IsGiftCardActivated = isGiftCardActivated;
+                    gc.GiftCardCouponCode = giftCardCouponCode;
+                    gc.RecipientName = recipientName;
+                    gc.RecipientEmail = recipientEmail;
+                    gc.SenderName = senderName;
+                    gc.SenderEmail = senderEmail;
+                    gc.Message = message;
+                    gc.IsRecipientNotified = false;
+                    gc.CreatedOnUtc = DateTime.UtcNow;
+
+                    if (newGc)
+                    {
+                        _giftCardService.InsertGiftCard(gc);
+                    }
+                    else
+                    {
+                        _giftCardService.UpdateGiftCard(gc);
+                    }
+
+                    //next giftcard
+                    iRow++;
+                }
+            }
+
+
+
+        }
         /// <summary>
         /// Import newsletter subscribers from TXT file
         /// </summary>

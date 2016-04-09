@@ -1,0 +1,182 @@
+﻿@model CustomerSubscriptionOrderListModel
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+}
+@using Nop.Web.Models.Customer
+@using Nop.Web.Models.SubscriptionOrder;
+@section left
+{
+    @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.SubscriptionOrders })
+}
+<div class="page account-page order-list-page article">
+    <div class="page-title">
+        <h1>@T("Account.MyAccount") - @T("Account.subscriptionorders")</h1>
+    </div>
+    <div class="page-body">
+       
+        @if (Model.RecurringSubscriptionOrders.Count > 0)
+        {
+            <div class="section recurring-payments">
+                <div class="title">
+                    <strong>@T("Account.subscriptionorders.RecurringSubscriptionOrders")</strong>
+                </div>
+                @using (Html.BeginForm())
+                {
+                @Html.AntiForgeryToken()
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <colgroup>
+                            <col />
+                            <col />
+                            <col />
+                            <col />
+                            <col />
+                            <col />
+                            <col />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="start-date">
+                                    @T("Account.subscriptionorders.RecurringSubscriptionOrders.StartDate")
+                                </th>
+                                <th class="cycle-info">
+                                    @T("Account.subscriptionorders.RecurringSubscriptionOrders.CycleInfo")
+                                </th>
+                                <th class="next-payment">
+                                    @T("Account.subscriptionorders.RecurringSubscriptionOrders.NextPayment")
+                                </th>
+                                <th class="total-cycles">
+                                    @T("Account.subscriptionorders.RecurringSubscriptionOrders.TotalCycles")
+                                </th>
+                                <th class="cycles-remaining">
+                                    @T("Account.subscriptionorders.RecurringSubscriptionOrders.CyclesRemaining")
+                                </th>
+                                <th class="initial-order">
+                                    @T("Account.subscriptionorders.RecurringSubscriptionOrders.InitialSubscriptionOrder")
+                                </th>
+                                <th class="cancel">
+                                    @T("Account.subscriptionorders.RecurringSubscriptionOrders.Cancel")
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.RecurringSubscriptionOrders)
+                                {
+                            <tr>
+                                <td class="start-date">
+                                    @item.StartDate
+                                </td>
+                                <td class="cycle-info">
+                                    @item.CycleInfo
+                                </td>
+                                <td class="next-payment">
+                                    @item.NextPayment
+                                </td>
+                                <td class="total-cycles">
+                                    @item.TotalCycles
+                                </td>
+                                <td class="cycles-remaining">
+                                    @item.CyclesRemaining
+                                </td>
+                                <td class="initial-order">
+                                    <a href="@Url.RouteUrl("SubscriptionOrderDetails", new { orderId = item.InitialSubscriptionOrderId })">@string.Format(T("Account.subscriptionorders.RecurringSubscriptionOrders.ViewInitialSubscriptionOrder").Text, item.InitialSubscriptionOrderId)</a>
+                                </td>
+                                <td class="cancel">
+                                    @if (item.CanCancel)
+                                            {
+                                        <input type="submit" name="cancelRecurringPayment@(item.Id)" value="@T("Account.subscriptionorders.RecurringSubscriptionOrders.Cancel")" class="button-2 cancel-recurring-order-button" />
+                                            }
+                                </td>
+                            </tr>
+                                }
+                        </tbody>
+                    </table>
+                </div>
+                }
+            </div>
+            if (Model.CancelRecurringPaymentErrors.Count > 0)
+            {
+                <div class="message-error">
+                    <ul>
+                        @foreach (var error in Model.CancelRecurringPaymentErrors)
+                        {
+                        <li>@error</li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+        <table class="cart">
+            <colgroup>
+                <col width="1" />
+                <col width="1" />
+                <col />
+                <col width="1" />
+                <col width="1" />
+                <col width="1" />
+                <col width="1" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="sku">
+                       Order No
+                    </th>
+                    <th class="sku">
+                        Plan Name
+                    </th>
+                    <th class="product-picture">
+                       Status
+                    </th>
+                    <th class="product">
+                        Activation Date
+                    </th>
+                    <th class="product">
+                        Valid Upto
+                    </th>
+                    <th class="quantity">
+                        Order Total 
+                    </th>
+                    <th class="subtotal">
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.SubscriptionOrders.Count > 0)
+                {
+                    foreach (var order in Model.SubscriptionOrders)
+                    {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.PlanName</td>
+                    <td><span class="order-status @order.SubscriptionOrderStatusEnum.ToString().ToLowerInvariant()">@order.SubscriptionOrderStatus</span></td>
+                    <td><span class="order-date">@order.RentalStartDate.ToString()</span></td>
+                    <td><span class="order-date">@order.RentalEndDate.ToString()</span></td>
+                    <td><span class="order-total">@order.SubscriptionOrderTotal</span></td>
+
+                    <td>
+                        @if (order.IsReturnRequestAllowed)
+                    {
+                    <input type="button" value="@T("Account.subscriptionorders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
+                    }
+                        <input type="button" value="@T("Account.subscriptionorders.SubscriptionOrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("SubscriptionOrderDetails", new { orderId = order.Id })')" />
+                    </td>
+                </tr>
+                    }
+                }
+                else
+                {
+                <tr>
+                    <td>
+                        @T("Account.subscriptionorders.NoSubscriptionOrders")
+                    </td>
+                </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>

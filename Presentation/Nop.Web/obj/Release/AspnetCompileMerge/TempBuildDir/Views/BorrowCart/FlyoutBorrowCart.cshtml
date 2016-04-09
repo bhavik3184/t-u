@@ -1,0 +1,68 @@
+﻿@model MiniBorrowCartModel
+@using Nop.Web.Models.BorrowCart;
+<div id="flyout-cart" class="flyout-cart">
+    <div class="mini-borrow-cart">
+        <div class="count">
+            @if (Model.TotalProducts == 0)
+            {
+                @T("BorrowCart.Mini.NoItems")
+            }
+            else
+            {
+                @Html.Raw(string.Format(T("BorrowCart.Mini.ItemsText").Text, string.Format("<a href=\"{0}\">{1}</a>", Url.RouteUrl("BorrowCart"), string.Format(T("BorrowCart.Mini.Items").Text, Model.TotalProducts))))
+            }
+        </div>
+        @if (Model.TotalProducts > 0)
+        {
+            <div class="items">
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    var item = Model.Items[i];
+                    <div class="item @(i == 0 ? "first" : null)">
+                        @if (Model.ShowProductImages)
+                        {
+                            <div class="picture">
+                                <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" title="@item.Picture.Title">
+                                    <img alt="@item.Picture.AlternateText" src="@item.Picture.ImageUrl" title="@item.Picture.Title" />
+                                </a>
+                            </div>
+                        }
+                        <div class="product">
+                            <div class="name">
+                                <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })">@item.ProductName</a>
+                            </div>
+                            @if (!String.IsNullOrEmpty(item.AttributeInfo))
+                            {
+                                <div class="attributes">
+                                    @Html.Raw(item.AttributeInfo)
+                                </div>
+                            }
+                            <div class="price">@T("BorrowCart.Mini.UnitPrice"): <span>@item.UnitPrice</span></div>
+                            <div class="quantity">@T("BorrowCart.Mini.Quantity"): <span>@item.Quantity</span></div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="buttons">
+                @if (Model.DisplayBorrowCartButton)
+                {
+                    <input type="button" value="Go To Borrow List  " class="button-1 cart-button" onclick="setLocation('@(Url.RouteUrl("BorrowCart"))')" />
+
+                }
+                @if (Model.DisplayCheckoutButton)
+                {
+                    var checkoutUrl = "";
+                    if (Model.AnonymousCheckoutAllowed && Model.CurrentCustomerIsGuest)
+                    {
+                        checkoutUrl = Url.RouteUrl("LoginCheckoutAsGuest", new { returnUrl = Url.RouteUrl("BorrowCart") });
+                    }
+                    else
+                    {
+                        checkoutUrl = Url.RouteUrl("Checkout");
+                    }
+                    <input type="button" value="@T("Checkout.Button")" class="button-1 checkout-button" onclick="setLocation('@checkoutUrl')" />
+                }
+            </div>
+        }
+    </div>
+</div>

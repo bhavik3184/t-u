@@ -2917,7 +2917,7 @@ namespace Nop.Admin.Controllers
                 var file = Request.Files["importexcelfile"];
                 if (file != null && file.ContentLength > 0)
                 {
-                    _importManager.ImportProductsFromXlsx(file.InputStream);
+                    _importManager.ImportSimpleProductsFromXlsx(file.InputStream);
                 }
                 else
                 {

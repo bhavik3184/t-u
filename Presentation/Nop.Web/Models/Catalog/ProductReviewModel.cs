@@ -9,6 +9,10 @@ namespace Nop.Web.Models.Catalog
 {
     public partial class ProductReviewOverviewModel : BaseNopModel
     {
+        public ProductReviewOverviewModel()
+        {
+            ProductReviewsModel = new ProductReviewsModel();
+        }
         public int ProductId { get; set; }
 
         public int RatingSum { get; set; }
@@ -16,6 +20,8 @@ namespace Nop.Web.Models.Catalog
         public int TotalReviews { get; set; }
 
         public bool AllowCustomerReviews { get; set; }
+
+        public ProductReviewsModel ProductReviewsModel { get; set; }
     }
 
     [Validator(typeof(ProductReviewsValidator))]
@@ -43,7 +49,7 @@ namespace Nop.Web.Models.Catalog
         public string CustomerName { get; set; }
 
         public bool AllowViewingProfiles { get; set; }
-        
+
         public string Title { get; set; }
 
         public string ReviewText { get; set; }

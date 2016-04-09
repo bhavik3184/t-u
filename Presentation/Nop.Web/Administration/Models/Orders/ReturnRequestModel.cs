@@ -18,6 +18,12 @@ namespace Nop.Admin.Models.Orders
 
         public int OrderItemId { get; set; }
 
+        public int ItemDetailId { get; set; }
+
+
+        public string Sku { get; set; }
+
+
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.Customer")]
         public int CustomerId { get; set; }
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.Customer")]
@@ -29,6 +35,8 @@ namespace Nop.Admin.Models.Orders
 
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.Quantity")]
         public int Quantity { get; set; }
+
+        public int QuantityOrdered { get; set; }
 
         [AllowHtml]
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.ReasonForReturn")]
@@ -55,5 +63,6 @@ namespace Nop.Admin.Models.Orders
 
         [NopResourceDisplayName("Admin.ReturnRequests.Fields.CreatedOn")]
         public DateTime CreatedOn { get; set; }
+
     }
 }

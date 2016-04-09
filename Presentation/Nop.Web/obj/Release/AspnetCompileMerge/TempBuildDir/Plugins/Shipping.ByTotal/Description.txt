@@ -1,0 +1,8 @@
+Group: Shipping rate computation
+FriendlyName: Shipping by total
+SystemName: Shipping.ByTotal
+Version: 1.21
+SupportedVersions: 3.70
+Author: mb
+DisplayOrder: 1
+FileName: Nop.Plugin.Shipping.ByTotal.dll

@@ -14,7 +14,8 @@ namespace Nop.Services.SubscriptionOrders
     public partial class ReturnRequestService : IReturnRequestService
     {
         #region Fields
-
+        private readonly IRepository<OrderItem> _orderItemRepository;
+        private readonly IRepository<ItemDetail> _itemDetailRepository;
         private readonly IRepository<ReturnRequest> _returnRequestRepository;
         private readonly IRepository<ReturnRequestAction> _returnRequestActionRepository;
         private readonly IRepository<ReturnRequestReason> _returnRequestReasonRepository;
@@ -31,11 +32,15 @@ namespace Nop.Services.SubscriptionOrders
         /// <param name="returnRequestActionRepository">Return request action repository</param>
         /// <param name="returnRequestReasonRepository">Return request reason repository</param>
         /// <param name="eventPublisher">Event published</param>
-        public ReturnRequestService(IRepository<ReturnRequest> returnRequestRepository,
+        public ReturnRequestService( IRepository<OrderItem> orderItemRepository,
+            IRepository<ItemDetail> itemDetailRepository,
+         IRepository<ReturnRequest> returnRequestRepository,
             IRepository<ReturnRequestAction> returnRequestActionRepository,
             IRepository<ReturnRequestReason> returnRequestReasonRepository,
             IEventPublisher eventPublisher)
         {
+            this._orderItemRepository = orderItemRepository;
+            this._itemDetailRepository = itemDetailRepository;
             this._returnRequestRepository = returnRequestRepository;
             this._returnRequestActionRepository = returnRequestActionRepository;
             this._returnRequestReasonRepository = returnRequestReasonRepository;
@@ -107,7 +112,27 @@ namespace Nop.Services.SubscriptionOrders
             return returnRequests;
         }
 
+        public virtual IList<ReturnRequest> SearchReturnRequestByTransactionId(int orderItemId = 0, int customerId = 0, 
+            ReturnRequestStatus? rs = null)
+        {
 
+            var  query =    from r in _returnRequestRepository.Table
+                        join i in _itemDetailRepository.Table on r.ItemDetailId equals i.Id
+                        join o in _orderItemRepository.Table on  i.OrderItemId equals o.Id 
+                        
+                        //join p in _productRepository.Table on itemDetail.ProductId equals p.Id
+                        where ( orderItemId == 0 || orderItemId == o.Id) &&
+                        (customerId == 0 || customerId == o.SubscriptionOrder.CustomerId) &&
+                         (!rs.HasValue || (int)rs.Value == r.ReturnRequestStatusId) 
+
+                        orderby o.Id descending, o.CreatedOnUtc descending, o.Id
+                        select r;
+
+            //query = query.OrderByDescending(rr => rr.CreatedOnUtc).ThenByDescending(rr => rr.Id);
+
+            var returnRequests = query.ToList();
+            return returnRequests;
+        }
         
         /// <summary>
         /// Delete a return request action

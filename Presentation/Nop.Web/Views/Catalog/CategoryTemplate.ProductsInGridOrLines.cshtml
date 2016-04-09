@@ -1,6 +1,6 @@
 ﻿@model CategoryModel
 @{
-    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+    Layout = "~/Views/Shared/_ColumnsCategory.cshtml";
     Html.AddTitleParts(!String.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name);
     Html.AddMetaDescriptionParts(Model.MetaDescription);
     Html.AddMetaKeywordParts(Model.MetaKeywords);
@@ -49,17 +49,48 @@
         @Html.Widget("categorydetails_after_breadcrumb", Model.Id)
     }
 }
-<div class="page category-page article">
+
+<div style="position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    padding: 15px 25px 15px 10px;
+    line-height: 16px;
+    color: #fff;
+    opacity: 0.95;" ng-show="displaynotification" ng-style="{'background-color': color}">
+    <span class="close" title="Close" ng-click="closenote()" style="    position: absolute;
+    top: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    margin: 7px;
+    background: #fff url('/Themes/DefaultClean/Content/images/close.png') center no-repeat;
+    cursor: pointer;">&nbsp;</span>
+    <p style="line-height: 1em; margin: 0 0 0px;" class="content" ng-bind-html="successmessage"></p>
+</div>
+<div class="page category-page article" >
+    <div class="progresscaption" ng-show="displayprogress">
+        <img style="top: 40%; left: 40%; position: absolute;" src="/Themes/DefaultClean/Content/images/progress.gif" />
+    </div>
     <div class="page-title">
         <h1>@Model.Name</h1>
     </div>
     <div class="page-body">
-        @Html.Widget("categorydetails_top", Model.Id)
+          @Html.Widget("categorydetails_top", Model.Id)
         @*description*@
-        
+        @if (!String.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="category-description">
+                @*@Html.Raw(Model.Description)*@
+            </div>
+        }
         @Html.Widget("categorydetails_before_subcategories", Model.Id)
         @*subcategories*@
-         
+        @if (Model.SubCategories.Count > 0)
+        {
+
+        }
         @Html.Widget("categorydetails_before_featured_products", Model.Id)
         @*featured products*@
         @if (Model.FeaturedProducts.Count > 0)
@@ -82,9 +113,10 @@
         @if (Model.Products.Count > 0)
         {
             @Html.Partial("_CatalogSelectors", Model.PagingFilteringContext, new ViewDataDictionary())
+             
         }
         @Html.Widget("categorydetails_before_filters", Model.Id)
-        <div class="product-filters">
+        <div class="product-filters" style="visibility:hidden;display:none;">
             @*filtering*@
             @if (Model.PagingFilteringContext.PriceRangeFilter.Enabled)
             {
@@ -100,7 +132,8 @@
 
         @if (Model.Products.Count > 0)
         {
-            <div class="@(Model.PagingFilteringContext.ViewMode == "list" ? "product-list" : "product-grid")">
+            <div class="@(Model.PagingFilteringContext.ViewMode == "list" ? "product-list" : "product-grid")" style="visibility:hidden;display:none;">
+
                 <div class="item-grid">
                     @foreach (var product in Model.Products)
                     {
@@ -111,15 +144,266 @@
                 </div>
             </div>
         }
+        <input type="text" ng-hide="true" value="@Model.Id" ng-model="CategoryId" id="categoryid" ng-change="addRowAsyncAsJSON()" />
+        <input type="text" ng-hide="true" value="@Model.OrderBy" ng-model="OrderBy" id="orderby" ng-change="addRowAsyncAsJSON()" />
+        <input type="text" ng-hide="true" value="@Model.PageSize" ng-model="PageSize" id="pagesize" ng-change="addRowAsyncAsJSON()" />
+        <input type="text" ng-hide="true" value="@Model.ViewMode" ng-model="ViewMode" id="viewmode" ng-change="addRowAsyncAsJSON()" />
+        <input type="text" ng-hide="true" value="@Model.PageNumber" ng-model="PageNumber" id="pagenumber" ng-change="addRowAsyncAsJSON()" />
+        <div class="product-grid">
+            <div class="item-grid" infinite-scroll='nextPage()' infinite-scroll-disabled='Reddit.busy' infinite-scroll-distance='0'>
+                <div class="item-box" ng-repeat="product in list.Products">
+                    <div class="product-item" data-productid="{{product.Id}}">
+
+                        <div class="picture" showonhoverparent>
+                            <a href="/{{product.SeName}}" title="{{product.DefaultPictureModel.Title}}">
+                                <img alt="{{product.DefaultPictureModel.AlternateText}}" src="{{product.DefaultPictureModel.ImageUrl}}" title="{{product.DefaultPictureModel.Title}}" />
+                            </a>
+                            <div class="caption" >
+                                <h3 ng-click="openDefault(product.Id)" style="vertical-align: middle; font-weight:normal; /* position: absolute; */ /* left: 30%; */ margin: 100px auto 0; text-align: center; width: 60%; ">Quick View</h3>
+                            </div>
+                        </div>
+                        <div class="details">
+                            <script type="text/ng-template" id="myModalContent.html">
+                                <div class="modal-header">
+                                    <h3 class="modal-title">{{items[0]}}</h3>
+                                </div>
+                                <div class="modal-body">
+                                    <iframe width="565" height="350" src="{{items[1]}}" frameborder="0"></iframe>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-warning" type="button" ng-click="cancel()">Close</button>
+                                </div>
+                            </script>
+
+                            <h2 class="product-title">
+                                <a ng-if="product.ProductVideoModel != null" ng-click="open(product.Name,product.ProductVideoModel.ValueRaw)" class="youtube" title="{{product.Name}}">
+                                    <img src="/Content/Images/video.png" style="width:30px;position:absolute;top:0;right:0;" />
+                                </a>
+                                <a href="/{{product.SeName}}">{{product.Name}}</a>
+                            </h2>
+                            <div class="product-rating-box" style="width:50%;" title="0 review(s)">
+                                <div class="rating">
+                                    <div ng-style="{'width' : (product.ReviewOverviewModel.TotalReviews != 0) ? '(product.ReviewOverviewModel.RatingSum * 100 / product.ReviewOverviewModel.TotalReviews / 5 )%' : '0%'};">
+                                    </div>
+                                </div>
+                            </div>
+                             
+                            <div class="description">
+                                {{product.shortdescription}}>
+                            </div>
+                            <div class="add-info">
+                                <div class="prices">
+                                    <span ng-if="product.ProductPrice.OldPrice" class="price old-price">{{product.ProductPrice.OldPrice}}</span>
+                                    <span class="price actual-price">{{product.ProductPrice.Price}}</span>
+                                </div>
+                            </div>
+                            <div class="description">
+
+                            </div>
+                            <div class="buttons">
+
+                                <input type="button" value="Add to MyToyBox" class=" button-2 add-to-mytoybox-button" ng-click="AddToBorrowCart(product.Id,2)">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-sm-12 see-more-wrapper">
+                <div align="center" class="sd-loader-see-more" ng-show='Reddit.busy' style="width:90px;margin:0 auto;">
+                    <img src="/content/images/loader.gif" style="width:90px;" />
+                </div>
+                <div class="col-xs-12 show-more-section">
+                    <div id="see-more-products" class="show-more" style="visibility: visible;" ng-click="nextPage()">
+                        {{Reddit.TotalDesc}}
+                        <i class="sd-icon sd-icon-expand-arrow pagination-arrow"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
         @{
             var pager = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber");
         }
         @if (!pager.IsEmpty())
         {
-            <div class="pager">
+            @*<div class="pager">
                 @pager
-            </div>
+            </div>*@
         }
         @Html.Widget("categorydetails_bottom", Model.Id)
     </div>
+
+    <script type="text/ng-template" id="firstDialogId">
+        <div class="progresscaption" ng-show="displayprogress">
+            <img style="top: 40%; left: 40%; position: absolute;" src="/Themes/DefaultClean/Content/images/progress.gif" />
+        </div>
+        <div style="position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    padding: 15px 25px 15px 10px;
+    line-height: 16px;
+    color: #fff;
+    opacity: 0.95;" ng-show="displaynotification" ng-style="{'background-color': color}">
+            <span class="close" title="Close" ng-click="closenote()" style="    position: absolute;
+    top: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    margin: 7px;
+    background: #fff url('/Themes/DefaultClean/Content/images/close.png') center no-repeat;
+    cursor: pointer;">&nbsp;</span>
+            <p style="line-height: 1em; margin: 0 0 0px;" class="content" ng-bind-html="successmessage"></p>
+        </div>
+        <div class="page-body" style="background-color:#fff;">
+
+            <form action="/dcm-mobile-bank" id="product-details-form" method="post" novalidate="novalidate">
+                <div itemscope="" itemtype="http://schema.org/Product" data-productid="68">
+                    <div class="col-sm-12 nopadding">
+                        <div class="product-essential col-sm-8 nopadding">
+                            <!--product pictures-->
+                            <div class="gallery" >
+                                <div class="picture">
+                                    <img alt="{{product.DefaultPictureModel.AlternateText}}" src="{{product.DefaultPictureModel.ImageUrl}}" title="{{product.DefaultPictureModel.Title}}" itemprop="image" id="main-product-img-68">
+                                </div>
+                                <div class="picture-thumbs">
+                                    <a ng-repeat="pic in product.PictureModels" class="thumb-popup-link" ng-click="SetDefaultImage(product,pic.FullSizeImageUrl)"  title="{{pic.Title}}">
+                                        <img src="{{pic.ImageUrl}}" alt="{{pic.AlternateText}}" title="Picture of DCM Mobile Bank">
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="overview">
+                                <div class="product-name">
+                                    <h1 itemprop="name">
+                                        {{product.Name}}
+                                    </h1>
+                                    <div class="prices" itemprop="offers" itemscope="" itemtype="http://schema.org/Offer">
+                                        <div class="product-price">
+                                            <span itemprop="price" class="price-value-68">
+                                                {{product.ProductPrice.Price}}
+                                            </span>
+                                        </div>
+                                        <meta itemprop="priceCurrency" content="{{product.ProductPrice.CurrencyCode}}">
+                                    </div>
+                                </div>
+                                <div class="short-description">
+                                    {{product.ShortDescription}}
+                                </div>
+
+                                <!--SKU, MAN, GTIN, vendor-->
+                                <div class="additional-details">
+                                </div>
+
+                                <!--attributes-->
+                                <!--gift card-->
+                                <!--rental info-->
+                                <!--price & add to cart-->
+                                <div class="col-sm-6" style="padding:0;">
+                                    <div class="add-to-cart">
+                                        <div class="add-to-cart-panel">
+                                            <label class="qty-label" for="addtocart_68_EnteredQuantity">Qty:</label>
+                                            <input class="qty-input valid" data-val="true" data-val-number="The field Qty must be a number." id="addtocart_4_EnteredQuantity" name="addtocart_4.EnteredQuantity" type="hidden" value="1">
+                                            <input type="button" id="add-to-cart-button" style="padding:10px 10px" class=" product-box-add-to-cart-button" ng-click="AddToBorrowCart(product.Id,1)" value="Add to Borrow Cart">
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-6" style="padding:0;">
+                                    <input type="button" id="add-to-mytoybox-button" style="padding:10px 10px;" class="button-1 add-to-mytoybox-button" ng-click="AddToBorrowCart(product.Id,2)" value="Add to MyToyBox">
+                                </div>
+                                <!--mytoybox, compare, email a friend-->
+                                <div class="overview-buttons">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-collateral  col-sm-4">
+                            <div class="product-specs-box">
+                                <div class="title">
+                                    <strong>Products specifications</strong>
+                                </div>
+                                <div class="table-wrapper">
+                                    <table class="data-table">
+                                        <colgroup>
+                                            <col width="25%">
+                                            <col>
+                                        </colgroup>
+                                        <tbody>
+                                            <tr ng-repeat="spec in product.ProductSpecifications">
+                                                <td class="spec-name">
+                                                    {{spec.SpecificationAttributeName}}
+                                                </td>
+                                                <td class="spec-value">
+                                                    {{spec.ValueRaw}}
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!--availability-->
+                            <div class="availability">
+                                <div class="stock">
+                                    <span class="label">Availability:</span>
+                                    <span class="value" id="stock-availability-value-{{product.Id}}">{{product.StockAvailability}} </span>
+                                </div>
+                            </div>
+                            <!--manufacturers-->
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                    </div>
+                </div>
+            </form>
+
+        </div>
+        <div class="ngdialog-buttons">
+            <button type="button" class="ngdialog-button ngdialog-button-secondary"
+                    ng-click="closeThisDialog()">
+                Close
+            </button>
+            <a href="/{{product.SeName}}" class="ngdialog-button ngdialog-button-primary">More Details</a>
+        </div>
+    </script>
+
 </div>
+ 
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('.picture').hover(
+            function () {
+                $(this).find('.caption').show();
+            },
+            function () {
+                $(this).find('.caption').hide();
+            }
+        );
+        $('.fade').hover(
+            function () {
+                $(this).find('.caption').fadeIn(250);
+            },
+            function () {
+                $(this).find('.caption').fadeOut(250);
+            }
+        );
+        $('.slide').hover(
+            function () {
+                $(this).find('.caption').slideDown(250);
+            },
+            function () {
+                $(this).find('.caption').slideUp(250);
+            }
+        );
+    });
+     
+</script>
+
+
+ 

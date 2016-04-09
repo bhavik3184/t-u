@@ -16,7 +16,8 @@ namespace Nop.Services.Catalog
         /// </summary>
         /// <param name="productAttribute">Product attribute</param>
         void DeleteProductAttribute(ProductAttribute productAttribute);
-
+        
+        List<ProductAttribute> GetProductAttributeByName(string name);
         /// <summary>
         /// Gets all product attributes
         /// </summary>
@@ -44,6 +45,8 @@ namespace Nop.Services.Catalog
         /// <param name="productAttribute">Product attribute</param>
         void UpdateProductAttribute(ProductAttribute productAttribute);
 
+        List<PredefinedProductAttributeValue> GetPredefinedProductAttributeValueByName(string name);
+        List<ProductAttributeValue> GetProductAttributeValuesByProductAndByName(int productId, string color);
         #endregion
 
         #region Product attributes mappings

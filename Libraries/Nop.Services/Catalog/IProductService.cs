@@ -92,29 +92,29 @@ namespace Nop.Services.Catalog
         /// </param>
         /// <returns>Products</returns>
         IPagedList<Product> SearchProducts(
-            int pageIndex = 0,
-            int pageSize = int.MaxValue,
-            IList<int> categoryIds = null,
-            int manufacturerId = 0,
-            int storeId = 0,
-            int vendorId = 0,
-            int warehouseId = 0,
-            ProductType? productType = null,
-            bool visibleIndividuallyOnly = false,
+          int pageIndex = 0,
+          int pageSize = int.MaxValue,
+          IList<int> categoryIds = null,
+          int manufacturerId = 0,
+          int storeId = 0,
+          int vendorId = 0,
+          int warehouseId = 0,
+          ProductType? productType = null,
+          bool visibleIndividuallyOnly = false,
             bool markedAsNewOnly = false,
-            bool? featuredProducts = null,
-            decimal? priceMin = null,
-            decimal? priceMax = null,
-            int productTagId = 0,
-            string keywords = null,
-            bool searchDescriptions = false,
-            bool searchSku = true,
-            bool searchProductTags = false,
-            int languageId = 0,
-            IList<int> filteredSpecs = null,
-            ProductSortingEnum orderBy = ProductSortingEnum.Position,
-            bool showHidden = false,
-            bool? overridePublished = null);
+          bool? featuredProducts = null,
+          decimal? priceMin = null,
+          decimal? priceMax = null,
+          int productTagId = 0,
+          string keywords = null,
+          bool searchDescriptions = false,
+          bool searchSku = true,
+          bool searchProductTags = false,
+          int languageId = 0,
+          string filteredSpecs = null,
+          ProductSortingEnum orderBy = ProductSortingEnum.Position,
+          bool showHidden = false,
+          bool? overridePublished = null);
 
         /// <summary>
         /// Search products
@@ -130,7 +130,6 @@ namespace Nop.Services.Catalog
         /// <param name="warehouseId">Warehouse identifier; 0 to load all records</param>
         /// <param name="productType">Product type; 0 to load all records</param>
         /// <param name="visibleIndividuallyOnly">A values indicating whether to load only products marked as "visible individually"; "false" to load all records; "true" to load "visible individually" only</param>
-        /// <param name="markedAsNewOnly">A values indicating whether to load only products marked as "new"; "false" to load all records; "true" to load "marked as new" only</param>
         /// <param name="featuredProducts">A value indicating whether loaded products are marked as featured (relates only to categories and manufacturers). 0 to load featured products only, 1 to load not featured products only, null to load all products</param>
         /// <param name="priceMin">Minimum price; null to load all records</param>
         /// <param name="priceMax">Maximum price; null to load all records</param>
@@ -150,7 +149,9 @@ namespace Nop.Services.Catalog
         /// </param>
         /// <returns>Products</returns>
         IPagedList<Product> SearchProducts(
+            out IList<int> AllfilterableSpecificationAttributeOptionIds,
             out IList<int> filterableSpecificationAttributeOptionIds,
+            out int TotalRecords,
             bool loadFilterableSpecificationAttributeOptionIds = false,
             int pageIndex = 0,
             int pageSize = int.MaxValue,
@@ -169,9 +170,9 @@ namespace Nop.Services.Catalog
             string keywords = null,
             bool searchDescriptions = false,
             bool searchSku = true,
-            bool searchProductTags = false, 
+            bool searchProductTags = false,
             int languageId = 0,
-            IList<int> filteredSpecs = null, 
+            string filteredSpecs = null,
             ProductSortingEnum orderBy = ProductSortingEnum.Position,
             bool showHidden = false,
             bool? overridePublished = null);

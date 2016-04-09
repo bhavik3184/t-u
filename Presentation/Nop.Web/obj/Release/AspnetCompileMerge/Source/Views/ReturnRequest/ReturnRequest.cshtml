@@ -1,0 +1,117 @@
+﻿@model SubmitReturnRequestModel
+@using Nop.Web.Models.Customer
+@using Nop.Web.Models.Order
+
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+}
+@section left
+{
+    @Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.ReturnRequests })
+}
+<link href="/Content/kendo/2014.1.318/kendo.default.min.css" rel="stylesheet" type="text/css" />
+<link href="/Content/kendo/2014.1.318/kendo.common.min.css" rel="stylesheet" type="text/css" />
+<script src="/Scripts/kendo/2014.1.318/kendo.web.min.js" type="text/javascript"></script>
+
+<div class="page return-request-page article">
+    <div class="page-title">
+        <h1>@string.Format(T("ReturnRequests.Title").Text, Model.SubscriptionOrderId)</h1>
+    </div>
+    <div class="page-body">
+        @if (!String.IsNullOrEmpty(Model.Result))
+        {
+            <div class="result">
+                @Model.Result
+            </div>
+        }
+        else
+        {
+            using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+            <div class="section">
+                <div class="title">
+                    <strong>@T("ReturnRequests.SelectProduct(s)")</strong>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <colgroup>
+                            <col />
+                            <col width="1" />
+                            <col width="1" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="product">
+                                    @T("ReturnRequests.Products.Name")
+                                </th>
+                                <th class="unit-price">
+                                    @T("ReturnRequests.Products.Price")
+                                </th>
+                                <th class="quantity">
+                                    @T("ReturnRequests.Products.Quantity")
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {   
+                                <tr>
+                                    <td class="product">
+                                        <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })">@item.ProductName</a>
+                                        @if (!String.IsNullOrEmpty(item.AttributeInfo))
+                                        {
+                                            <div class="attributes">
+                                                @Html.Raw(item.AttributeInfo)
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="unit-price">
+                                        @item.UnitPrice
+                                    </td>
+                                    <td class="quantity">
+                                        <select name="quantity@(item.Id)">
+                                            @for (int i = 0; i <= item.Quantity; i++)
+                                            {
+                                                <option value="@(i)">@(i)</option>
+                                            }
+                                        </select>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="fieldset">
+                <div class="title">
+                    <strong>@T("ReturnRequests.WhyReturning")</strong>
+                </div>
+                <div class="form-fields">
+
+                    <div class="inputs">
+                        @Html.LabelFor(model => model.AvailableDate, new { }, ":")
+                        @Html.EditorFor(model => model.AvailableDate, new { })
+                        @Html.ValidationMessageFor(model => model.AvailableDate)
+                    </div>
+                </div>
+                <div class="form-fields">
+                    
+                    <div class="inputs">
+                        @Html.LabelFor(model => model.Comments, new { }, ":")
+                        @Html.TextAreaFor(model => model.Comments, new { @class = "comment" })
+                        @Html.ValidationMessageFor(model => model.Comments)
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <input type="submit" name="submit-return-request" class="btn btn-success bootstrap-touchspin-up button-2 product-box-add-to-cart-button" value="@T("ReturnRequests.Submit")" />
+            </div>
+            }
+        }
+    </div>
+</div>

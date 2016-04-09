@@ -1,0 +1,210 @@
+﻿@model Nop.Admin.Models.SubscriptionOrders.SubscriptionOrderModel
+@using Nop.Core.Domain.Tax;
+@using Nop.Core.Domain.Catalog;
+
+<table class="adminContent">
+    <tr>
+        <td class="adminData">
+            @foreach (var item1 in Model.OrderItems)
+            {foreach (var item in item1.ItemDetails)
+            {
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        toggleOrderItemEdit@(item.Id)(false);
+                    });
+                </script>
+
+                <script type="text/javascript">
+                    function toggleOrderItemEdit@(item.Id)(editMode) {
+                        if (editMode) {
+                            $('#pnlEditPvUnitPrice@(item.Id)').show();
+                            $('#pnlEditPvQuantity@(item.Id)').show();
+                            $('#pnlEditPvDiscount@(item.Id)').show();
+                            $('#pnlEditPvPrice@(item.Id)').show();
+                            $('#btnEditOrderItem@(item.Id)').hide();
+                            $('#btnDeleteOrderItem@(item.Id)').hide();
+                            $('#btnSaveOrderItem@(item.Id)').show();
+                            $('#btnCancelOrderItem@(item.Id)').show();
+                        }
+                        else {
+                            $('#pnlEditPvUnitPrice@(item.Id)').hide();
+                            $('#pnlEditPvQuantity@(item.Id)').hide();
+                            $('#pnlEditPvDiscount@(item.Id)').hide();
+                            $('#pnlEditPvPrice@(item.Id)').hide();
+                            $('#btnEditOrderItem@(item.Id)').show();
+                            $('#btnDeleteOrderItem@(item.Id)').show();
+                            $('#btnSaveOrderItem@(item.Id)').hide();
+                            $('#btnCancelOrderItem@(item.Id)').hide();
+                        }
+                    }
+                </script>
+            }
+            }
+            <table class="tablestyle" border="1" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+                <col />
+                <col />
+                
+                 
+                <col />
+                <col />
+                @if (!Model.IsLoggedInAsVendor)
+                {
+                    <col />
+                }
+                <thead>
+                    <tr class="headerstyle">
+                        <th align="center">
+                            ItemDetail Id
+                        </th>
+                        <th align="center">
+                            @T("Admin.Orders.Products.Picture")
+                        </th>
+                        <th align="center">
+                            @T("Admin.Orders.Products.ProductName")
+                        </th>
+                        <th align="center">
+                            @T("Admin.Orders.Products.Quantity")
+                        </th>
+
+                        
+                        @if (!Model.IsLoggedInAsVendor)
+                        {
+                            <th align="center">
+                                @T("Admin.Common.Edit")
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item1 in Model.OrderItems)
+                {
+                     <tr>
+                            <th style="width:10%;" colspan="5">
+                                <div style="padding-left:10px;padding-right:10px;width:200px;margin:0 auto;font-size:15px;">
+                                 Transaction Id :   @item1.Id
+                                </div>
+                            </th>   
+                         </tr>
+                    foreach (var item in item1.ItemDetails)
+                    {
+                        <tr>
+                            <td style="width:10%;">
+                                <div style="padding-left:10px;padding-right:10px;">
+                                    @item.Id
+                                </div>
+                            </td>   
+                            <td align="center" style="width: 10%;">
+                                <img src="@item.PictureThumbnailUrl" alt="" title="" />
+                            </td>
+                            <td style="width: 25%;">
+                                <div style="padding-left: 10px; padding-right: 10px; text-align: left;">
+                                    <em><a href="@Url.Action("Edit", "Product", new { id = item.ProductId })">@item.ProductName</a></em>
+                                    @if (!String.IsNullOrEmpty(item.AttributeInfo))
+                                    {
+                                        <br />
+                                        @Html.Raw(item.AttributeInfo)
+                                    }
+                                    @if (!String.IsNullOrEmpty(item.RecurringInfo))
+                                    {
+                                        <br />
+                                        @Html.Raw(item.RecurringInfo)
+                                    }
+                                    @if (!String.IsNullOrEmpty(item.RentalInfo))
+                                    {
+                                        <br />
+                                        @Html.Raw(item.RentalInfo)
+                                    }
+                                    @if (!String.IsNullOrEmpty(item.Sku))
+                                    {
+                                        <br />
+                                        <strong>@T("Admin.Orders.Products.SKU")</strong><text>:</text>
+                                        @item.Sku
+                                    }
+                                    @if (!String.IsNullOrEmpty(item.VendorName))
+                                    {
+                                        <br />
+                                        <strong>@T("Admin.Orders.Products.Vendor")</strong><text>:</text>
+                                        @item.VendorName
+                                    }
+                                    @if (item.ReturnRequestIds.Count > 0)
+                                    {
+                                        <br />
+                                        <br />
+                                        <hr />
+                                        @T("Admin.Orders.Products.ReturnRequests")<text>:</text>
+                                        for (int i = 0; i < item.ReturnRequestIds.Count; i++)
+                                        {
+                                            <a href="@Url.Action("Edit", "ReturnRequest", new { id = item.ReturnRequestIds[i] })">@item.ReturnRequestIds[i]</a>
+                                            if (i != item.ReturnRequestIds.Count - 1)
+                                            {
+                                                <text>,</text>
+                                            }
+                                        }
+                                    }
+                                    @if (item.PurchasedGiftCardIds.Count > 0)
+                                    {
+                                        <br />
+                                        <br />
+                                        <hr />
+                                        @T("Admin.Orders.Products.GiftCards")<text>:</text>
+                                        for (int i = 0; i < item.PurchasedGiftCardIds.Count; i++)
+                                        {
+                                            <a href="@Url.Action("Edit", "GiftCard", new { id = item.PurchasedGiftCardIds[i] })">@item.PurchasedGiftCardIds[i]</a>
+                                            if (i != item.PurchasedGiftCardIds.Count - 1)
+                                            {
+                                                <text>,</text>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </td>
+                           
+                            <td align="center" style="width: 10%;">
+                                <div>@item.Quantity</div>
+                                <div id="pnlEditPvQuantity@(item.Id)">
+                                    <table class="order-edit">
+                                        <tr>
+                                            <td colspan="2">
+                                                <input name="pvQuantity@(item.Id)" type="text" value="@item.Quantity" id="pvQuantity@(item.Id)" class="adminInput" style="width:100px;" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+
+                             
+
+                            @if (!Model.IsLoggedInAsVendor)
+                            {
+                                <td align="center" style="width: 15%;">
+                                    <input type="submit" name="btnEditOrderItem@(item.Id)" value="@T("Admin.Common.Edit")" onclick="toggleOrderItemEdit@(item.Id)(true);return false; " id="btnEditOrderItem@(item.Id)" class="adminButton" />
+                                    <input type="submit" name="btnDeleteOrderItem@(item.Id)" value="@T("Admin.Common.Delete")" id="btnDeleteOrderItem@(item.Id)" class="adminButton" onclick="return confirm('@T("Admin.Common.AreYouSure")'); " />
+                                    <input type="submit" name="btnSaveOrderItem@(item.Id)" value="@T("Admin.Common.Save")" id="btnSaveOrderItem@(item.Id)" class="adminButton" style="display:none;" onclick="return confirm('@T("Admin.Common.AreYouSure")'); " />
+                                    <input type="submit" name="btnCancelOrderItem@(item.Id)" value="@T("Admin.Common.Cancel")" onclick="toggleOrderItemEdit@(item.Id)    (false);return false; " id="btnCancelOrderItem@(item.Id)" class="adminButton" style="display:none;" />
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    @if (!String.IsNullOrEmpty(Model.CheckoutAttributeInfo) && !Model.IsLoggedInAsVendor)
+    {
+        <tr>
+            <td class="adminData">
+                @Html.Raw(Model.CheckoutAttributeInfo)
+            </td>
+        </tr>
+    }
+    @if (!Model.IsLoggedInAsVendor)
+    {
+        <tr>
+            <td class="adminData">
+            
+            </td>
+        </tr>
+    }
+</table>
+

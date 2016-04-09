@@ -1,0 +1,191 @@
+﻿@model Nop.Admin.Models.SubscriptionOrders.SubscriptionOrderModel
+
+<table class="adminContent">
+    <tr>
+        <td>
+            <div id="ordernotes-grid"></div>
+
+            <script>
+                $(document).ready(function () {
+                    $("#ordernotes-grid").kendoGrid({
+                        dataSource: {
+                            type: "json",
+                            transport: {
+                                read: {
+                                    url: "@Html.Raw(Url.Action("SubscriptionOrderNotesSelect", "SubscriptionOrder", new { orderId = Model.Id }))",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: addAntiForgeryToken
+                                },
+                                destroy: {
+                                    url: "@Html.Raw(Url.Action("SubscriptionOrderNoteDelete", "SubscriptionOrder", new { orderId = Model.Id }))",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: addAntiForgeryToken
+                                }
+                            },
+                            schema: {
+                                data: "Data",
+                                total: "Total",
+                                errors: "Errors",
+                                model: {
+                                    id: "Id",
+                                    fields: {
+                                        //do not implicitly specify all fields
+                                        //we do it only for fields which implicitly require it
+                                        //otherwise, they'll be formatted wrong way
+                                        CreatedOn: {type: "date" }
+                                    }
+                                }
+                            },
+                            error: function(e) {
+                                display_kendoui_grid_error(e);
+                                // Cancel the changes
+                                this.cancelChanges();
+                            },
+                            serverPaging: true,
+                            serverFiltering: true,
+                            serverSorting: true
+                        },
+                        pageable: {
+                            refresh: true,
+                            numeric: false,
+                            previousNext: false,
+                            info: false
+                        },
+                        editable: {
+                            confirmation: false,
+                            mode: "inline"
+                        },
+                        scrollable: false,
+                        columns: [{
+                            field: "CreatedOn",
+                            title: "@T("Admin.SubscriptionOrders.SubscriptionOrderNotes.Fields.CreatedOn")",
+                            width: 200,
+                            type: "date",
+                            format: "{0:G}"
+                        }, {
+                            field: "Note",
+                            title: "@T("Admin.SubscriptionOrders.SubscriptionOrderNotes.Fields.Note")",
+                            encoded: false
+                        },{
+                            field: "DownloadId",
+                            title: "@T("Admin.SubscriptionOrders.SubscriptionOrderNotes.Fields.Download")",
+                            template: '# if(DownloadId > 0) {# <a href="@Url.Content("~/Admin/Download/DownloadFile")?downloadGuid=#=DownloadGuid#">@T("Admin.SubscriptionOrders.SubscriptionOrderNotes.Fields.Download.Link")</a> #} else {# @T("Admin.SubscriptionOrders.SubscriptionOrderNotes.Fields.Download.Link.No") #} #'
+                        },{
+                            field: "DisplayToCustomer",
+                            title: "@T("Admin.SubscriptionOrders.SubscriptionOrderNotes.Fields.DisplayToCustomer")",
+                            width: 100,
+                            headerAttributes: { style: "text-align:center" },
+                            attributes: { style: "text-align:center" },
+                            template: '<img src="@Url.Content("~/Administration/Content/images/")active-#=DisplayToCustomer#.gif" />'
+                        },  {
+                            command: { name: "destroy", text: "@T("Admin.Common.Delete")" },
+                            title: "@T("Admin.Common.Delete")",
+                            width: 100
+                        }]
+                    });
+                });
+            </script>
+        </td>
+    </tr>
+</table>
+<p>
+    <strong>
+        @T("Admin.SubscriptionOrders.SubscriptionOrderNotes.AddTitle")
+    </strong>
+</p>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#@Html.FieldIdFor(model => model.AddSubscriptionOrderNoteHasDownload)").change(toggleAddSubscriptionOrderNoteHasDownload);
+
+        toggleAddSubscriptionOrderNoteHasDownload();
+    });
+
+    function toggleAddSubscriptionOrderNoteHasDownload() {
+        if ($('#@Html.FieldIdFor(model => model.AddSubscriptionOrderNoteHasDownload)').is(':checked')) {
+            $('#pnlAddSubscriptionOrderNoteDownloadId').show();
+        }
+        else {
+            $('#pnlAddSubscriptionOrderNoteDownloadId').hide();
+        }
+    }
+
+</script>
+
+<table class="adminContent">
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.AddSubscriptionOrderNoteMessage):
+        </td>
+        <td class="adminData">
+            @Html.TextAreaFor(model => model.AddSubscriptionOrderNoteMessage, new { style = "Width: 350px; Height: 150px;" })
+            @Html.ValidationMessageFor(model => model.AddSubscriptionOrderNoteMessage)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.AddSubscriptionOrderNoteDownloadId):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.AddSubscriptionOrderNoteHasDownload) @T("Admin.SubscriptionOrders.SubscriptionOrderNotes.Fields.Download.HasDownload")
+            <div id="pnlAddSubscriptionOrderNoteDownloadId">
+                @Html.EditorFor(model => model.AddSubscriptionOrderNoteDownloadId)
+                @Html.ValidationMessageFor(model => model.AddSubscriptionOrderNoteDownloadId)
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.AddSubscriptionOrderNoteDisplayToCustomer):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.AddSubscriptionOrderNoteDisplayToCustomer)
+            @Html.ValidationMessageFor(model => model.AddSubscriptionOrderNoteDisplayToCustomer)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" align="left">
+            <input type="button" id="addSubscriptionOrderNote" class="k-button" value="@T("Admin.SubscriptionOrders.SubscriptionOrderNotes.AddButton")" />
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#addSubscriptionOrderNote').click(function () {
+            var orderNoteMessage = $("#@Html.FieldIdFor(model => model.AddSubscriptionOrderNoteMessage)").val();
+            var orderNoteDownloadId = 0;
+            if ($('#@Html.FieldIdFor(model => model.AddSubscriptionOrderNoteHasDownload)').is(':checked')) {
+                orderNoteDownloadId = $("#@Html.FieldIdFor(model => model.AddSubscriptionOrderNoteDownloadId)").val();
+            }
+            var orderNoteDisplayToCustomer = $("#@Html.FieldIdFor(model => model.AddSubscriptionOrderNoteDisplayToCustomer)").is(':checked');
+            $('#addSubscriptionOrderNote').attr('disabled', true);
+            
+            var postData = {
+                DisplayToCustomer: orderNoteDisplayToCustomer,
+                message: orderNoteMessage, 
+                downloadId: orderNoteDownloadId, 
+                orderId: @Model.Id
+            };
+            addAntiForgeryToken(postData);
+
+            $.ajax({
+                cache:false,
+                type: "POST",
+                url: "@(Url.Action("SubscriptionOrderNoteAdd", "Subscription"))",
+                data: postData,
+                success: function (data) {
+                    var grid = $("#ordernotes-grid").data('kendoGrid');
+                    grid.dataSource.read();
+                    $('#addSubscriptionOrderNote').attr('disabled', false);
+                },
+                error:function (xhr, ajaxOptions, thrownError){
+                    alert('Failed to add order note.');
+                    $('#addSubscriptionOrderNote').attr('disabled', false);
+                }  
+            });
+        });
+    });
+</script>

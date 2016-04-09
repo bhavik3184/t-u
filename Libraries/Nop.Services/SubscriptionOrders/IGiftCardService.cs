@@ -24,6 +24,9 @@ namespace Nop.Services.SubscriptionOrders
         /// <returns>Gift card entry</returns>
         GiftCard GetGiftCardById(int giftCardId);
 
+
+        GiftCard GetGiftCardByCouponCode(string giftCardCouponCode);
+
         /// <summary>
         /// Gets all gift cards
         /// </summary>

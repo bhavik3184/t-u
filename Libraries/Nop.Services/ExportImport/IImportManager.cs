@@ -14,6 +14,9 @@ namespace Nop.Services.ExportImport
         /// </summary>
         /// <param name="stream">Stream</param>
         void ImportProductsFromXlsx(Stream stream);
+        void ImportSimpleProductsFromXlsx(Stream stream);
+        void ImportGiftCardsFromXlsx(Stream stream);
+        void ImportManufacturersFromXlsx(Stream stream);
 
         /// <summary>
         /// Import newsletter subscribers from TXT file

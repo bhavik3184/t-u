@@ -1,0 +1,22 @@
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Views\PaymentCCAvenue\Configure.cshtml
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Views\PaymentCCAvenue\PaymentInfo.cshtml
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Presentation\Nop.Web\Plugins\Payments.CCAvenue\web.config
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Description.txt
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Presentation\Nop.Web\Plugins\Payments.CCAvenue\logo.jpg
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Nop.Plugin.Payments.CCAvenue.dll.config
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Nop.Plugin.Payments.CCAvenue.dll
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Nop.Plugin.Payments.CCAvenue.pdb
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Plugins\Nop.Plugin.Payments.CCAvenue\obj\Debug\Nop.Plugin.Payments.CCAvenue.csprojResolveAssemblyReference.cache
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Plugins\Nop.Plugin.Payments.CCAvenue\obj\Debug\Nop.Plugin.Payments.CCAvenue.dll
+C:\!work\Обновление плагинов\nopCommerce_3.70_Source\Plugins\Nop.Plugin.Payments.CCAvenue\obj\Debug\Nop.Plugin.Payments.CCAvenue.pdb
+C:\projects\ToysAndUs\Plugins\Nop.Plugin.Payments.CCAvenue\obj\Debug\Nop.Plugin.Payments.CCAvenue.csprojResolveAssemblyReference.cache
+C:\projects\ToysAndUs\Plugins\Nop.Plugin.Payments.CCAvenue\obj\Debug\Nop.Plugin.Payments.CCAvenue.dll
+C:\projects\ToysAndUs\Plugins\Nop.Plugin.Payments.CCAvenue\obj\Debug\Nop.Plugin.Payments.CCAvenue.pdb
+C:\projects\ToysAndUs\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Views\PaymentCCAvenue\Configure.cshtml
+C:\projects\ToysAndUs\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Views\PaymentCCAvenue\PaymentInfo.cshtml
+C:\projects\ToysAndUs\Presentation\Nop.Web\Plugins\Payments.CCAvenue\web.config
+C:\projects\ToysAndUs\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Description.txt
+C:\projects\ToysAndUs\Presentation\Nop.Web\Plugins\Payments.CCAvenue\logo.jpg
+C:\projects\ToysAndUs\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Nop.Plugin.Payments.CCAvenue.dll.config
+C:\projects\ToysAndUs\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Nop.Plugin.Payments.CCAvenue.dll
+C:\projects\ToysAndUs\Presentation\Nop.Web\Plugins\Payments.CCAvenue\Nop.Plugin.Payments.CCAvenue.pdb

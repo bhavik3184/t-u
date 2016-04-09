@@ -350,37 +350,40 @@ namespace Nop.Services.Catalog
         /// </param>
         /// <returns>Products</returns>
         public virtual IPagedList<Product> SearchProducts(
-            int pageIndex = 0,
-            int pageSize = int.MaxValue,
-            IList<int> categoryIds = null,
-            int manufacturerId = 0,
-            int storeId = 0,
-            int vendorId = 0,
-            int warehouseId = 0,
-            ProductType? productType = null,
-            bool visibleIndividuallyOnly = false,
+             int pageIndex = 0,
+             int pageSize = int.MaxValue,
+             IList<int> categoryIds = null,
+             int manufacturerId = 0,
+             int storeId = 0,
+             int vendorId = 0,
+             int warehouseId = 0,
+             ProductType? productType = null,
+             bool visibleIndividuallyOnly = false,
             bool markedAsNewOnly = false,
-            bool? featuredProducts = null,
-            decimal? priceMin = null,
-            decimal? priceMax = null,
-            int productTagId = 0,
-            string keywords = null,
-            bool searchDescriptions = false,
-            bool searchSku = true,
-            bool searchProductTags = false,
-            int languageId = 0,
-            IList<int> filteredSpecs = null,
-            ProductSortingEnum orderBy = ProductSortingEnum.Position,
-            bool showHidden = false,
-            bool? overridePublished = null)
+             bool? featuredProducts = null,
+             decimal? priceMin = null,
+             decimal? priceMax = null,
+             int productTagId = 0,
+             string keywords = null,
+             bool searchDescriptions = false,
+             bool searchSku = true,
+             bool searchProductTags = false,
+             int languageId = 0,
+             string filteredSpecs = null,
+             ProductSortingEnum orderBy = ProductSortingEnum.Position,
+             bool showHidden = false,
+             bool? overridePublished = null)
         {
             IList<int> filterableSpecificationAttributeOptionIds;
-            return SearchProducts(out filterableSpecificationAttributeOptionIds, false,
+            IList<int> AllfilterableSpecificationAttributeOptionIds;
+            int TotalRecords;
+            return SearchProducts(out AllfilterableSpecificationAttributeOptionIds, out filterableSpecificationAttributeOptionIds,out TotalRecords,
+                false,
                 pageIndex, pageSize, categoryIds, manufacturerId,
                 storeId, vendorId, warehouseId,
-                productType, visibleIndividuallyOnly, markedAsNewOnly, featuredProducts,
+                productType, visibleIndividuallyOnly,markedAsNewOnly, featuredProducts,
                 priceMin, priceMax, productTagId, keywords, searchDescriptions, searchSku,
-                searchProductTags, languageId, filteredSpecs, 
+                searchProductTags, languageId, filteredSpecs,
                 orderBy, showHidden, overridePublished);
         }
 
@@ -398,7 +401,6 @@ namespace Nop.Services.Catalog
         /// <param name="warehouseId">Warehouse identifier; 0 to load all records</param>
         /// <param name="productType">Product type; 0 to load all records</param>
         /// <param name="visibleIndividuallyOnly">A values indicating whether to load only products marked as "visible individually"; "false" to load all records; "true" to load "visible individually" only</param>
-        /// <param name="markedAsNewOnly">A values indicating whether to load only products marked as "new"; "false" to load all records; "true" to load "marked as new" only</param>
         /// <param name="featuredProducts">A value indicating whether loaded products are marked as featured (relates only to categories and manufacturers). 0 to load featured products only, 1 to load not featured products only, null to load all products</param>
         /// <param name="priceMin">Minimum price; null to load all records</param>
         /// <param name="priceMax">Maximum price; null to load all records</param>
@@ -418,7 +420,9 @@ namespace Nop.Services.Catalog
         /// </param>
         /// <returns>Products</returns>
         public virtual IPagedList<Product> SearchProducts(
+            out IList<int> AllfilterableSpecificationAttributeOptionIds,
             out IList<int> filterableSpecificationAttributeOptionIds,
+            out int TotalRecords,
             bool loadFilterableSpecificationAttributeOptionIds = false,
             int pageIndex = 0,
             int pageSize = 2147483647,  //Int32.MaxValue
@@ -439,13 +443,13 @@ namespace Nop.Services.Catalog
             bool searchSku = true,
             bool searchProductTags = false,
             int languageId = 0,
-            IList<int> filteredSpecs = null,
+            string filteredSpecs = null,
             ProductSortingEnum orderBy = ProductSortingEnum.Position,
             bool showHidden = false,
             bool? overridePublished = null)
         {
             filterableSpecificationAttributeOptionIds = new List<int>();
-
+            AllfilterableSpecificationAttributeOptionIds = new List<int>();
             //search by keyword
             bool searchLocalizedValue = false;
             if (languageId > 0)
@@ -463,7 +467,7 @@ namespace Nop.Services.Catalog
             }
 
             //validate "categoryIds" parameter
-            if (categoryIds !=null && categoryIds.Contains(0))
+            if (categoryIds != null && categoryIds.Contains(0))
                 categoryIds.Remove(0);
 
             //Access control list. Allowed customer roles
@@ -475,7 +479,7 @@ namespace Nop.Services.Catalog
                 //It's much faster than the LINQ implementation below 
 
                 #region Use stored procedure
-                
+
                 //pass category identifiers as comma-delimited string
                 string commaSeparatedCategoryIds = categoryIds == null ? "" : string.Join(",", categoryIds);
 
@@ -488,20 +492,20 @@ namespace Nop.Services.Catalog
                 string commaSeparatedSpecIds = "";
                 if (filteredSpecs != null)
                 {
-                    ((List<int>)filteredSpecs).Sort();
-                    commaSeparatedSpecIds = string.Join(",", filteredSpecs);
+
+                    commaSeparatedSpecIds = filteredSpecs;
                 }
 
                 //some databases don't support int.MaxValue
                 if (pageSize == int.MaxValue)
                     pageSize = int.MaxValue - 1;
-                
+
                 //prepare parameters
                 var pCategoryIds = _dataProvider.GetParameter();
                 pCategoryIds.ParameterName = "CategoryIds";
                 pCategoryIds.Value = commaSeparatedCategoryIds != null ? (object)commaSeparatedCategoryIds : DBNull.Value;
                 pCategoryIds.DbType = DbType.String;
-                
+
                 var pManufacturerId = _dataProvider.GetParameter();
                 pManufacturerId.ParameterName = "ManufacturerId";
                 pManufacturerId.Value = manufacturerId;
@@ -551,7 +555,7 @@ namespace Nop.Services.Catalog
                 pPriceMin.ParameterName = "PriceMin";
                 pPriceMin.Value = priceMin.HasValue ? (object)priceMin.Value : DBNull.Value;
                 pPriceMin.DbType = DbType.Decimal;
-                
+
                 var pPriceMax = _dataProvider.GetParameter();
                 pPriceMax.ParameterName = "PriceMax";
                 pPriceMax.Value = priceMax.HasValue ? (object)priceMax.Value : DBNull.Value;
@@ -631,12 +635,18 @@ namespace Nop.Services.Catalog
                 pLoadFilterableSpecificationAttributeOptionIds.ParameterName = "LoadFilterableSpecificationAttributeOptionIds";
                 pLoadFilterableSpecificationAttributeOptionIds.Value = loadFilterableSpecificationAttributeOptionIds;
                 pLoadFilterableSpecificationAttributeOptionIds.DbType = DbType.Boolean;
-                
+
                 var pFilterableSpecificationAttributeOptionIds = _dataProvider.GetParameter();
                 pFilterableSpecificationAttributeOptionIds.ParameterName = "FilterableSpecificationAttributeOptionIds";
                 pFilterableSpecificationAttributeOptionIds.Direction = ParameterDirection.Output;
                 pFilterableSpecificationAttributeOptionIds.Size = int.MaxValue - 1;
                 pFilterableSpecificationAttributeOptionIds.DbType = DbType.String;
+
+                var pAllFilterableSpecificationAttributeOptionIds = _dataProvider.GetParameter();
+                pAllFilterableSpecificationAttributeOptionIds.ParameterName = "AllFilterableSpecificationAttributeOptionIds";
+                pAllFilterableSpecificationAttributeOptionIds.Direction = ParameterDirection.Output;
+                pAllFilterableSpecificationAttributeOptionIds.Size = int.MaxValue - 1;
+                pAllFilterableSpecificationAttributeOptionIds.DbType = DbType.String;
 
                 var pTotalRecords = _dataProvider.GetParameter();
                 pTotalRecords.ParameterName = "TotalRecords";
@@ -674,19 +684,31 @@ namespace Nop.Services.Catalog
                     pOverridePublished,
                     pLoadFilterableSpecificationAttributeOptionIds,
                     pFilterableSpecificationAttributeOptionIds,
+                    pAllFilterableSpecificationAttributeOptionIds,
                     pTotalRecords);
                 //get filterable specification attribute option identifier
                 string filterableSpecificationAttributeOptionIdsStr = (pFilterableSpecificationAttributeOptionIds.Value != DBNull.Value) ? (string)pFilterableSpecificationAttributeOptionIds.Value : "";
                 if (loadFilterableSpecificationAttributeOptionIds &&
                     !string.IsNullOrWhiteSpace(filterableSpecificationAttributeOptionIdsStr))
                 {
-                     filterableSpecificationAttributeOptionIds = filterableSpecificationAttributeOptionIdsStr
-                        .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(x => Convert.ToInt32(x.Trim()))
-                        .ToList();
+                    filterableSpecificationAttributeOptionIds = filterableSpecificationAttributeOptionIdsStr
+                       .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                       .Select(x => Convert.ToInt32(x.Trim()))
+                       .ToList();
+                }
+
+                string AllfilterableSpecificationAttributeOptionIdsStr = (pAllFilterableSpecificationAttributeOptionIds.Value != DBNull.Value) ? (string)pAllFilterableSpecificationAttributeOptionIds.Value : "";
+                if (loadFilterableSpecificationAttributeOptionIds &&
+                    !string.IsNullOrWhiteSpace(AllfilterableSpecificationAttributeOptionIdsStr))
+                {
+                    AllfilterableSpecificationAttributeOptionIds = AllfilterableSpecificationAttributeOptionIdsStr
+                       .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                       .Select(x => Convert.ToInt32(x.Trim()))
+                       .ToList();
                 }
                 //return products
                 int totalRecords = (pTotalRecords.Value != DBNull.Value) ? Convert.ToInt32(pTotalRecords.Value) : 0;
+                TotalRecords = totalRecords;
                 return new PagedList<Product>(products, pageIndex, pageSize, totalRecords);
 
                 #endregion
@@ -722,27 +744,20 @@ namespace Nop.Services.Catalog
                 {
                     query = query.Where(p => p.VisibleIndividually);
                 }
-                //The function 'CurrentUtcDateTime' is not supported by SQL Server Compact. 
-                //That's why we pass the date value
-                var nowUtc = DateTime.UtcNow;
-                if (markedAsNewOnly)
-                {
-                    query = query.Where(p => p.MarkAsNew);
-                    query = query.Where(p =>
-                        (!p.MarkAsNewStartDateTimeUtc.HasValue || p.MarkAsNewStartDateTimeUtc.Value < nowUtc) &&
-                        (!p.MarkAsNewEndDateTimeUtc.HasValue || p.MarkAsNewEndDateTimeUtc.Value > nowUtc));
-                }
                 if (productType.HasValue)
                 {
-                    var productTypeId = (int) productType.Value;
+                    var productTypeId = (int)productType.Value;
                     query = query.Where(p => p.ProductTypeId == productTypeId);
                 }
 
+                //The function 'CurrentUtcDateTime' is not supported by SQL Server Compact. 
+                //That's why we pass the date value
+                var nowUtc = DateTime.UtcNow;
                 if (priceMin.HasValue)
                 {
                     //min price
                     query = query.Where(p =>
-                                        //special price (specified price and valid date range)
+                        //special price (specified price and valid date range)
                                         ((p.SpecialPrice.HasValue &&
                                           ((!p.SpecialPriceStartDateTimeUtc.HasValue ||
                                             p.SpecialPriceStartDateTimeUtc.Value < nowUtc) &&
@@ -750,7 +765,7 @@ namespace Nop.Services.Catalog
                                             p.SpecialPriceEndDateTimeUtc.Value > nowUtc))) &&
                                          (p.SpecialPrice >= priceMin.Value))
                                         ||
-                                        //regular price (price isn't specified or date range isn't valid)
+                                            //regular price (price isn't specified or date range isn't valid)
                                         ((!p.SpecialPrice.HasValue ||
                                           ((p.SpecialPriceStartDateTimeUtc.HasValue &&
                                             p.SpecialPriceStartDateTimeUtc.Value > nowUtc) ||
@@ -762,7 +777,7 @@ namespace Nop.Services.Catalog
                 {
                     //max price
                     query = query.Where(p =>
-                                        //special price (specified price and valid date range)
+                        //special price (specified price and valid date range)
                                         ((p.SpecialPrice.HasValue &&
                                           ((!p.SpecialPriceStartDateTimeUtc.HasValue ||
                                             p.SpecialPriceStartDateTimeUtc.Value < nowUtc) &&
@@ -770,7 +785,7 @@ namespace Nop.Services.Catalog
                                             p.SpecialPriceEndDateTimeUtc.Value > nowUtc))) &&
                                          (p.SpecialPrice <= priceMax.Value))
                                         ||
-                                        //regular price (price isn't specified or date range isn't valid)
+                                            //regular price (price isn't specified or date range isn't valid)
                                         ((!p.SpecialPrice.HasValue ||
                                           ((p.SpecialPriceStartDateTimeUtc.HasValue &&
                                             p.SpecialPriceStartDateTimeUtc.Value > nowUtc) ||
@@ -797,7 +812,7 @@ namespace Nop.Services.Catalog
                                   (searchDescriptions && p.ShortDescription.Contains(keywords)) ||
                                   (searchDescriptions && p.FullDescription.Contains(keywords)) ||
                                   (searchProductTags && pt.Name.Contains(keywords)) ||
-                                  //localized values
+                                //localized values
                                   (searchLocalizedValue && lp.LanguageId == languageId && lp.LocaleKeyGroup == "Product" && lp.LocaleKey == "Name" && lp.LocaleValue.Contains(keywords)) ||
                                   (searchDescriptions && searchLocalizedValue && lp.LanguageId == languageId && lp.LocaleKeyGroup == "Product" && lp.LocaleKey == "ShortDescription" && lp.LocaleValue.Contains(keywords)) ||
                                   (searchDescriptions && searchLocalizedValue && lp.LanguageId == languageId && lp.LocaleKeyGroup == "Product" && lp.LocaleKey == "FullDescription" && lp.LocaleValue.Contains(keywords))
@@ -825,18 +840,9 @@ namespace Nop.Services.Catalog
                             where !p.LimitedToStores || storeId == sm.StoreId
                             select p;
                 }
-                
+
                 //search by specs
-                if (filteredSpecs != null && filteredSpecs.Count > 0)
-                {
-                    query = from p in query
-                            where !filteredSpecs
-                                       .Except(
-                                           p.ProductSpecificationAttributes.Where(psa => psa.AllowFiltering).Select(
-                                               psa => psa.SpecificationAttributeOptionId))
-                                       .Any()
-                            select p;
-                }
+
 
                 //category filtering
                 if (categoryIds != null && categoryIds.Count > 0)
@@ -873,8 +879,8 @@ namespace Nop.Services.Catalog
                          p.UseMultipleWarehouses &&
                          p.ProductWarehouseInventory.Any(pwi => pwi.WarehouseId == warehouseId))
                         ||
-                        //"Use multiple warehouses" disabled
-                        //we use standard "warehouse" property
+                            //"Use multiple warehouses" disabled
+                            //we use standard "warehouse" property
                         ((p.ManageInventoryMethodId != manageStockInventoryMethodId ||
                           !p.UseMultipleWarehouses) &&
                           p.WarehouseId == warehouseId));
@@ -902,9 +908,9 @@ namespace Nop.Services.Catalog
                 //it'll not work in SQL Server Compact when searching products by a keyword)
                 query = from p in query
                         group p by p.Id
-                        into pGroup
-                        orderby pGroup.Key
-                        select pGroup.FirstOrDefault();
+                            into pGroup
+                            orderby pGroup.Key
+                            select pGroup.FirstOrDefault();
 
                 //sort products
                 if (orderBy == ProductSortingEnum.Position && categoryIds != null && categoryIds.Count > 0)
@@ -916,7 +922,7 @@ namespace Nop.Services.Catalog
                 else if (orderBy == ProductSortingEnum.Position && manufacturerId > 0)
                 {
                     //manufacturer position
-                    query = 
+                    query =
                         query.OrderBy(p => p.ProductManufacturers.FirstOrDefault(pm => pm.ManufacturerId == manufacturerId).DisplayOrder);
                 }
                 else if (orderBy == ProductSortingEnum.Position)
@@ -969,7 +975,7 @@ namespace Nop.Services.Catalog
                         .Distinct()
                         .ToList();
                 }
-
+                TotalRecords = products.Count();
                 //return products
                 return products;
 

@@ -28,7 +28,7 @@ namespace Nop.Web.Models.BorrowCart
         }
 
         public bool OnePageCheckoutEnabled { get; set; }
-
+     
         public bool ShowSku { get; set; }
         public bool ShowProductImages { get; set; }
         public bool IsEditable { get; set; }
@@ -79,7 +79,7 @@ namespace Nop.Web.Models.BorrowCart
             public string UnitPrice { get; set; }
 
             public string SubTotal { get; set; }
-
+            public bool IsStockAvailable { get; set; }
             public string Discount { get; set; }
             public string CreatedOn { get; set; }
             public int Quantity { get; set; }

@@ -640,10 +640,10 @@ namespace Nop.Services.SubscriptionOrders
         public virtual decimal? GetBorrowCartTotal(IList<BorrowCartItem> cart,
             bool ignoreRewardPonts = false, bool usePaymentMethodAdditionalFee = true)
         {
-            decimal discountAmount;
-            Discount appliedDiscount;
-            int redeemedRewardPoints;
-            decimal redeemedRewardPointsAmount;
+            //decimal discountAmount;
+            //Discount appliedDiscount;
+            //int redeemedRewardPoints;
+            //decimal redeemedRewardPointsAmount;
            
             return GetBorrowCartTotal(cart, 
                 

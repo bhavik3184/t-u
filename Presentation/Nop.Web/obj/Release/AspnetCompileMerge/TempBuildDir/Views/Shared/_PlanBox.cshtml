@@ -1,0 +1,73 @@
+﻿@model PlanOverviewModel
+@using Nop.Core
+@using Nop.Core.Domain.SubscriptionOrders
+@using Nop.Core.Domain.Tax
+@using Nop.Core.Infrastructure
+@using Nop.Web.Models.Catalog;
+@{
+    //prepare "Add to cart" AJAX link
+    string addtocartlink = "";
+    var borrowCartTypeId = (int)SubscriptionCartType.SubscriptionCart;
+    var quantity = 1;
+    if (Model.PlanPrice.ForceRedirectionAfterAddingToCart)
+    {
+        addtocartlink = Url.RouteUrl("AddPlanToCart-Catalog", new { planId = Model.Id, borrowCartTypeId = borrowCartTypeId, quantity = quantity, forceredirection = Model.PlanPrice.ForceRedirectionAfterAddingToCart });
+    }
+    else
+    {
+        addtocartlink = Url.RouteUrl("AddPlanToCart-Catalog", new { planId = Model.Id, borrowCartTypeId = borrowCartTypeId, quantity = quantity });
+    }
+
+}
+ <style>
+     .product-box-add-to-cart-button {
+         background-color: #4ab2f1;
+         text-align: center;
+         font-size: 14px;
+         color: #fff;
+         width: 100%;
+         text-transform: uppercase;
+     }
+    input[type="button"] {
+         display: inline-block;
+         height: 30px;
+         border: none;
+         vertical-align: middle;
+     }
+ </style>
+ <tr>
+    <td class="product">
+        <span class="product-name">@Model.Name</span>
+    </td>
+     <td class="product">
+         <span class="product-name">@Html.Raw(@Model.PlanCategoryProductsName)</span>
+     </td>
+     <td class="unit-price">
+         <span class="product-unit-price">@Model.Duration</span>
+    </td>
+     <td class="unit-price" style="visibility:hidden;display:none;">
+         <span class="product-unit-price">@Model.NoOfItemsToBorrow</span>
+     </td>
+    <td class="unit-price">
+        <label class="td-title">@T("SubscriptionCart.UnitPrice"):</label>
+        <span class="product-unit-price">@Model.PlanPrice.Price</span>
+    </td>
+     <td class="unit-price">
+         <span class="product-unit-price">@Model.PlanPrice.SecurityDeposit</span>
+     </td>       
+     <td class="product">
+         <span class="product-unit-price">@Model.MaxNoOfDeliveries</span>
+     </td>       
+     <td>
+         @if (!Model.CurrentPlan)
+         { <input type="radio" value="SELECT" class="button-2 product-box-add-to-cart-button" onclick="AjaxCart.addplantocart_catalog('@addtocartlink');return false;" />
+         }
+         else
+         {
+             <span style="color:red;">Current Plan</span>
+         }
+     </td>
+                    
+</tr>
+           
+       

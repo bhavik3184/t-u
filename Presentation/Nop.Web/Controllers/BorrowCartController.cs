@@ -341,6 +341,11 @@ namespace Nop.Web.Controllers
                     + _dateTimeHelper.ConvertToUserTime(sci.CreatedOnUtc, DateTimeKind.Utc).Year ,
                 };
 
+                if (sci.Product.StockQuantity > 0)
+                    cartItemModel.IsStockAvailable = true;
+                else
+                    cartItemModel.IsStockAvailable = false;
+
                 //allow editing?
                 //1. setting enabled?
                 //2. simple product?
@@ -549,6 +554,11 @@ namespace Nop.Web.Controllers
                     Quantity = sci.Quantity,
                     AttributeInfo = _productAttributeFormatter.FormatAttributes(sci.Product, sci.AttributesXml),
                 };
+
+                if (sci.Product.StockQuantity > 0)
+                    cartItemModel.IsStockAvailable = true;
+                else
+                    cartItemModel.IsStockAvailable = false;
 
                 //allowed quantities
                 var allowedQuantities = sci.Product.ParseAllowedQuantities();
@@ -836,10 +846,10 @@ namespace Nop.Web.Controllers
                 model.DisplayTax = displayTax;
 
                 //total
-                decimal orderTotalDiscountAmountBase;
-                Discount orderTotalAppliedDiscount;
-                int redeemedRewardPoints;
-                decimal redeemedRewardPointsAmount;
+                //decimal orderTotalDiscountAmountBase;
+                //Discount orderTotalAppliedDiscount;
+                //int redeemedRewardPoints;
+                //decimal redeemedRewardPointsAmount;
                 decimal? borrowCartTotalBase = _orderTotalCalculationService.GetBorrowCartTotal(cart,false);
                 if (borrowCartTotalBase.HasValue)
                 {
@@ -1101,6 +1111,15 @@ namespace Nop.Web.Controllers
                 });
             }
 
+            if (product.StockQuantity == 0 && cartType == BorrowCartType.BorrowCart)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "This product is not in stock " + cartType,
+                });
+            }
+
             //products with "minimum order quantity" more than a specified qty
             if (product.OrderMinimumQuantity > quantity)
             {
@@ -1149,6 +1168,24 @@ namespace Nop.Web.Controllers
                 });
             }
 
+            bool successflag = false;
+            String errorMessage = "";
+
+            var cartDuplicate = _workContext.CurrentCustomer.BorrowCartItems
+              .Where(sci => sci.BorrowCartType == cartType && sci .ProductId ==product.Id)
+              .LimitPerStore(_storeContext.CurrentStore.Id)
+              .ToList();
+
+            if (cartDuplicate.Count() > 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "This product is already exists in " + cartType,
+                });
+            }
+
+
             //get standard warnings without attribute validations
             //first, try to find existing shopping cart item
             var cart = _workContext.CurrentCustomer.BorrowCartItems
@@ -1156,8 +1193,7 @@ namespace Nop.Web.Controllers
                 .LimitPerStore(_storeContext.CurrentStore.Id)
                 .ToList();
 
-            bool successflag = false;
-            String errorMessage = "";
+        
 
             var currentorder = _subscriptionService.GetCurrentSubscribedOrder(_workContext.CurrentCustomer.Id);
             if (currentorder != null)
@@ -1183,7 +1219,7 @@ namespace Nop.Web.Controllers
                         //var productCategories = proCategories.GroupBy(x => x.Id).Select(y => y.First());
                         
                         var productCategories = _categoryService.GetProductCategoriesByProductId(productId);
-                        int s = 0;
+                        //int s = 0;
                         foreach(PlanCategory pl in planCategories){
                             if (pl.Category.ParentCategoryId == 0) {
                                 if (productCategories.Count > 0) {
@@ -1206,7 +1242,7 @@ namespace Nop.Web.Controllers
                                             });
                                         }
                                     }
-                                    s = 1;
+                                  //  s = 1;
                                 }
                                 else
                                 {
@@ -1415,23 +1451,88 @@ namespace Nop.Web.Controllers
         [ValidateInput(false)]
         public ActionResult AddProductToCart_Details(int productId, int borrowCartTypeId, FormCollection form)
         {
-            var product = _productService.GetProductById(productId);
             var cartType = (BorrowCartType)borrowCartTypeId;
+
+            var product = _productService.GetProductById(productId);
             if (product == null)
-            {
+                //no product found
                 return Json(new
                 {
-                    redirect = Url.RouteUrl("HomePage"),
+                    success = false,
+                    message = "No product found with the specified ID"
                 });
-            }
 
             //we can add only simple products
             if (product.ProductType != ProductType.SimpleProduct)
             {
                 return Json(new
                 {
+                    redirect = Url.RouteUrl("Product", new { SeName = product.GetSeName() }),
+                });
+            }
+
+            if (product.StockQuantity == 0 && cartType == BorrowCartType.BorrowCart)
+            {
+                return Json(new
+                {
                     success = false,
-                    message = "Only simple products could be added to the cart"
+                    message = "This product is not in stock " + cartType,
+                });
+            }
+
+            
+
+            if (product.CustomerEntersPrice)
+            {
+                //cannot be added to the cart (requires a customer to enter price)
+                return Json(new
+                {
+                    redirect = Url.RouteUrl("Product", new { SeName = product.GetSeName() }),
+                });
+            }
+
+            if (product.IsRental)
+            {
+                //rental products require start/end dates to be entered
+                return Json(new
+                {
+                    redirect = Url.RouteUrl("Product", new { SeName = product.GetSeName() }),
+                });
+            }
+
+            var allowedQuantities = product.ParseAllowedQuantities();
+            if (allowedQuantities.Length > 0)
+            {
+                //cannot be added to the cart (requires a customer to select a quantity from dropdownlist)
+                return Json(new
+                {
+                    redirect = Url.RouteUrl("Product", new { SeName = product.GetSeName() }),
+                });
+            }
+
+            if (product.ProductAttributeMappings.Count > 0)
+            {
+                //product has some attributes. let a customer see them
+                return Json(new
+                {
+                    redirect = Url.RouteUrl("Product", new { SeName = product.GetSeName() }),
+                });
+            }
+
+            bool successflag = false;
+            String errorMessage = "";
+
+            var cartDuplicate = _workContext.CurrentCustomer.BorrowCartItems
+              .Where(sci => sci.BorrowCartType == cartType && sci.ProductId == product.Id)
+              .LimitPerStore(_storeContext.CurrentStore.Id)
+              .ToList();
+
+            if (cartDuplicate.Count() > 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "This product is already exists in " + cartType,
                 });
             }
 
@@ -1442,8 +1543,7 @@ namespace Nop.Web.Controllers
                          .LimitPerStore(_storeContext.CurrentStore.Id)
                          .ToList();
 
-            bool successflag = false;
-            String errorMessage = "";
+           
 
             var currentorder = _subscriptionService.GetCurrentSubscribedOrder(_workContext.CurrentCustomer.Id);
             if (currentorder != null)
@@ -1470,7 +1570,7 @@ namespace Nop.Web.Controllers
                         //var productCategories = proCategories.GroupBy(x => x.Id).Select(y => y.First());
 
                         var productCategories = _categoryService.GetProductCategoriesByProductId(productId);
-                        String s = "";
+                        //String s = "";
                         foreach (PlanCategory pl in planCategories)
                         {
                             if (pl.Category.ParentCategoryId == 0)
@@ -1532,7 +1632,7 @@ namespace Nop.Web.Controllers
                         //var productCategories = proCategories.GroupBy(x => x.Id).Select(y => y.First());
 
                         var productCategories = _categoryService.GetProductCategoriesByProductId(productId);
-                        String s = "";
+                        //String s = "";
                         foreach (PlanCategory pl in planCategories)
                         {
                             if (pl.Category.ParentCategoryId == 0)
@@ -2170,7 +2270,7 @@ namespace Nop.Web.Controllers
                                     }
                                 }
                         
-                                String s = "";
+                                //String s = "";
                                 foreach (PlanCategory pl in planCategories)
                                 {
                                     if (pl.Category.ParentCategoryId == 0)
@@ -2517,7 +2617,7 @@ namespace Nop.Web.Controllers
                     //if (cart.Count > 0) { 
                     //    productCategories = _categoryService.GetProductCategoriesByProductId(cart.FirstOrDefault().ProductId);
                     //}
-                    String s = "";
+                    //String s = "";
                     foreach (PlanCategory pl in plancategories)
                     {
                         PlanCategoryModel plm = new PlanCategoryModel();

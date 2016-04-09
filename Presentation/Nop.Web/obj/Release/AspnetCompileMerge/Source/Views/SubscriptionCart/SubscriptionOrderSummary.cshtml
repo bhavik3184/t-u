@@ -1,0 +1,131 @@
+@model SubscriptionCartModel
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Core.Infrastructure
+@using Nop.Web.Models.SubscriptionCart;
+@{
+   var webHelper = EngineContext.Current.Resolve<IWebHelper>();
+}
+<div class="order-summary-content  col-md-3 col-sm-12" style="padding: 0 !important; margin-top: 90px;">
+    @Html.Widget("order_summary_content_before")
+    @Html.Partial("_SubscriptionOrderReviewData", Model.SubscriptionOrderReviewData)
+    @if (Model.Items.Count > 0)
+    {
+        if (Model.Warnings.Count > 0)
+        {
+            <div class="message-error">
+                <ul>
+                    @foreach (var warning in Model.Warnings)
+                    {
+                        <li>@warning</li>
+                    }
+                </ul>
+            </div>
+        }
+       
+         using (Html.BeginRouteForm("CartConfirm", FormMethod.Post, new { id = "confirm-order-form" }))
+            {
+            @Html.AntiForgeryToken()
+          
+            if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
+            {
+                var inclTax = EngineContext.Current.Resolve<IWorkContext>().TaxDisplayType == TaxDisplayType.IncludingTax;
+                //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
+                //of course, you can modify appropriate locales to include VAT info there
+                <div class="tax-shipping-info">
+                    @T(inclTax ? "SubscriptionCart.TaxShipping.InclTax" : "SubscriptionCart.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                </div>
+            }
+            <div class="cart-options">
+                @*@if (Model.IsEditable)
+                    {
+                        <div class="common-buttons">
+                            <input type="submit" name="updatecart" value="@T("SubscriptionCart.UpdateCart")" class="button-2 update-cart-button" />
+                            <input type="submit" name="continueshopping" value="@T("SubscriptionCart.ContinueShopping")" class="button-2 continue-shopping-button" />
+                        </div>
+                    }*@
+                @if (Model.IsEditable)
+                {
+                    @Html.Partial("_CheckoutAttributes", Model.CheckoutAttributes, new ViewDataDictionary())
+                }
+                @if (!String.IsNullOrEmpty(Model.CheckoutAttributeInfo))
+                {
+                    <div class="selected-checkout-attributes">
+                        @Html.Raw(Model.CheckoutAttributeInfo)
+                    </div>
+                }
+            </div>
+            <div class="cart-footer">
+                @Html.Widget("order_summary_cart_footer")
+                @if (Model.IsEditable)
+                {
+                    @Html.Widget("order_summary_content_deals")
+                }
+                <div class="totals">
+                    @Html.Action("SubscriptionOrderTotals", "SubscriptionCart", new { isEditable = Model.IsEditable })
+                    @if (Model.IsEditable)
+                    {
+                        if (!String.IsNullOrEmpty(Model.MinSubscriptionOrderSubtotalWarning))
+                        {
+                            <div class="min-amount-warning">
+                                @Model.MinSubscriptionOrderSubtotalWarning
+                            </div>
+                        }
+                    }
+                    @if (Model.IsEditable)
+                    {
+                        <div class="cart-collaterals">
+                            <div class="deals">
+                                @Html.Partial("_GiftCardBox", Model.GiftCardBox)
+                            </div>
+                        </div>
+                        if (Model.TermsOfServiceOnSubscriptionCartPage)
+                        {
+                            <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display:none;">
+                                <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
+                            </div>
+                            <div class="terms-of-service">
+                                <input id="termsofservice" type="checkbox" name="termsofservice" />
+                                <span>@T("Checkout.TermsOfService.IAccept")<a class="read" onclick="javascript:OpenWindow('@Url.RouteUrl("TopicPopup", new { SystemName = "conditionsofuse" })', 450, 500, true)">@T("Checkout.TermsOfService.Read")</a></span>
+                            </div>
+                        }
+                        <div class="checkout-buttons">
+                            @if (String.IsNullOrEmpty(Model.MinSubscriptionOrderSubtotalWarning))
+                            {
+                                <script type="text/javascript">
+                                    $(document).ready(function () {
+                                        $('#checkout').click(function () {
+                                            //terms of service
+                                            var termOfServiceOk = true;
+                                            if ($('#termsofservice').length > 0) {
+                                                //terms of service element exists
+                                                if (!$('#termsofservice').is(':checked')) {
+                                                    $("#terms-of-service-warning-box").dialog();
+                                                    termOfServiceOk = false;
+                                                } else {
+                                                    termOfServiceOk = true;
+                                                }
+                                            }
+                                            return termOfServiceOk;
+                                        });
+                                    });
+                                </script>
+                             <input type="submit" name="nextstep" value="@T("Checkout.ConfirmButton")" class="button-1 confirm-order-next-step-button" />
+
+                            }
+                        </div>
+
+                    }
+                </div>
+            </div>
+
+        }
+    }
+    else
+    {
+        <div class="no-data">
+            You have not selected any plans yet.
+        </div>
+    }
+    @Html.Widget("order_summary_content_after")
+</div>

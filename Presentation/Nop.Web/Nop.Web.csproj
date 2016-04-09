@@ -300,6 +300,7 @@
     <Compile Include="Models\Catalog\PlanOverviewModel.cs" />
     <Compile Include="Models\Catalog\DeliveryModel.cs" />
     <Compile Include="Models\Catalog\DeliveryListModel.cs" />
+    <Compile Include="Models\Catalog\ProductMainSpecificationModel.cs" />
     <Compile Include="Models\Catalog\SubscriptionCartPlansModel.cs" />
     <Compile Include="Models\Catalog\ShipmentModel.cs" />
     <Compile Include="Models\Catalog\ShipmentListModel.cs" />
@@ -1613,6 +1614,9 @@
     <Content Include="Scripts\kendo\2014.1.318\kendo.view.min.js" />
     <Content Include="Scripts\kendo\2014.1.318\kendo.web.min.js" />
     <Content Include="Scripts\kendo\2014.1.318\kendo.window.min.js" />
+    <Content Include="Scripts\ng\app.js" />
+    <Content Include="Scripts\ng\ngDialog.js" />
+    <Content Include="Scripts\ng\ngDialog.min.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\selectivizr.min.js" />
     <Content Include="Scripts\tag-it.js" />
@@ -2090,6 +2094,9 @@
     <Content Include="Views\Product\HomepageNewProducts.cshtml" />
     <Content Include="Views\Customer\Dashboard.cshtml" />
     <Content Include="Views\ReturnRequest\ReturnItems.cshtml" />
+    <Content Include="Views\Shared\_ColumnsCategory.cshtml" />
+    <Content Include="Views\Customer\LoginBox.cshtml" />
+    <Content Include="Views\Blog\HomeBlogPost.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\Roxy_Fileman\tmp\" />

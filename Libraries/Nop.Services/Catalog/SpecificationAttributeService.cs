@@ -83,6 +83,21 @@ namespace Nop.Services.Catalog
             return _specificationAttributeRepository.GetById(specificationAttributeId);
         }
 
+        public virtual List<SpecificationAttribute> GetSpecificationAttributeByName(string name)
+        {
+            if (name.Length == 0)
+                return null;
+
+            var query = from p in _specificationAttributeRepository.Table
+                        orderby p.DisplayOrder, p.Name
+                        where p.Name == name
+                        select p;
+            var specificationAttribute = query.ToList();
+
+            return specificationAttribute;
+        }
+
+
         /// <summary>
         /// Gets specification attributes
         /// </summary>
@@ -165,7 +180,63 @@ namespace Nop.Services.Catalog
 
             return _specificationAttributeOptionRepository.GetById(specificationAttributeOptionId);
         }
+        public virtual IList<SpecificationAttributeOption> GetAllSpecificationAttributeOptions(bool? allowFiltering = null)
+        {
 
+
+            var query = from sao in _specificationAttributeOptionRepository.Table
+                        where sao.Name.ToLower() != "n/a"
+                        select sao;
+
+            var specificationAttributeOptions = query.ToList();
+
+            //sort by passed identifiers
+
+            return specificationAttributeOptions;
+        }
+        /// <summary>
+        /// Get specification attribute options by identifiers
+        /// </summary>
+        /// <param name="specificationAttributeOptionIds">Identifiers</param>
+        /// <returns>Specification attribute options</returns>
+        public virtual IList<SpecificationAttributeOption> GetAllSpecificationAttributeOptionsByIds(List<int> specificationAttributeOptionIds)
+        {
+            if (specificationAttributeOptionIds == null || specificationAttributeOptionIds.Count == 0)
+                return new List<SpecificationAttributeOption>();
+
+            var query = from sao in _specificationAttributeOptionRepository.Table
+                        where specificationAttributeOptionIds.Contains(sao.Id)
+                        select sao;
+            var specificationAttributeOptions = query.ToList();
+            //sort by passed identifiers
+            var sortedSpecificationAttributeOptions = new List<SpecificationAttributeOption>();
+            foreach (int id in specificationAttributeOptionIds)
+            {
+                var sao = specificationAttributeOptions.Find(x => x.Id == id);
+                if (sao != null)
+                    sortedSpecificationAttributeOptions.Add(sao);
+            }
+            return sortedSpecificationAttributeOptions;
+        }
+
+        public virtual SpecificationAttributeOption GetSpecificationAttributeOptionBySpecificationIdAndValue(int specificationAttributeId, string optionname)
+        {
+            if (specificationAttributeId == 0)
+                return null;
+
+            var query = from sao in _specificationAttributeOptionRepository.Table
+                        orderby sao.DisplayOrder
+                        where sao.SpecificationAttributeId == specificationAttributeId
+                        && sao.Name == optionname
+                        select sao;
+
+            var specificationAttributeOptions = query.ToList();
+
+            if (specificationAttributeOptions.Count > 0)
+                return specificationAttributeOptions.ElementAt(0);
+            else
+                return null;
+        }
 
         /// <summary>
         /// Get specification attribute options by identifiers
@@ -277,6 +348,89 @@ namespace Nop.Services.Catalog
 
             //event notification
             _eventPublisher.EntityDeleted(productSpecificationAttribute);
+        }
+
+        public virtual void DeleteProductSpecificationAttributeByProductId(int productId = 0,
+          int specificationAttributeId = 0)
+        {
+            if (specificationAttributeId == 0)
+                throw new ArgumentNullException("productSpecificationAttribute");
+            if (specificationAttributeId > 0)
+            {
+                var query1 = _specificationAttributeOptionRepository.Table;
+
+                var query = _productSpecificationAttributeRepository.Table;
+                if (productId > 0)
+                    query = query.Where(psa => psa.ProductId == productId);
+                query = query.Where(psa => psa.SpecificationAttributeOption.SpecificationAttribute.Id == specificationAttributeId);
+
+                query = query.OrderBy(psa => psa.DisplayOrder);
+
+                var p = query.ToList();
+
+
+                foreach (ProductSpecificationAttribute a in p)
+                {
+                    _productSpecificationAttributeRepository.Delete(a);
+
+                    _cacheManager.RemoveByPattern(PRODUCTSPECIFICATIONATTRIBUTE_PATTERN_KEY);
+                    _eventPublisher.EntityDeleted(a);
+                }
+
+            }
+            //event notification
+
+        }
+
+        public virtual ProductSpecificationAttribute GetProductSpecificationAttributesOne(int productId = 0,
+          int specificationAttributeOptionId = 0, bool? allowFiltering = null, bool? showOnProductPage = null)
+        {
+            string allowFilteringCacheStr = allowFiltering.HasValue ? allowFiltering.ToString() : "null";
+            string showOnProductPageCacheStr = showOnProductPage.HasValue ? showOnProductPage.ToString() : "null";
+            string key = string.Format(PRODUCTSPECIFICATIONATTRIBUTE_ALLBYPRODUCTID_KEY, productId, allowFilteringCacheStr, showOnProductPageCacheStr);
+
+
+            var query = _productSpecificationAttributeRepository.Table;
+            if (productId > 0)
+                query = query.Where(psa => psa.ProductId == productId);
+            if (specificationAttributeOptionId > 0)
+                query = query.Where(psa => psa.SpecificationAttributeOptionId == specificationAttributeOptionId);
+
+            query = query.OrderBy(psa => psa.DisplayOrder);
+
+            var productSpecificationAttributes = query.ToList();
+            if (productSpecificationAttributes.Count > 0)
+                return productSpecificationAttributes.ElementAt(0);
+            else
+                return null;
+
+        }
+
+
+        public virtual ProductSpecificationAttribute GetProductSpecificationAttributesByCustomValue(int productId = 0, int attributeid = 0,
+       string CustomValue = "", bool? allowFiltering = null, bool? showOnProductPage = null)
+        {
+            string allowFilteringCacheStr = allowFiltering.HasValue ? allowFiltering.ToString() : "null";
+            string showOnProductPageCacheStr = showOnProductPage.HasValue ? showOnProductPage.ToString() : "null";
+            string key = string.Format(PRODUCTSPECIFICATIONATTRIBUTE_ALLBYPRODUCTID_KEY, productId, allowFilteringCacheStr, showOnProductPageCacheStr);
+
+
+            var query = _productSpecificationAttributeRepository.Table;
+            if (productId > 0)
+                query = query.Where(psa => psa.ProductId == productId);
+            if (productId > 0)
+                query = query.Where(psa => psa.SpecificationAttributeOption.SpecificationAttributeId == attributeid);
+            if (CustomValue.Length > 0)
+                query = query.Where(psa => psa.CustomValue == CustomValue);
+
+            query = query.OrderBy(psa => psa.DisplayOrder);
+
+            var productSpecificationAttributes = query.ToList();
+            if (productSpecificationAttributes.Count > 0)
+                return productSpecificationAttributes.ElementAt(0);
+            else
+                return null;
+
         }
 
         /// <summary>

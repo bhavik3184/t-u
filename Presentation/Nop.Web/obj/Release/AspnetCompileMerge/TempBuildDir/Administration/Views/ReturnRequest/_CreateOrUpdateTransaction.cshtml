@@ -1,0 +1,160 @@
+﻿@model ReturnRequestTransactionModel
+@using Nop.Core.Domain.SubscriptionOrders;
+@Html.ValidationSummary(false)
+@Html.HiddenFor(model => model.Id)
+<table class="adminContent">
+    <tr>
+        <td class="adminTitle">
+            Transaction Id:
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.OrderItemId)  
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.SubscriptionOrderId):
+        </td>
+        <td class="adminData">
+            @Html.ActionLink(T("Admin.Common.View").Text, "Edit", "SubscriptionOrder", new { id = Model.SubscriptionOrderId }, new { })
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.CustomerId):
+        </td>
+        <td class="adminData">
+            @Html.ActionLink(Model.CustomerInfo, "Edit", "Customer", new { id = Model.CustomerId }, new { })
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.ReturnRequestStatusId):
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.ReturnRequestStatusId, ((ReturnRequestStatus)Model.ReturnRequestStatusId).ToSelectList())
+            @Html.ValidationMessageFor(model => model.ReturnRequestStatusId)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.AvailableDateUtc):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.AvailableDateUtc)
+            @Html.ValidationMessageFor(model => model.AvailableDateUtc)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.CustomerComments):
+        </td>
+        <td class="adminData">
+            @Html.TextAreaFor(model => model.CustomerComments, new { style = "Width: 500px; Height: 150px;" })
+            @Html.ValidationMessageFor(model => model.CustomerComments)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.StaffNotes):
+        </td>
+        <td class="adminData">
+            @Html.TextAreaFor(model => model.StaffNotes, new { style = "Width: 500px; Height: 150px;" })
+            @Html.ValidationMessageFor(model => model.StaffNotes)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.CreatedOn):
+        </td>
+        <td class="adminData">
+            @Html.DisplayFor(model => model.CreatedOn)
+        </td>
+    </tr>
+</table>
+
+
+<table class="adminContent">
+    <tr>
+        <td class="adminData">
+            <strong>@T("Admin.Orders.Shipments.Products")</strong>
+        </td>
+    </tr>
+    <tr>
+        <td class="adminData">
+            <table class="tablestyle" border="1" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr class="headerstyle">
+                        <th align="center">
+                            Transaction Id
+                        </th>
+                        <th align="center">
+                            Item Id
+                        </th>
+                        <th align="center">
+                            @T("Admin.Orders.Shipments.Products.ProductName")
+                        </th>
+                        <th align="center">
+                            @T("Admin.Orders.Shipments.Products.SKU")
+                        </th>
+                        <th align="center">
+                            @T("Admin.Orders.Shipments.Products.QtySubscriptioned")
+                        </th>
+                        <th align="center">
+                            Status
+                        </th>
+                        <th align="center">
+                           Qty to Receive
+                        </th>
+                       
+                        <th align="center">
+                            Transaction Id
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td style="width:10%;">
+                                <div style="padding-left:10px;padding-right:10px;">
+                                    @item.OrderItemId
+                                </div>
+                            </td>
+                            <td style="width:10%;">
+                                <div style="padding-left:10px;padding-right:10px;">
+                                    @item.ItemDetailId
+                                </div>
+                            </td>
+                            <td align="center" style="width:20%;">
+                                <div style="padding-left:10px;padding-right:10px;">
+                                    @item.ProductName
+                                </div>
+                            </td>
+                            <td style="width:10%;">
+                                <div style="padding-left:10px;padding-right:10px;">
+                                    @item.Sku
+                                </div>
+                            </td>
+                            <td align="center" style="width:5%;">
+                                @item.QuantityOrdered
+                            </td>
+                            <td align="center" style="width:5%;">
+                                @item.ReturnRequestStatusStr
+                            </td>
+                            <td align="center" style="width:20%;">
+                                <input name="qtyToAdd@(item.Id)" type="text" value="@item.Quantity" id="qtyToAdd@(item.Id)" class="adminInput" style="width:100px;" />
+                            </td>
+
+                            <td style="width:10%;">
+                                <div style="padding-left:10px;padding-right:10px;">
+                                    @item.OrderItemId
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </td>
+    </tr>
+</table>

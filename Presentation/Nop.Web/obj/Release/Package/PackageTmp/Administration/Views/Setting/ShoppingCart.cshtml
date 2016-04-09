@@ -1,0 +1,223 @@
+﻿@model BorrowCartSettingsModel
+@{
+    //page title
+    ViewBag.Title = T("Admin.Configuration.Settings.BorrowCart").Text;
+}
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="section-header">
+        <div class="title">
+            <img src="@Url.Content("~/Administration/Content/images/ico-configuration.png")" alt="" />
+            @T("Admin.Configuration.Settings.BorrowCart")
+        </div>
+        <div class="options">
+            <input type="submit" name="save" class="k-button" value="@T("Admin.Common.Save")" />
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#@Html.FieldIdFor(model => model.MiniBorrowCartEnabled)").click(toggleMiniBorrowCartEnabled);
+            $("#@Html.FieldIdFor(model => model.EmailMyToyBoxEnabled)").click(toggleEmailMyToyBoxEnabled);
+
+            toggleMiniBorrowCartEnabled();
+            toggleEmailMyToyBoxEnabled();
+        });
+
+        function toggleMiniBorrowCartEnabled() {
+            if ($('#@Html.FieldIdFor(model => model.MiniBorrowCartEnabled)').is(':checked')) {
+                $('#pnlMiniBorrowCartProductNumber').show();
+                $('#pnlShowProductImagesInMiniBorrowCart').show();
+            }
+            else {
+                $('#pnlMiniBorrowCartProductNumber').hide();
+                $('#pnlShowProductImagesInMiniBorrowCart').hide();
+            }
+        }
+
+        function toggleEmailMyToyBoxEnabled() {
+            if ($('#@Html.FieldIdFor(model => model.EmailMyToyBoxEnabled)').is(':checked')) {
+                $('#pnlAllowAnonymousUsersToEmailMyToyBox').show();
+            }
+            else {
+                $('#pnlAllowAnonymousUsersToEmailMyToyBox').hide();
+            }
+        }
+        
+    </script>
+    @Html.Action("StoreScopeConfiguration", "Setting")
+    @Html.ValidationSummary(false)
+    <table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.DisplayCartAfterAddingProduct_OverrideForStore, model => model.DisplayCartAfterAddingProduct, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.DisplayCartAfterAddingProduct):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.DisplayCartAfterAddingProduct)
+                @Html.ValidationMessageFor(model => model.DisplayCartAfterAddingProduct)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.DisplayMyToyBoxAfterAddingProduct_OverrideForStore, model => model.DisplayMyToyBoxAfterAddingProduct, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.DisplayMyToyBoxAfterAddingProduct):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.DisplayMyToyBoxAfterAddingProduct)
+                @Html.ValidationMessageFor(model => model.DisplayMyToyBoxAfterAddingProduct)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.AllowOutOfStockItemsToBeAddedToMyToyBox_OverrideForStore, model => model.AllowOutOfStockItemsToBeAddedToMyToyBox, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.AllowOutOfStockItemsToBeAddedToMyToyBox):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.AllowOutOfStockItemsToBeAddedToMyToyBox)
+                @Html.ValidationMessageFor(model => model.AllowOutOfStockItemsToBeAddedToMyToyBox)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.MaximumBorrowCartItems_OverrideForStore, model => model.MaximumBorrowCartItems, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.MaximumBorrowCartItems):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.MaximumBorrowCartItems)
+                @Html.ValidationMessageFor(model => model.MaximumBorrowCartItems)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.MaximumMyToyBoxItems_OverrideForStore, model => model.MaximumMyToyBoxItems, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.MaximumMyToyBoxItems):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.MaximumMyToyBoxItems)
+                @Html.ValidationMessageFor(model => model.MaximumMyToyBoxItems)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.MoveItemsFromMyToyBoxToCart_OverrideForStore, model => model.MoveItemsFromMyToyBoxToCart, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.MoveItemsFromMyToyBoxToCart):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.MoveItemsFromMyToyBoxToCart)
+                @Html.ValidationMessageFor(model => model.MoveItemsFromMyToyBoxToCart)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.ShowProductImagesOnBorrowCart_OverrideForStore, model => model.ShowProductImagesOnBorrowCart, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.ShowProductImagesOnBorrowCart):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.ShowProductImagesOnBorrowCart)
+                @Html.ValidationMessageFor(model => model.ShowProductImagesOnBorrowCart)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.ShowProductImagesOnWishList_OverrideForStore, model => model.ShowProductImagesOnWishList, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.ShowProductImagesOnWishList):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.ShowProductImagesOnWishList)
+                @Html.ValidationMessageFor(model => model.ShowProductImagesOnWishList)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.ShowDiscountBox_OverrideForStore, model => model.ShowDiscountBox, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.ShowDiscountBox):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.ShowDiscountBox)
+                @Html.ValidationMessageFor(model => model.ShowDiscountBox)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.ShowGiftCardBox_OverrideForStore, model => model.ShowGiftCardBox, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.ShowGiftCardBox):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.ShowGiftCardBox)
+                @Html.ValidationMessageFor(model => model.ShowGiftCardBox)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.CrossSellsNumber_OverrideForStore, model => model.CrossSellsNumber, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.CrossSellsNumber):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.CrossSellsNumber)
+                @Html.ValidationMessageFor(model => model.CrossSellsNumber)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.EmailMyToyBoxEnabled_OverrideForStore, model => model.EmailMyToyBoxEnabled, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.EmailMyToyBoxEnabled):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.EmailMyToyBoxEnabled)
+                @Html.ValidationMessageFor(model => model.EmailMyToyBoxEnabled)
+            </td>
+        </tr>
+        <tr id="pnlAllowAnonymousUsersToEmailMyToyBox">
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.AllowAnonymousUsersToEmailMyToyBox_OverrideForStore, model => model.AllowAnonymousUsersToEmailMyToyBox, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.AllowAnonymousUsersToEmailMyToyBox):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.AllowAnonymousUsersToEmailMyToyBox)
+                @Html.ValidationMessageFor(model => model.AllowAnonymousUsersToEmailMyToyBox)
+            </td>
+        </tr>        
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.MiniBorrowCartEnabled_OverrideForStore, model => model.MiniBorrowCartEnabled, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.MiniBorrowCartEnabled):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.MiniBorrowCartEnabled)
+                @Html.ValidationMessageFor(model => model.MiniBorrowCartEnabled)
+            </td>
+        </tr>
+        <tr id="pnlMiniBorrowCartProductNumber">
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.MiniBorrowCartProductNumber_OverrideForStore, model => model.MiniBorrowCartProductNumber, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.MiniBorrowCartProductNumber):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.MiniBorrowCartProductNumber)
+                @Html.ValidationMessageFor(model => model.MiniBorrowCartProductNumber)
+            </td>
+        </tr>
+        <tr id="pnlShowProductImagesInMiniBorrowCart">
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.ShowProductImagesInMiniBorrowCart_OverrideForStore, model => model.ShowProductImagesInMiniBorrowCart, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.ShowProductImagesInMiniBorrowCart):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.ShowProductImagesInMiniBorrowCart)
+                @Html.ValidationMessageFor(model => model.ShowProductImagesInMiniBorrowCart)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.OverrideStoreCheckboxFor(model => model.AllowCartItemEditing_OverrideForStore, model => model.AllowCartItemEditing, Model.ActiveStoreScopeConfiguration)
+                @Html.NopLabelFor(model => model.AllowCartItemEditing):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.AllowCartItemEditing)
+                @Html.ValidationMessageFor(model => model.AllowCartItemEditing)
+            </td>
+        </tr>
+    </table>
+}

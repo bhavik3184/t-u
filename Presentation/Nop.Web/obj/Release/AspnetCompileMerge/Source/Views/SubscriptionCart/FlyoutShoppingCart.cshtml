@@ -1,0 +1,62 @@
+﻿@model MiniSubscriptionCartModel
+@using Nop.Web.Models.SubscriptionCart;
+<div id="flyout-cart" class="flyout-cart">
+    <div class="mini-borrow-cart">
+        <div class="count">
+            @if (Model.TotalPlans == 0)
+            {
+                @T("SubscriptionCart.Mini.NoItems")
+            }
+            else
+            {
+                @Html.Raw(string.Format(T("SubscriptionCart.Mini.ItemsText").Text, string.Format("<a href=\"{0}\">{1}</a>", Url.RouteUrl("SubscriptionCart"), string.Format(T("SubscriptionCart.Mini.Items").Text, Model.TotalPlans))))
+            }
+        </div>
+        @if (Model.TotalPlans > 0)
+        {
+            <div class="items">
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    var item = Model.Items[i];
+                    <div class="item @(i == 0 ? "first" : null)">
+                         
+                        <div class="Plan">
+                            <div class="name">
+                                <a href="@Url.RouteUrl("Plan", new { SeName = item.PlanSeName })">@item.PlanName</a>
+                            </div>
+                            @if (!String.IsNullOrEmpty(item.AttributeInfo))
+                            {
+                                <div class="attributes">
+                                    @Html.Raw(item.AttributeInfo)
+                                </div>
+                            }
+                            <div class="price">@T("SubscriptionCart.Mini.UnitPrice"): <span>@item.UnitPrice</span></div>
+                            <div class="quantity">@T("SubscriptionCart.Mini.Quantity"): <span>@item.Quantity</span></div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="totals">@T("SubscriptionCart.Totals.SubTotal"): <strong>@Model.SubTotal</strong></div>
+            <div class="buttons">
+                @if (Model.DisplaySubscriptionCartButton)
+                {
+                    <input type="button" value="@T("SubscriptionCart.Mini.ViewCart")" class="button-1 cart-button" onclick="setLocation('@(Url.RouteUrl("SubscriptionCart"))')" />
+                    
+                }
+                @if (Model.DisplayCheckoutButton)
+                {
+                    var checkoutUrl = "";
+                    if (Model.AnonymousCheckoutAllowed && Model.CurrentCustomerIsGuest)
+                    {
+                        checkoutUrl = Url.RouteUrl("LoginCheckoutAsGuest", new { returnUrl = Url.RouteUrl("SubscriptionCart") });
+                    }
+                    else
+                    {
+                        checkoutUrl = Url.RouteUrl("Checkout");
+                    }
+                    <input type="button" value="@T("Checkout.Button")" class="button-1 checkout-button" onclick="setLocation('@checkoutUrl')" />
+                }
+            </div>
+        }
+    </div>
+</div>

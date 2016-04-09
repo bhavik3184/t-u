@@ -47,6 +47,7 @@ namespace Nop.Admin.Controllers
         private readonly IAclService _aclService; 
         private readonly IPermissionService _permissionService;
         private readonly CatalogSettings _catalogSettings;
+        private readonly IImportManager _importManager;
 
         #endregion
         
@@ -70,7 +71,8 @@ namespace Nop.Admin.Controllers
             IVendorService vendorService,
             IAclService aclService,
             IPermissionService permissionService,
-            CatalogSettings catalogSettings)
+            CatalogSettings catalogSettings,
+            IImportManager importManager)
         {
             this._categoryService = categoryService;
             this._manufacturerTemplateService = manufacturerTemplateService;
@@ -91,6 +93,7 @@ namespace Nop.Admin.Controllers
             this._aclService = aclService;
             this._permissionService = permissionService;
             this._catalogSettings = catalogSettings;
+            this._importManager = importManager;
         }
 
         #endregion
@@ -514,6 +517,35 @@ namespace Nop.Admin.Controllers
         #endregion
 
         #region Export / Import
+
+        [HttpPost]
+        public ActionResult ImportExcel()
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageCategories))
+                return AccessDeniedView();
+
+            try
+            {
+                var file = Request.Files["importexcelfile"];
+                if (file != null && file.ContentLength > 0)
+                {
+                    _importManager.ImportManufacturersFromXlsx(file.InputStream);
+                }
+                else
+                {
+                    ErrorNotification(_localizationService.GetResource("Admin.Common.UploadFile"));
+                    return RedirectToAction("List");
+                }
+                SuccessNotification("Vendors Imported Successfully.");
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                ErrorNotification(exc);
+                return RedirectToAction("List");
+            }
+
+        }
 
         public ActionResult ExportXml()
         {

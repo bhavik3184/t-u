@@ -32,12 +32,13 @@ namespace Nop.Services.SubscriptionOrders
         /// <param name="pageIndex">Page index</param>
         /// <param name="pageSize">Page size</param>
         /// <returns>Return requests</returns>
+        IList<ReturnRequest> SearchReturnRequestByTransactionId(int orderItemId = 0, int customerId = 0, 
+            ReturnRequestStatus? rs = null);
+
+
         IPagedList<ReturnRequest> SearchReturnRequests(int storeId = 0, int customerId = 0,
-            int itemDetailId = 0, ReturnRequestStatus? rs = null, 
-            int pageIndex = 0, int pageSize = int.MaxValue);
-
-
-
+         int itemDetailId = 0, ReturnRequestStatus? rs = null,
+         int pageIndex = 0, int pageSize = int.MaxValue);
 
         /// <summary>
         /// Delete a return request action

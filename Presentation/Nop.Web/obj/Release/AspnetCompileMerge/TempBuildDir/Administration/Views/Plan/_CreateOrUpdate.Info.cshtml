@@ -1,0 +1,810 @@
+﻿@model PlanModel
+@{
+    //resources for plan tags input
+    Html.AppendCssFileParts("~/Content/tagit/jquery.tagit.css");
+    Html.AppendScriptParts("~/Scripts/tag-it.min.js");
+}
+@using Nop.Core.Domain.Catalog;
+@using Nop.Services.Catalog;
+@using System.Text;
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        @if (!Model.IsLoggedInAsVendor)
+        {
+            <text>$("#@Html.FieldIdFor(model => model.ShowOnHomePage)").click(toggleShowOnHomePage);</text>
+        }
+        $("#@Html.FieldIdFor(model => model.PlanTypeId)").change(togglePlanType);
+        $("#@Html.FieldIdFor(model => model.RequireOtherPlans)").click(toggleRequireOtherPlans);
+        $("#@Html.FieldIdFor(model => model.AvailableForPreSubscription)").click(togglePreSubscription);
+        $("#@Html.FieldIdFor(model => model.IsGiftCard)").click(toggleGiftCard);
+        $("#@Html.FieldIdFor(model => model.CustomerEntersPrice)").click(toggleCustomerEntersPrice);
+        $("#@Html.FieldIdFor(model => model.BasepriceEnabled)").click(toggleBasepriceEnabled);
+        $("#@Html.FieldIdFor(model => model.IsDownload)").click(toggleDownloadablePlan);
+        $("#@Html.FieldIdFor(model => model.UnlimitedDownloads)").click(toggleDownloadablePlan);
+        $("#@Html.FieldIdFor(model => model.HasSampleDownload)").click(toggleDownloadablePlan);
+        $("#@Html.FieldIdFor(model => model.HasUserAgreement)").click(toggleDownloadablePlan);
+        $("#@Html.FieldIdFor(model => model.IsRecurring)").click(toggleRecurring);
+        $("#@Html.FieldIdFor(model => model.IsRental)").click(toggleRental);
+        $("#@Html.FieldIdFor(model => model.IsShipEnabled)").click(toggleShipping);
+        $("#@Html.FieldIdFor(model => model.IsTaxExempt)").click(toggleTax);
+        $("#@Html.FieldIdFor(model => model.ManageInventoryMethodId)").change(toggleManageStock);
+        $("#@Html.FieldIdFor(model => model.UseMultipleWarehouses)").click(toggleManageStock);
+        $("#@Html.FieldIdFor(model => model.BackorderModeId)").change(toggleManageStock);
+        $("#@Html.FieldIdFor(model => model.DisplayStockAvailability)").click(toggleManageStock);
+        $("#@Html.FieldIdFor(model => model.MarkAsNew)").click(toggleMarkAsNew);
+
+        @if (!Model.IsLoggedInAsVendor)
+        {
+            <text>toggleShowOnHomePage();</text>
+        }
+        togglePlanType();
+        togglePreSubscription();
+        toggleRequireOtherPlans();
+        toggleGiftCard();
+        toggleCustomerEntersPrice();
+        toggleBasepriceEnabled();
+        toggleDownloadablePlan();
+        toggleRecurring();
+        toggleRental();
+        toggleShipping();
+        toggleTax();
+        toggleManageStock();
+        toggleMarkAsNew();
+    });
+
+    function toggleShowOnHomePage() {
+        if ($('#@Html.FieldIdFor(model => model.ShowOnHomePage)').is(':checked')) {
+            $('#pnlDisplayOrder').show();
+        } else {
+            $('#pnlDisplayOrder').hide();
+        }
+    }
+
+    function togglePlanType() {
+        var selectedPlanTypeId = $("#@Html.FieldIdFor(model => model.PlanTypeId)").val();
+        if (selectedPlanTypeId == @(((int) PlanType.SimplePlan).ToString())) {
+            $('#group-prices').show();
+            $('#group-required-other-plans').show();
+            $('#group-giftcard').show();
+            $('#group-downloads').show();
+            $('#group-recurring').show();
+            $('#group-rental').show();
+            $('#group-shipping').show();
+            $('#group-tax').show();
+            $('#group-inventory').show();
+            $('#tab-associated-plans').hide();
+        } else if (selectedPlanTypeId == @(((int) PlanType.GroupedPlan).ToString())) {
+            $('#group-prices').hide();
+            $('#group-required-other-plans').hide();
+            $('#group-giftcard').hide();
+            $('#group-downloads').hide();
+            $('#group-recurring').hide();
+            $('#group-rental').hide();
+            $('#group-shipping').hide();
+            $('#group-tax').hide();
+            $('#group-inventory').hide();
+            $('#tab-associated-plans').show();
+        }
+    }
+
+    function togglePreSubscription() {
+        if ($('#@Html.FieldIdFor(model => model.AvailableForPreSubscription)').is(':checked')) {
+            $('#pnlPreSubscriptionAvailabilityStartDateTimeUtc').show();
+        } else {
+            $('#pnlPreSubscriptionAvailabilityStartDateTimeUtc').hide();
+        }
+    }
+
+    function toggleRequireOtherPlans() {
+        if ($('#@Html.FieldIdFor(model => model.RequireOtherPlans)').is(':checked')) {
+            $('#pnlRequiredPlanIds').show();
+            $('#pnlAutomaticallyAddRequiredPlans').show();
+        } else {
+            $('#pnlRequiredPlanIds').hide();
+            $('#pnlAutomaticallyAddRequiredPlans').hide();
+        }
+    }
+
+    function toggleGiftCard() {
+        if ($('#@Html.FieldIdFor(model => model.IsGiftCard)').is(':checked')) {
+            $('#pnlGiftCardType').show();
+            $('#pnlOverriddenGiftCardAmount').show();
+        } else {
+            $('#pnlGiftCardType').hide();
+            $('#pnlOverriddenGiftCardAmount').hide();
+        }
+    }
+
+    function toggleCustomerEntersPrice() {
+        if ($('#@Html.FieldIdFor(model => model.CustomerEntersPrice)').is(':checked')) {
+            $('#pnlMinimumCustomerEnteredPrice').show();
+            $('#pnlMaximumCustomerEnteredPrice').show();
+        } else {
+            $('#pnlMinimumCustomerEnteredPrice').hide();
+            $('#pnlMaximumCustomerEnteredPrice').hide();
+        }
+    }
+
+    function toggleBasepriceEnabled() {
+        if ($('#@Html.FieldIdFor(model => model.BasepriceEnabled)').is(':checked')) {
+            $('#pnlBasepriceAmount').show();
+            $('#pnlBasepriceUnit').show();
+            $('#pnlBasepriceBaseAmount').show();
+            $('#pnlBasepriceBaseUnit').show();
+        } else {
+            $('#pnlBasepriceAmount').hide();
+            $('#pnlBasepriceUnit').hide();
+            $('#pnlBasepriceBaseAmount').hide();
+            $('#pnlBasepriceBaseUnit').hide();
+        }
+    }
+
+    function toggleDownloadablePlan() {
+        if ($('#@Html.FieldIdFor(model => model.IsDownload)').is(':checked')) {
+
+            $('#pnlDownloadFile').show();
+            $('#pnlUnlimitedDownloads').show();
+            if ($('#@Html.FieldIdFor(model => model.UnlimitedDownloads)').is(':checked')) {
+                $('#pnlMaxNumberOfDownloads').hide();
+            } else {
+                $('#pnlMaxNumberOfDownloads').show();
+            }
+            $('#pnlDownloadExpirationDays').show();
+            $('#pnlDownloadActivationType').show();
+
+            $('#pnlHasUserAgreement').show();
+            if ($('#@Html.FieldIdFor(model => model.HasUserAgreement)').is(':checked')) {
+                $('#pnlUserAgreementText').show();
+            } else {
+                $('#pnlUserAgreementText').hide();
+            }
+
+            $('#pnlHasSampleDownload').show();
+
+            if ($('#@Html.FieldIdFor(model => model.HasSampleDownload)').is(':checked')) {
+                $('#pnlSampleDownloadFile').show();
+            } else {
+                $('#pnlSampleDownloadFile').hide();
+            }
+        } else {
+            $('#pnlDownloadFile').hide();
+            $('#pnlUnlimitedDownloads').hide();
+            $('#pnlMaxNumberOfDownloads').hide();
+            $('#pnlDownloadExpirationDays').hide();
+            $('#pnlDownloadActivationType').hide();
+            $('#pnlHasUserAgreement').hide();
+            $('#pnlUserAgreementText').hide();
+            $('#pnlHasSampleDownload').hide();
+            $('#pnlSampleDownloadFile').hide();
+        }
+    }
+
+    function toggleShipping() {
+        if ($('#@Html.FieldIdFor(model => model.IsShipEnabled)').is(':checked')) {
+            $('#pnlFreeShipping').show();
+            $('#pnlShipSeparately').show();
+            $('#pnlAdditionalShippingCharge').show();
+            $('#pnlWeight').show();
+            $('#pnlLength').show();
+            $('#pnlWidth').show();
+            $('#pnlHeight').show();
+            $('#pnlDeliveryDate').show();
+        } else {
+            $('#pnlFreeShipping').hide();
+            $('#pnlShipSeparately').hide();
+            $('#pnlAdditionalShippingCharge').hide();
+            $('#pnlWeight').hide();
+            $('#pnlLength').hide();
+            $('#pnlWidth').hide();
+            $('#pnlHeight').hide();
+            $('#pnlDeliveryDate').hide();
+        }
+    }
+
+    function toggleRecurring() {
+        if ($('#@Html.FieldIdFor(model => model.IsRecurring)').is(':checked')) {
+            $('#pnlCycleLength').show();
+            $('#pnlCyclePeriod').show();
+            $('#pnlTotalCycles').show();
+        } else {
+            $('#pnlCycleLength').hide();
+            $('#pnlCyclePeriod').hide();
+            $('#pnlTotalCycles').hide();
+        }
+    }
+
+    function toggleRental() {
+        if ($('#@Html.FieldIdFor(model => model.IsRental)').is(':checked')) {
+            $('#pnlRentalPriceLength').show();
+            $('#pnlRentalPricePeriod').show();
+        } else {
+            $('#pnlRentalPriceLength').hide();
+            $('#pnlRentalPricePeriod').hide();
+        }
+    }
+
+    function toggleTax() {
+        if ($('#@Html.FieldIdFor(model => model.IsTaxExempt)').is(':checked')) {
+            $('#pnlTaxCategory').hide();
+        } else {
+            $('#pnlTaxCategory').show();
+        }
+    }
+
+    function toggleManageStock() {
+        var selectedManageInventoryMethodId = $("#@Html.FieldIdFor(model => model.ManageInventoryMethodId)").val();
+        if (selectedManageInventoryMethodId == @(((int) ManageInventoryMethod.DontManageStock).ToString())) {
+            $('#pnlUseMultipleWarehouses').hide();
+            $('#pnlWarehouse').show();
+            $('#pnlMultipleWarehouses').hide();
+            $('#pnlStockQuantity').hide();
+            $('#pnlDisplayStockAvailability').hide();
+            $('#pnlDisplayStockQuantity').hide();
+            $('#pnlMinStockQuantity').hide();
+            $('#pnlLowStockActivity').hide();
+            $('#pnlNotifyForQuantityBelow').hide();
+            $('#pnlAllowBackInStockSubscriptions').hide();
+            $('#pnlBackorders').hide();
+            $('#pnlAllowAddingOnlyExistingAttributeCombinations').hide();
+        } else if (selectedManageInventoryMethodId == @(((int) ManageInventoryMethod.ManageStock).ToString())) {
+            $('#pnlUseMultipleWarehouses').show();
+
+            if ($('#@Html.FieldIdFor(model => model.UseMultipleWarehouses)').is(':checked')) {
+                $('#pnlWarehouse').hide();
+                $('#pnlMultipleWarehouses').show();
+                $('#pnlStockQuantity').hide();
+            } else {
+                $('#pnlWarehouse').show();
+                $('#pnlMultipleWarehouses').hide();
+                $('#pnlStockQuantity').show();
+            }
+
+            $('#pnlDisplayStockAvailability').show();
+            if ($('#@Html.FieldIdFor(model => model.DisplayStockAvailability)').is(':checked')) {
+                $('#pnlDisplayStockQuantity').show();
+            } else {
+                $('#pnlDisplayStockQuantity').hide();
+            }
+
+            $('#pnlMinStockQuantity').show();
+            $('#pnlLowStockActivity').show();
+            $('#pnlNotifyForQuantityBelow').show();
+            $('#pnlBackorders').show();
+            var selectedBackorderModeId = $("#@Html.FieldIdFor(model => model.BackorderModeId)").val();
+            if (selectedBackorderModeId == @(((int) BackorderMode.NoBackorders).ToString())) {
+                //no backorders
+                $('#pnlAllowBackInStockSubscriptions').show();
+            } else {
+                //backorders are enabled
+                $('#pnlAllowBackInStockSubscriptions').hide();
+            }
+            $('#pnlAllowAddingOnlyExistingAttributeCombinations').hide();
+        } else {
+            $('#pnlUseMultipleWarehouses').hide();
+            $('#pnlWarehouse').show();
+            $('#pnlMultipleWarehouses').hide();
+            $('#pnlStockQuantity').hide();
+            $('#pnlDisplayStockAvailability').show();
+            if ($('#@Html.FieldIdFor(model => model.DisplayStockAvailability)').is(':checked')) {
+                $('#pnlDisplayStockQuantity').show();
+            } else {
+                $('#pnlDisplayStockQuantity').hide();
+            }
+            $('#pnlMinStockQuantity').hide();
+            $('#pnlLowStockActivity').hide();
+            $('#pnlNotifyForQuantityBelow').hide();
+            $('#pnlAllowBackInStockSubscriptions').hide();
+            $('#pnlBackorders').hide();
+            $('#pnlAllowAddingOnlyExistingAttributeCombinations').show();
+        }
+    }
+
+    function toggleMarkAsNew() {
+        if ($('#@Html.FieldIdFor(model => model.MarkAsNew)').is(':checked')) {
+            $('#pnlMarkAsNewStartDateTimeUtc').show();
+            $('#pnlMarkAsNewEndDateTimeUtc').show();
+        } else {
+            $('#pnlMarkAsNewStartDateTimeUtc').hide();
+            $('#pnlMarkAsNewEndDateTimeUtc').hide();
+        }
+    }
+
+    @{
+       
+    }
+    //plan tags
+    $(document).ready(function () {
+       
+    });
+
+
+    //required plan friendly names
+    $(document).ready(function () {
+        loadRequiredPlanFriendlyNames();
+    });
+    $(document).ready(function () {
+        $('#@Html.FieldIdFor(model => model.RequiredPlanIds)')
+        .data('timeout', null)
+        .keyup(function() {
+            clearTimeout($(this).data('timeout'));
+            //one second timeout
+            $(this).data('timeout', setTimeout(loadRequiredPlanFriendlyNames, 1000));
+        });
+    });
+    function loadRequiredPlanFriendlyNames() {
+        var inputValue = $('#@Html.FieldIdFor(model => model.RequiredPlanIds)').val();
+        if (inputValue) {
+            //load friendly names
+            $('#required-plans-check-progress').show();
+
+            var postData = {
+                planIds: inputValue
+            };
+            addAntiForgeryToken(postData);
+
+            $.ajax({
+                cache: false,
+                type: 'POST',
+                url: '@Url.Action("LoadPlanFriendlyNames", "Plan")',
+                data: postData,
+                dataType: 'json',
+                success: function(data) {
+                    $('#required-plans-check-progress').hide();
+                    $('#required-plan-names').text(data.Text);
+                },
+                failure: function () {
+                    $('#required-plans-check-progress').hide();
+                    $('#required-plan-names').text('');
+                }
+            });
+        } else {
+            $('#required-plan-names').text('');
+        }
+    }
+
+</script>
+<table class="adminContent">
+    @if (Model.Id > 0)
+    {
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.Id):
+            </td>
+            <td class="adminData">
+                @Model.Id.ToString()
+                @Html.ValidationMessageFor(model => model.Id)
+            </td>
+        </tr>
+    }
+     
+    @if (Model.Id > 0 && Model.AssociatedToPlanId > 0)
+    {
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.AssociatedToPlanId):
+            </td>
+            <td class="adminData">
+                @Html.ActionLink(Model.AssociatedToPlanName, "Edit", "Plan", new { id = Model.AssociatedToPlanId }, new { })
+            </td>
+        </tr>
+    }
+     
+</table>
+@(Html.LocalizedEditor<PlanModel, PlanLocalizedModel>("plan-info-localized",
+                @<table class="adminContent">
+                    <tr>
+                        <td class="adminTitle">
+                            @Html.NopLabelFor(model => model.Locales[item].Name):
+                        </td>
+                        <td class="adminData">
+                            @Html.EditorFor(model => model.Locales[item].Name)
+                            @Html.ValidationMessageFor(model => model.Locales[item].Name)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="adminTitle">
+                            @Html.NopLabelFor(model => model.Locales[item].ShortDescription):
+                        </td>
+                        <td class="adminData">
+                            @Html.TextAreaFor(model => model.Locales[item].ShortDescription, new { style = "Width: 250px; Height: 150px;" })
+                            @Html.ValidationMessageFor(model => model.Locales[item].ShortDescription)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="adminTitle">
+                            @Html.NopLabelFor(model => model.Locales[item].FullDescription):
+                        </td>
+                        <td class="adminData">
+                            @Html.EditorFor(model => model.Locales[item].FullDescription, "RichEditor")
+                            @Html.ValidationMessageFor(model => model.Locales[item].FullDescription)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            @Html.HiddenFor(model => model.Locales[item].LanguageId)
+                        </td>
+                    </tr>
+                </table>
+                ,
+                @<table class="adminContent">
+                    <tr>
+                        <td class="adminTitle">
+                            @Html.NopLabelFor(model => model.Name):
+                        </td>
+                        <td class="adminData">
+                            @Html.EditorFor(model => model.Name)
+                            @Html.ValidationMessageFor(model => model.Name)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="adminTitle">
+                            @Html.NopLabelFor(model => model.ShortDescription):
+                        </td>
+                        <td class="adminData">
+                            @Html.TextAreaFor(x => x.ShortDescription, new { style = "Width: 250px; Height: 150px;" })
+                            @Html.ValidationMessageFor(model => model.ShortDescription)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="adminTitle">
+                            @Html.NopLabelFor(model => model.FullDescription):
+                        </td>
+                        <td class="adminData">
+                            @Html.EditorFor(x => x.FullDescription, "RichEditor")
+                            @Html.ValidationMessageFor(model => model.FullDescription)
+                        </td>
+                    </tr>
+                </table>
+            ))
+<table class="adminContent">
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.AdminComment):
+        </td>
+        <td class="adminData">
+            @Html.TextAreaFor(model => model.AdminComment)
+            @Html.ValidationMessageFor(model => model.AdminComment)
+        </td>
+    </tr>
+     
+    
+    <tr id="pnlDisplayOrder" @(Model.IsLoggedInAsVendor ? Html.Raw("style='display: none;'") : null)>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.DisplayOrder):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.DisplayOrder)
+            @Html.ValidationMessageFor(model => model.DisplayOrder)
+        </td>
+    </tr>
+     
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.Sku):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Sku)
+            @Html.ValidationMessageFor(model => model.Sku)
+        </td>
+    </tr>
+    
+</table>
+<table class="adminContent" id="group-prices">
+    <tr class="adminSeparator">
+        <td colspan="2">
+            <hr />
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.RegistrationCharge):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.RegistrationCharge) [@Model.PrimaryStoreCurrencyCode]
+            @Html.ValidationMessageFor(model => model.RegistrationCharge)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.SecurityDeposit):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.SecurityDeposit) [@Model.PrimaryStoreCurrencyCode]
+            @Html.ValidationMessageFor(model => model.SecurityDeposit)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.NoOfItemsToBorrow) (Per Month):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.NoOfItemsToBorrow)
+            @Html.ValidationMessageFor(model => model.NoOfItemsToBorrow)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.MaxNoOfDeliveries) (Per Month):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.MaxNoOfDeliveries) 
+            @Html.ValidationMessageFor(model => model.MaxNoOfDeliveries)
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.Price):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Price) [@Model.PrimaryStoreCurrencyCode]
+            @Html.ValidationMessageFor(model => model.Price)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.OldPrice):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.OldPrice) [@Model.PrimaryStoreCurrencyCode]
+            @Html.ValidationMessageFor(model => model.OldPrice)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.PlanCost):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.PlanCost) [@Model.PrimaryStoreCurrencyCode]
+            @Html.ValidationMessageFor(model => model.PlanCost)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.SpecialPrice):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.SpecialPrice) [@Model.PrimaryStoreCurrencyCode]
+            @Html.ValidationMessageFor(model => model.SpecialPrice)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.SpecialPriceStartDateTimeUtc):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.SpecialPriceStartDateTimeUtc)
+            @Html.ValidationMessageFor(model => model.SpecialPriceStartDateTimeUtc)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.SpecialPriceEndDateTimeUtc):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.SpecialPriceEndDateTimeUtc)
+            @Html.ValidationMessageFor(model => model.SpecialPriceEndDateTimeUtc)
+        </td>
+    </tr>
+         
+   
+</table>
+ 
+ 
+ 
+<table class="adminContent" id="group-recurring">
+    <tr class="adminSeparator">
+        <td colspan="2">
+            <hr />
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.IsShipEnabled):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.IsShipEnabled)
+            @Html.ValidationMessageFor(model => model.IsShipEnabled)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.IsRecurring):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.IsRecurring)
+            @Html.ValidationMessageFor(model => model.IsRecurring)
+        </td>
+    </tr>
+    <tr id="pnlCycleLength">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.RecurringCycleLength):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.RecurringCycleLength)
+            @Html.ValidationMessageFor(model => model.RecurringCycleLength)
+        </td>
+    </tr>
+    <tr id="pnlCyclePeriod">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.RecurringCyclePeriodId):
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.RecurringCyclePeriodId, ((RecurringPlanCyclePeriod)Model.RecurringCyclePeriodId).ToSelectList())
+            @Html.ValidationMessageFor(model => model.RecurringCyclePeriodId)
+        </td>
+    </tr>
+    <tr id="pnlTotalCycles">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.RecurringTotalCycles):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.RecurringTotalCycles)
+            @Html.ValidationMessageFor(model => model.RecurringTotalCycles)
+        </td>
+    </tr>
+</table>
+<table class="adminContent" id="group-rental">
+    <tr class="adminSeparator">
+        <td colspan="2">
+            <hr />
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.IsRental):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.IsRental)
+            @Html.ValidationMessageFor(model => model.IsRental)
+        </td>
+    </tr>
+    <tr id="pnlRentalPriceLength">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.RentalPriceLength):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.RentalPriceLength)
+            @Html.ValidationMessageFor(model => model.RentalPriceLength)
+        </td>
+    </tr>
+    <tr id="pnlRentalPricePeriod">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.RentalPricePeriodId):
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.RentalPricePeriodId, ((RentalPricePeriod)Model.RentalPricePeriodId).ToSelectList())
+            @Html.ValidationMessageFor(model => model.RentalPricePeriodId)
+        </td>
+    </tr>
+</table>
+<table class="adminContent" id="group-shipping">
+    <tr class="adminSeparator">
+        <td colspan="2">
+            <hr />
+        </td>
+    </tr>
+   
+    
+    <tr id="pnlAdditionalShippingCharge">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.AdditionalShippingCharge):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.AdditionalShippingCharge) [@Model.PrimaryStoreCurrencyCode]
+            @Html.ValidationMessageFor(model => model.AdditionalShippingCharge)
+        </td>
+    </tr>
+    
+    <tr id="pnlDeliveryDate">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.DeliveryDateId):
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.DeliveryDateId, Model.AvailableDeliveryDates)
+            @Html.ValidationMessageFor(model => model.DeliveryDateId)
+        </td>
+    </tr>
+</table>
+<table class="adminContent" id="group-tax">
+    <tr class="adminSeparator">
+        <td colspan="2">
+            <hr />
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.IsTaxExempt):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.IsTaxExempt)
+            @Html.ValidationMessageFor(model => model.IsTaxExempt)
+        </td>
+    </tr>
+    <tr id="pnlTaxCategory">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.TaxCategoryId):
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.TaxCategoryId, Model.AvailableTaxCategories)
+            @Html.ValidationMessageFor(model => model.TaxCategoryId)
+        </td>
+    </tr>
+    
+</table>
+ 
+<table class="adminContent">
+    <tr class="adminSeparator">
+        <td colspan="2">
+            <hr />
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.AvailableStartDateTimeUtc):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.AvailableStartDateTimeUtc)
+            @Html.ValidationMessageFor(model => model.AvailableStartDateTimeUtc)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.AvailableEndDateTimeUtc):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.AvailableEndDateTimeUtc)
+            @Html.ValidationMessageFor(model => model.AvailableEndDateTimeUtc)
+        </td>
+    </tr>
+    <tr id="pnlMarkAsNewStartDateTimeUtc">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.MarkAsNewStartDateTimeUtc):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.MarkAsNewStartDateTimeUtc)
+            @Html.ValidationMessageFor(model => model.MarkAsNewStartDateTimeUtc)
+        </td>
+    </tr>
+    <tr id="pnlMarkAsNewEndDateTimeUtc">
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.MarkAsNewEndDateTimeUtc):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.MarkAsNewEndDateTimeUtc)
+            @Html.ValidationMessageFor(model => model.MarkAsNewEndDateTimeUtc)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.NopLabelFor(model => model.Published):
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Published)
+            @Html.ValidationMessageFor(model => model.Published)
+        </td>
+    </tr>
+    @if (Model.CreatedOn.HasValue)
+    {
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.CreatedOn):
+            </td>
+            <td class="adminData">
+                @Model.CreatedOn.Value.ToString("F")
+            </td>
+        </tr>
+    }
+    @if (Model.UpdatedOn.HasValue)
+    {
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.UpdatedOn):
+            </td>
+            <td class="adminData">
+                @Model.UpdatedOn.Value.ToString("F")
+            </td>
+        </tr>
+    }
+</table>

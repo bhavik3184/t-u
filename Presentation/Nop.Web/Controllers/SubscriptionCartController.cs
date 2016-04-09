@@ -2287,8 +2287,7 @@ namespace Nop.Web.Controllers
         }
 
         [ValidateInput(false)]
-        [HttpPost, ActionName("Cart")]
-        [FormValueRequired("applygiftcardcouponcode")]
+        [HttpPost]
         public ActionResult ApplyGiftCard(string giftcardcouponcode, FormCollection form)
         {
             //trim
@@ -2302,7 +2301,7 @@ namespace Nop.Web.Controllers
                 .ToList();
 
             //parse and save checkout attributes
-            ParseAndSaveCheckoutAttributes(cart, form);
+             ParseAndSaveCheckoutAttributes(cart, form);
             
             var model = new SubscriptionCartModel();
             if (!cart.IsRecurring())
@@ -2328,30 +2327,34 @@ namespace Nop.Web.Controllers
                             {
                                 //valid
                                 _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, SystemCustomerAttributeNames.DiscountCouponCode, giftcardcouponcode);
-                                model.DiscountBox.Message = _localizationService.GetResource("SubscriptionCart.DiscountCouponCode.Applied");
-                                model.DiscountBox.IsApplied = true;
+                                model.GiftCardBox.Message = _localizationService.GetResource("SubscriptionCart.DiscountCouponCode.Applied");
+                                model.GiftCardBox.IsApplied = true;
                             }
                             else
                             {
                                 if (!String.IsNullOrEmpty(validationResult.UserError))
                                 {
                                     //some user error
-                                    model.DiscountBox.Message = validationResult.UserError;
-                                    model.DiscountBox.IsApplied = false;
+                                    model.GiftCardBox.Message = validationResult.UserError;
+                                    model.GiftCardBox.IsApplied = false;
                                 }
                                 else
                                 {
                                     //general error text
-                                    model.DiscountBox.Message = _localizationService.GetResource("SubscriptionCart.DiscountCouponCode.WrongDiscount");
-                                    model.DiscountBox.IsApplied = false;
+                                    model.GiftCardBox.Message = _localizationService.GetResource("SubscriptionCart.DiscountCouponCode.WrongDiscount");
+                                    model.GiftCardBox.IsApplied = false;
                                 }
                             }
 
                             //   model.GiftCardBox.Message = _localizationService.GetResource("ShoppingCart.GiftCardCouponCode.WrongGiftCard");
                             //  model.GiftCardBox.IsApplied = false;
                         }
+                        else
+                        {
+                            model.GiftCardBox.Message = _localizationService.GetResource("SubscriptionCart.GiftCardCouponCode.WrongGiftCard");
+                            model.GiftCardBox.IsApplied = false;
+                        }
                     }
-                    
                 }
                 else
                 {
@@ -2365,8 +2368,13 @@ namespace Nop.Web.Controllers
                 model.GiftCardBox.IsApplied = false;
             }
 
-            PrepareSubscriptionCartModel(model, cart);
-            return View(model);
+           // PrepareSubscriptionCartModel(model, cart);
+            return Json(new
+            {
+                success = model.GiftCardBox.IsApplied,
+                message = model.GiftCardBox.Message 
+            });
+           // return View(model);
         }
 
         [ValidateInput(false)]
@@ -2466,10 +2474,10 @@ namespace Nop.Web.Controllers
         }
 
         [ValidateInput(false)]
-        [HttpPost, ActionName("Cart")]
-        [FormValueRequired("removesubtotaldiscount", "removeordertotaldiscount", "removediscountcouponcode")]
+        [HttpPost]
         public ActionResult RemoveDiscountCoupon()
         {
+            bool success = false;
             var cart = _workContext.CurrentCustomer.SubscriptionCartItems
                 .Where(sci => sci.SubscriptionCartType == SubscriptionCartType.SubscriptionCart)
                 .LimitPerStore(_storeContext.CurrentStore.Id)
@@ -2478,36 +2486,36 @@ namespace Nop.Web.Controllers
 
             _genericAttributeService.SaveAttribute<string>(_workContext.CurrentCustomer,
                 SystemCustomerAttributeNames.DiscountCouponCode, null);
+            success = true;
 
-            PrepareSubscriptionCartModel(model, cart);
-            return View(model);
+            return Json(new
+            {
+                success = success,
+                message = "Removed Successfully."
+            });
         }
 
         [ValidateInput(false)]
-        [HttpPost, ActionName("Cart")]
-        [FormValueRequired(FormValueRequirement.StartsWith, "removegiftcard-")]
-        public ActionResult RemoveGiftCardCode(FormCollection form)
+        [HttpPost]
+        public ActionResult RemoveGiftCardCode(int giftCardId, FormCollection form)
         {
             var model = new SubscriptionCartModel();
 
             //get gift card identifier
-            int giftCardId = 0;
-            foreach (var formValue in form.AllKeys)
-                if (formValue.StartsWith("removegiftcard-", StringComparison.InvariantCultureIgnoreCase))
-                    giftCardId = Convert.ToInt32(formValue.Substring("removegiftcard-".Length));
+            bool success = false;
             var gc = _giftCardService.GetGiftCardById(giftCardId);
             if (gc != null)
             {
                 _workContext.CurrentCustomer.RemoveGiftCardCouponCode(gc.GiftCardCouponCode);
                 _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+                success = true;
             }
 
-            var cart = _workContext.CurrentCustomer.SubscriptionCartItems
-                .Where(sci => sci.SubscriptionCartType == SubscriptionCartType.SubscriptionCart)
-                .LimitPerStore(_storeContext.CurrentStore.Id)
-                .ToList();
-            PrepareSubscriptionCartModel(model, cart);
-            return View(model);
+            return Json(new
+            {
+                success = success,
+                message = "Removed Successfully."
+            });
         }
 
         [ChildActionOnly]

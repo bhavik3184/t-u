@@ -1,0 +1,131 @@
+﻿@model PlanModel
+
+
+    @if (Model.Id > 0)
+    {
+            
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="relatedplans-grid"></div>
+
+                <script>
+                    $(document).ready(function () {
+                        $("#relatedplans-grid").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "@Html.Raw(Url.Action("RelatedPlanList", "Plan", new { planId = Model.Id }))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: addAntiForgeryToken
+                                    },
+                                    update: {
+                                        url:"@Html.Raw(Url.Action("RelatedPlanUpdate", "Plan"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: addAntiForgeryToken
+                                    },
+                                    destroy: {
+                                        url: "@Html.Raw(Url.Action("RelatedPlanDelete", "Plan"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: addAntiForgeryToken
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors",
+                                    model: {
+                                        id: "Id",
+                                        fields: {
+                                            Plan2Name: { editable: false, type: "string" },
+                                            DisplayOrder: {editable: true, type: "number" },
+                                            PlanId2: { editable: false, type: "number" }
+                                        }
+                                    }
+                                },
+                                requestEnd: function(e) {
+                                    if(e.type=="update") {
+                                        this.read();
+                                    }
+                                },
+                                error: function(e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                numeric: false,
+                                previousNext: false,
+                                info: false
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            columns: [{
+                                field: "Plan2Name",
+                                title: "@T("Admin.Catalog.Plans.RelatedPlans.Fields.Plan")"
+                            }, {
+                                field: "DisplayOrder",
+                                title: "@T("Admin.Catalog.Plans.RelatedPlans.Fields.DisplayOrder")",
+                                //integer format
+                                format: "{0:0}",
+                                width: 150
+                            }, {
+                                field: "PlanId2",
+                                title: "@T("Admin.Common.View")",
+                                width: 100,
+                                template: '<a href="@Url.Content("~/Admin/Plan/Edit/")#=PlanId2#">@T("Admin.Common.View")</a>'
+                            }, {
+                                command: [{
+                                    name: "edit",
+                                    text: {
+                                        edit: "@T("Admin.Common.Edit")",
+                                        update: "@T("Admin.Common.Update")",
+                                        cancel: "@T("Admin.Common.Cancel")"
+                                    }
+                                }, {
+                                    name: "destroy",
+                                    text: "@T("Admin.Common.Delete")"
+                                }],
+                                width: 200
+                            }]
+                        });
+                    });
+                </script>
+            </td>
+        </tr>
+        <tr>
+            <td width="100%">
+                <input type="submit" id="btnAddNewRelatedPlan" value="@T("Admin.Catalog.Plans.RelatedPlans.AddNew")" onclick="javascript:OpenWindow('@(Url.Action("RelatedPlanAddPopup", "Plan", new { planId = Model.Id, btnId = "btnRefreshRelatedPlans", formId = "plan-form" }))    ', 800, 800, true); return false;" class="k-button" />
+                <input type="submit" id="btnRefreshRelatedPlans" style="display: none" />
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $('#btnRefreshRelatedPlans').click(function () {
+                            //refresh grid
+                            var grid = $("#relatedplans-grid").data('kendoGrid');
+                            grid.dataSource.read();
+
+                            //return false to don't reload a page
+                            return false;
+                        });
+                    });
+                </script>
+            </td>
+        </tr>
+    </table>
+    }
+    else
+    {
+    @T("Admin.Catalog.Plans.RelatedPlans.SaveBeforeEdit")
+    }

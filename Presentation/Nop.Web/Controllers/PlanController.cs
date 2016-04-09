@@ -296,7 +296,7 @@ namespace Nop.Web.Controllers
                     }
                     else
                     {
-                        decimal taxRate;
+                       // decimal taxRate;
                         decimal oldPriceBase = decimal.Zero;
                         decimal finalPriceWithoutDiscountBase = decimal.Zero;
                         decimal finalPriceWithDiscountBase = decimal.Zero; 
@@ -418,7 +418,7 @@ namespace Nop.Web.Controllers
                         {
                             Quantity = tierPrice.Quantity,
                         };
-                        decimal taxRate;
+                      //  decimal taxRate;
                         decimal priceBase = decimal.Zero; 
                         decimal price = _currencyService.ConvertFromPrimaryStoreCurrency(priceBase, _workContext.WorkingCurrency);
                         m.Price = _priceFormatter.FormatPrice(price, false, false);

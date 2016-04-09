@@ -509,6 +509,12 @@ namespace Nop.Web.Controllers
             //countries and states
             if (_customerSettings.CountryEnabled)
             {
+                model.CountryId = 1;
+                model.ShippingCountryId = 1;
+                model.StateProvinceId = 1;
+                model.ShippingStateProvinceId = 1;
+                model.CityId = 1;
+                model.ShippingCityId = 1;
                 model.AvailableCountries.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectCountry"), Value = "0" });
 
                 model.AvailableShippingCountries.Add(new SelectListItem { Text = _localizationService.GetResource("Address.SelectCountry"), Value = "0" });
@@ -793,7 +799,7 @@ namespace Nop.Web.Controllers
                     case CustomerLoginResults.Successful:
                         {
                             var customer = _customerSettings.UsernamesEnabled ? _customerService.GetCustomerByUsername(model.Username) : _customerService.GetCustomerByEmail(model.Email);
-
+                            model.IsLoggedIn = true;
                             //migrate shopping cart
                             _borrowCartService.MigrateBorrowCart(_workContext.CurrentCustomer, customer, true);
 
@@ -834,6 +840,97 @@ namespace Nop.Web.Controllers
             model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
             model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage;
             return View(model);
+        }
+
+        [NopHttpsRequirement(SslRequirement.Yes)]
+        //available even when a store is closed
+        [StoreClosed(true)]
+        //available even when navigation is not allowed
+        [PublicStoreAllowNavigation(true)]
+        public ActionResult LoginBox(bool? checkoutAsGuest)
+        {
+            var model = new LoginModel();
+            if (_workContext.CurrentCustomer.IsRegistered())
+                
+                model.IsLoggedIn = true;
+            else
+                model.IsLoggedIn = false;
+            model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
+            model.CheckoutAsGuest = checkoutAsGuest.GetValueOrDefault();
+            model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage;
+            return PartialView(model);
+        }
+
+        [HttpPost]
+        [CaptchaValidator]
+        //available even when a store is closed
+        [StoreClosed(true)]
+        //available even when navigation is not allowed
+        [PublicStoreAllowNavigation(true)]
+        public ActionResult LoginBox(LoginModel model, string returnUrl, bool captchaValid)
+        {
+            //validate CAPTCHA
+            if (_captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage && !captchaValid)
+            {
+                ModelState.AddModelError("", _localizationService.GetResource("Common.WrongCaptcha"));
+            }
+
+            
+
+            if (ModelState.IsValid)
+            {
+                if (_customerSettings.UsernamesEnabled && model.Username != null)
+                {
+                    model.Username = model.Username.Trim();
+                }
+                var loginResult = _customerRegistrationService.ValidateCustomer(_customerSettings.UsernamesEnabled ? model.Username : model.Email, model.Password);
+                switch (loginResult)
+                {
+                    case CustomerLoginResults.Successful:
+                        {
+                            var customer = _customerSettings.UsernamesEnabled ? _customerService.GetCustomerByUsername(model.Username) : _customerService.GetCustomerByEmail(model.Email);
+                            model.IsLoggedIn = true;
+                            //migrate shopping cart
+                            _borrowCartService.MigrateBorrowCart(_workContext.CurrentCustomer, customer, true);
+
+                            //sign in new customer
+                            _authenticationService.SignIn(customer, model.RememberMe);
+
+                            //raise event       
+                            _eventPublisher.Publish(new CustomerLoggedinEvent(customer));
+
+                            //activity log
+                            _customerActivityService.InsertActivity("PublicStore.Login", _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
+
+                            if (String.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
+                                return PartialView(model);
+
+                            return PartialView(model);
+                        }
+                    case CustomerLoginResults.CustomerNotExist:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.CustomerNotExist"));
+                        break;
+                    case CustomerLoginResults.Deleted:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.Deleted"));
+                        break;
+                    case CustomerLoginResults.NotActive:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.NotActive"));
+                        break;
+                    case CustomerLoginResults.NotRegistered:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.NotRegistered"));
+                        break;
+                    case CustomerLoginResults.WrongPassword:
+                    default:
+                        ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials"));
+                        break;
+                }
+                
+            }
+            model.IsLoggedIn = false;
+            //If we got this far, something failed, redisplay form
+            model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
+            model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage;
+            return PartialView(model);
         }
 
         //available even when a store is closed

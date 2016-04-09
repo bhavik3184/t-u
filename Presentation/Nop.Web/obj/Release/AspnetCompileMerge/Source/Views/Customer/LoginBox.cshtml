@@ -1,0 +1,85 @@
+﻿@model LoginModel
+@using Nop.Web.Models.Customer;
+@using Nop.Core;
+@using Nop.Core.Infrastructure;
+ 
+<div id="opentimes_widget-2" class="widget widget_opentimes_widget homepagewidget orange">
+    <div class="widgetnails"></div>
+    <h3 class="widget-title">Login</h3>
+    @if (!Model.IsLoggedIn) { 
+       using (Html.BeginForm())
+        {
+            var validationSummary = Html.ValidationSummary(true, T("Account.Login.Unsuccessful").Text);
+            if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
+                {
+                    <div class="message-error">@validationSummary</div>
+                }
+
+     
+        <fieldset>
+            @if (Model.UsernamesEnabled)
+    {
+        <div class="input-group" style="width:100%;">
+            @Html.LabelFor(m => m.Username, new { }, ":")
+            @Html.TextBoxFor(m => m.Username, new { @class = "searchfield form-control", autofocus = "autofocus" })
+            @Html.ValidationMessageFor(m => m.Username)
+        </div>
+    } 
+            else
+            {
+                <div class="input-group" style="width:100%;">
+                    @Html.LabelFor(m => m.Email, new { }, ":")
+                    @Html.TextBoxFor(m => m.Email, new { @class = "searchfield form-control", autofocus = "autofocus" })
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+            }
+            <div class="input-group" style="width:100%;">
+                @Html.LabelFor(m => m.Password, new { }, ":")
+                @Html.PasswordFor(m => m.Password, new { @class = "password searchfield form-control" })
+                @Html.ValidationMessageFor(m => m.Password)
+            </div>
+            <div class="input-group reversed">
+            
+            
+           
+            </div>
+            @if (Model.DisplayCaptcha)
+            {
+                <div class="captcha-box">
+                    @Html.Raw(Html.GenerateCaptcha())
+                </div>
+            }
+            <p class="form-row" style="margin-bottom:10px;">
+         	
+                <input class="loginbutton  " type="submit" value="@T("Account.Login.LoginButton")" />
+                 @Html.CheckBoxFor(m => m.RememberMe)
+                @Html.LabelFor(m => m.RememberMe)
+            </p>
+            <p class="lost_password" style=" text-align:right">
+                <span class="forgot-password lost_password" style=" text-align:right">
+                    @Html.RouteLink(T("Account.Login.ForgotPassword").Text, "PasswordRecovery")
+                </span>
+            </p>
+        </fieldset>
+
+        <div class="external-authentication" style="margin: 0 0 0px;">
+            @Html.Action("ExternalMethods", "ExternalAuthentication")
+        </div>
+            @Html.Partial("_ExternalAuthentication.AssociateMessage")
+            @Html.Partial("_ExternalAuthentication.Errors")
+
+        }
+    }
+    else
+    {
+        <fieldset>
+         
+            <p class="form-row" style=" margin: 50px auto; width: 100px;">
+                <a class="loginbutton" href="@Url.RouteUrl("Logout")" >@T("Account.Logout")</a>
+            </p>
+        </fieldset>
+    }
+        <div class="widgetnails widgetnailsbottom"></div>
+</div>
+
+ 

@@ -555,8 +555,8 @@ namespace Nop.Services.SubscriptionOrders
             //shipping total
             if (!processPaymentRequest.IsRecurringPayment)
             {
-                decimal taxRate;
-                Discount shippingTotalDiscount;
+                //decimal taxRate;
+                //Discount shippingTotalDiscount;
                 decimal? orderShippingTotalInclTax = decimal.Zero; ;
                 decimal? orderShippingTotalExclTax = decimal.Zero;
                 if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)

@@ -7,12 +7,12 @@ namespace Nop.Web.Models.Order
 {
     public partial class CustomerReturnRequestsModel : BaseNopModel
     {
-           public CustomerReturnRequestsModel()
+         public CustomerReturnRequestsModel()
         {
-            TransactionItem = new TransactionItemModel();
+            TransactionItems = new List<TransactionItemModel>();
         }
 
-        public TransactionItemModel TransactionItem { get; set; }
+           public IList<TransactionItemModel> TransactionItems { get; set; }
 
 
         public partial class TransactionItemModel : BaseNopEntityModel
@@ -21,7 +21,6 @@ namespace Nop.Web.Models.Order
             {
                 Items = new List<ReturnRequestModel>();
             }
-
 
             public IList<ReturnRequestModel> Items { get; set; }
             
@@ -33,6 +32,8 @@ namespace Nop.Web.Models.Order
                 }
                 public string ReturnRequestStatus { get; set; }
                 public int ProductId { get; set; }
+                public int OrderItemId { get; set; }
+                public int ItemDetailId { get; set; }
                 public string ProductName { get; set; }
                 public string ProductSeName { get; set; }
                 public int Quantity { get; set; }

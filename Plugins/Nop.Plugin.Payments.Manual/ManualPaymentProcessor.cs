@@ -9,8 +9,7 @@ using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.SubscriptionOrders;
 using Nop.Services.Payments;
-using Nop.Services.SubscriptionOrders;
-using Nop.Core.Domain.SubscriptionOrders;
+
 
 namespace Nop.Plugin.Payments.Manual
 {

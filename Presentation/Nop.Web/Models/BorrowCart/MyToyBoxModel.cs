@@ -18,7 +18,7 @@ namespace Nop.Web.Models.BorrowCart
 
         public Guid CustomerGuid { get; set; }
         public string CustomerFullname { get; set; }
-
+      
         public bool EmailMyToyBoxEnabled { get; set; }
 
         public bool ShowSku { get; set; }
@@ -62,6 +62,7 @@ namespace Nop.Web.Models.BorrowCart
             public string SubTotal { get; set; }
 
             public string Discount { get; set; }
+            public bool IsStockAvailable { get; set; }
 
             public int Quantity { get; set; }
             public List<SelectListItem> AllowedQuantities { get; set; }

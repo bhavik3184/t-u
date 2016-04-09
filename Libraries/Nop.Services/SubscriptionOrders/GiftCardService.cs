@@ -67,6 +67,22 @@ namespace Nop.Services.SubscriptionOrders
             return _giftCardRepository.GetById(giftCardId);
         }
 
+        public virtual GiftCard GetGiftCardByCouponCode(string giftCardCouponCode)
+        {
+            if (String.IsNullOrEmpty(giftCardCouponCode))
+                return null;
+
+            giftCardCouponCode = giftCardCouponCode.Trim();
+
+            var query = from p in _giftCardRepository.Table
+                        orderby p.Id
+                        where p.GiftCardCouponCode == giftCardCouponCode
+                        select p;
+            var product = query.FirstOrDefault();
+            return product;
+        }
+
+
         /// <summary>
         /// Gets all gift cards
         /// </summary>

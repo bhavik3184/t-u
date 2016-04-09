@@ -30,6 +30,7 @@ namespace Nop.Web.Infrastructure
                             "login/",
                             new { controller = "Customer", action = "Login" },
                             new[] { "Nop.Web.Controllers" });
+           
             //register
             routes.MapLocalizedRoute("Register",
                             "register/",
@@ -51,6 +52,35 @@ namespace Nop.Web.Infrastructure
                             "mytoybox/{customerGuid}",
                             new { controller = "BorrowCart", action = "MyToyBox", customerGuid = UrlParameter.Optional },
                             new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("ProductReview",
+                    "ProductReview",
+                    new { controller = "Product", action = "ProductReviews" },
+                    new[] { "Nop.Web.Controllers" });
+
+
+            routes.MapLocalizedRoute("ProductDetailsById",
+                   "ProductDetailsById",
+                   new { controller = "Product", action = "ProductDetailsById" },
+                   new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("ApplyGiftCard",
+                  "ApplyGiftCard",
+                  new { controller = "SubscriptionCart", action = "ApplyGiftCard" },
+                  new[] { "Nop.Web.Controllers" });
+
+
+            routes.MapLocalizedRoute("RemoveGiftCardCode",
+                  "RemoveGiftCardCode",
+                  new { controller = "SubscriptionCart", action = "RemoveGiftCardCode" },
+                  new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("RemoveDiscountCoupon",
+                  "RemoveDiscountCoupon",
+                  new { controller = "SubscriptionCart", action = "RemoveDiscountCoupon" },
+                  new[] { "Nop.Web.Controllers" });
+
+            
 
             //customer account links
             routes.MapLocalizedRoute("CustomerInfo",
@@ -110,6 +140,23 @@ namespace Nop.Web.Infrastructure
                             "catalog/searchtermautocomplete",
                             new { controller = "Catalog", action = "SearchTermAutoComplete" },
                             new[] { "Nop.Web.Controllers" });
+
+
+            routes.MapLocalizedRoute("CategoryFilter",
+                          "catalog/CategoryFilter",
+                          new { controller = "Catalog", action = "CategoryFilter" },
+                          new[] { "Nop.Web.Controllers" });
+
+            routes.MapLocalizedRoute("SearchFilter",
+                         "catalog/SearchFilter",
+                         new { controller = "Catalog", action = "SearchFilter" },
+                         new[] { "Nop.Web.Controllers" });
+
+
+            routes.MapLocalizedRoute("SearchCategoryFilter",
+                       "SearchProducts/",
+                       new { controller = "Catalog", action = "SearchCategoryFilter" },
+                       new[] { "Nop.Web.Controllers" });
 
             //change currency (AJAX link)
             routes.MapLocalizedRoute("ChangeCurrency",

@@ -801,6 +801,7 @@ namespace Nop.Web.Controllers
                 TotalReviews = product.ApprovedTotalReviews,
                 AllowCustomerReviews = product.AllowCustomerReviews
             };
+            PrepareProductReviewsModel(model.ProductReviewOverview.ProductReviewsModel, product);
 
             #endregion
 
@@ -998,6 +999,46 @@ namespace Nop.Web.Controllers
             return View(model.ProductTemplateViewPath, model);
         }
 
+        public JsonResult ProductDetailsById(int productId)
+        {
+            var product = _productService.GetProductById(productId);
+            if (product == null || product.Deleted)
+                return null;
+
+            //published?
+            if (!_catalogSettings.AllowViewUnpublishedProductPage)
+            {
+                //Check whether the current user has a "Manage catalog" permission
+                //It allows him to preview a product before publishing
+                if (!product.Published && !_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                    return null;
+            }
+
+            //ACL (access control list)
+            if (!_aclService.Authorize(product))
+                return null;
+
+            //Store mapping
+            if (!_storeMappingService.Authorize(product))
+                return null;
+
+            //availability dates
+            if (!product.IsAvailable())
+                return null;
+            
+            //prepare the model
+            var model = PrepareProductDetailsPageModel(product, null, false);
+
+            //save as recently viewed
+            _recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
+
+            //activity log
+            _customerActivityService.InsertActivity("PublicStore.ViewProduct", _localizationService.GetResource("ActivityLog.PublicStore.ViewProduct"), product.Name);
+
+            return Json(model);
+          //  return View(model.ProductTemplateViewPath, model);
+        }
+
         [ChildActionOnly]
         public ActionResult RelatedProducts(int productId, int? productThumbPictureSize)
         {
@@ -1147,45 +1188,7 @@ namespace Nop.Web.Controllers
             return View(model);
         }
 
-        public ActionResult NewProductsRss()
-        {
-            var feed = new SyndicationFeed(
-                                    string.Format("{0}: New products", _storeContext.CurrentStore.GetLocalized(x => x.Name)),
-                                    "Information about products",
-                                    new Uri(_webHelper.GetStoreLocation(false)),
-                                    "NewProductsRSS",
-                                    DateTime.UtcNow);
-
-            if (!_catalogSettings.NewProductsEnabled)
-                return new RssActionResult { Feed = feed };
-
-            var items = new List<SyndicationItem>();
-
-            var products = _productService.SearchProducts(
-                storeId: _storeContext.CurrentStore.Id,
-                visibleIndividuallyOnly: true,
-                markedAsNewOnly: true,
-                orderBy: ProductSortingEnum.CreatedOn,
-                pageSize: _catalogSettings.NewProductsNumber);
-            foreach (var product in products)
-            {
-                string productUrl = Url.RouteUrl("Product", new { SeName = product.GetSeName() }, "http");
-                string productName = product.GetLocalized(x => x.Name);
-                string productDescription = product.GetLocalized(x => x.ShortDescription);
-                var item = new SyndicationItem(productName, productDescription, new Uri(productUrl), String.Format("NewProduct:{0}", product.Id), product.CreatedOnUtc);
-                items.Add(item);
-                //uncomment below if you want to add RSS enclosure for pictures
-                //var picture = _pictureService.GetPicturesByProductId(product.Id, 1).FirstOrDefault();
-                //if (picture != null)
-                //{
-                //    var imageUrl = _pictureService.GetPictureUrl(picture, _mediaSettings.ProductDetailsPictureSize);
-                //    item.ElementExtensions.Add(new XElement("enclosure", new XAttribute("type", "image/jpeg"), new XAttribute("url", imageUrl)).CreateReader());
-                //}
-
-            }
-            feed.Items = items;
-            return new RssActionResult { Feed = feed };
-        }
+       
 
         #endregion
 
@@ -1262,22 +1265,46 @@ namespace Nop.Web.Controllers
             if (product == null || product.Deleted || !product.Published || !product.AllowCustomerReviews)
                 return RedirectToRoute("HomePage");
 
-            var model = new ProductReviewsModel();
-            PrepareProductReviewsModel(model, product);
+            var model = new ProductReviewOverviewModel();
+            PrepareProductReviewsModel(model.ProductReviewsModel, product);
             //only registered users can leave reviews
             if (_workContext.CurrentCustomer.IsGuest() && !_catalogSettings.AllowAnonymousUsersToReviewProduct)
                 ModelState.AddModelError("", _localizationService.GetResource("Reviews.OnlyRegisteredUsersCanWriteReviews"));
             //default value
-            model.AddProductReview.Rating = _catalogSettings.DefaultProductRatingValue;
+            model.ProductReviewsModel.AddProductReview.Rating = _catalogSettings.DefaultProductRatingValue;
             return View(model);
         }
 
-        [HttpPost, ActionName("ProductReviews")]
-        [PublicAntiForgery]
-        [FormValueRequired("add-review")]
-        [CaptchaValidator]
-        public ActionResult ProductReviewsAdd(int productId, ProductReviewsModel model, bool captchaValid)
+
+        [HttpPost]
+        public ActionResult ProductReviews(int productId, string reviewTitle, string reviewText, int reviewRating)
         {
+            bool captchaValid = true;
+
+            var model = new ProductReviewOverviewModel
+            {
+                ProductId = productId,
+
+            };
+
+            var model1 = new ProductReviewsModel
+            {
+                ProductId = productId,
+            };
+
+            var model2 = new AddProductReviewModel
+            {
+                Title = reviewTitle,
+                ReviewText = reviewText,
+                Rating = reviewRating,
+            };
+
+
+
+            model.ProductReviewsModel = model1;
+
+            model.ProductReviewsModel.AddProductReview = model2;
+
             var product = _productService.GetProductById(productId);
             if (product == null || product.Deleted || !product.Published || !product.AllowCustomerReviews)
                 return RedirectToRoute("HomePage");
@@ -1296,7 +1323,7 @@ namespace Nop.Web.Controllers
             if (ModelState.IsValid)
             {
                 //save review
-                int rating = model.AddProductReview.Rating;
+                int rating = model.ProductReviewsModel.AddProductReview.Rating;
                 if (rating < 1 || rating > 5)
                     rating = _catalogSettings.DefaultProductRatingValue;
                 bool isApproved = !_catalogSettings.ProductReviewsMustBeApproved;
@@ -1305,8 +1332,8 @@ namespace Nop.Web.Controllers
                 {
                     ProductId = product.Id,
                     CustomerId = _workContext.CurrentCustomer.Id,
-                    Title = model.AddProductReview.Title,
-                    ReviewText = model.AddProductReview.ReviewText,
+                    Title = model.ProductReviewsModel.AddProductReview.Title,
+                    ReviewText = model.ProductReviewsModel.AddProductReview.ReviewText,
                     Rating = rating,
                     HelpfulYesTotal = 0,
                     HelpfulNoTotal = 0,
@@ -1330,21 +1357,96 @@ namespace Nop.Web.Controllers
                 if (productReview.IsApproved)
                     _eventPublisher.Publish(new ProductReviewApprovedEvent(productReview));
 
-                PrepareProductReviewsModel(model, product);
-                model.AddProductReview.Title = null;
-                model.AddProductReview.ReviewText = null;
+                PrepareProductReviewsModel(model.ProductReviewsModel, product);
+                model.ProductReviewsModel.AddProductReview.Title = null;
+                model.ProductReviewsModel.AddProductReview.ReviewText = null;
 
-                model.AddProductReview.SuccessfullyAdded = true;
+                model.ProductReviewsModel.AddProductReview.SuccessfullyAdded = true;
                 if (!isApproved)
-                    model.AddProductReview.Result = _localizationService.GetResource("Reviews.SeeAfterApproving");
+                    model.ProductReviewsModel.AddProductReview.Result = _localizationService.GetResource("Reviews.SeeAfterApproving");
                 else
-                    model.AddProductReview.Result = _localizationService.GetResource("Reviews.SuccessfullyAdded");
+                    model.ProductReviewsModel.AddProductReview.Result = _localizationService.GetResource("Reviews.SuccessfullyAdded");
 
                 return View(model);
             }
 
             //If we got this far, something failed, redisplay form
-            PrepareProductReviewsModel(model, product);
+            PrepareProductReviewsModel(model.ProductReviewsModel, product);
+            return View(model);
+        }
+
+        [HttpPost, ActionName("ProductReviews")]
+        [FormValueRequired("add-review")]
+        [CaptchaValidator]
+        public ActionResult ProductReviewsAdd(int productId, ProductReviewOverviewModel model, bool captchaValid)
+        {
+            var product = _productService.GetProductById(productId);
+            if (product == null || product.Deleted || !product.Published || !product.AllowCustomerReviews)
+                return RedirectToRoute("HomePage");
+
+            //validate CAPTCHA
+            if (_captchaSettings.Enabled && _captchaSettings.ShowOnProductReviewPage && !captchaValid)
+            {
+                ModelState.AddModelError("", _localizationService.GetResource("Common.WrongCaptcha"));
+            }
+
+            if (_workContext.CurrentCustomer.IsGuest() && !_catalogSettings.AllowAnonymousUsersToReviewProduct)
+            {
+                ModelState.AddModelError("", _localizationService.GetResource("Reviews.OnlyRegisteredUsersCanWriteReviews"));
+            }
+
+            if (ModelState.IsValid)
+            {
+                //save review
+                int rating = model.ProductReviewsModel.AddProductReview.Rating;
+                if (rating < 1 || rating > 5)
+                    rating = _catalogSettings.DefaultProductRatingValue;
+                bool isApproved = !_catalogSettings.ProductReviewsMustBeApproved;
+
+                var productReview = new ProductReview
+                {
+                    ProductId = product.Id,
+                    CustomerId = _workContext.CurrentCustomer.Id,
+                    Title = model.ProductReviewsModel.AddProductReview.Title,
+                    ReviewText = model.ProductReviewsModel.AddProductReview.ReviewText,
+                    Rating = rating,
+                    HelpfulYesTotal = 0,
+                    HelpfulNoTotal = 0,
+                    IsApproved = isApproved,
+                    CreatedOnUtc = DateTime.UtcNow,
+                };
+                product.ProductReviews.Add(productReview);
+                _productService.UpdateProduct(product);
+
+                //update product totals
+                _productService.UpdateProductReviewTotals(product);
+
+                //notify store owner
+                if (_catalogSettings.NotifyStoreOwnerAboutNewProductReviews)
+                    _workflowMessageService.SendProductReviewNotificationMessage(productReview, _localizationSettings.DefaultAdminLanguageId);
+
+                //activity log
+                _customerActivityService.InsertActivity("PublicStore.AddProductReview", _localizationService.GetResource("ActivityLog.PublicStore.AddProductReview"), product.Name);
+
+                //raise event
+                if (productReview.IsApproved)
+                    _eventPublisher.Publish(new ProductReviewApprovedEvent(productReview));
+
+                PrepareProductReviewsModel(model.ProductReviewsModel, product);
+                model.ProductReviewsModel.AddProductReview.Title = null;
+                model.ProductReviewsModel.AddProductReview.ReviewText = null;
+
+                model.ProductReviewsModel.AddProductReview.SuccessfullyAdded = true;
+                if (!isApproved)
+                    model.ProductReviewsModel.AddProductReview.Result = _localizationService.GetResource("Reviews.SeeAfterApproving");
+                else
+                    model.ProductReviewsModel.AddProductReview.Result = _localizationService.GetResource("Reviews.SuccessfullyAdded");
+
+                return View(model);
+            }
+
+            //If we got this far, something failed, redisplay form
+            PrepareProductReviewsModel(model.ProductReviewsModel, product);
             return View(model);
         }
 

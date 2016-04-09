@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework;
 using Nop.Web.Framework.Mvc;
+using System;
 
 namespace Nop.Admin.Models.SubscriptionOrders
 {
@@ -17,5 +18,8 @@ namespace Nop.Admin.Models.SubscriptionOrders
 
         [NopResourceDisplayName("Admin.CurrentCarts.TotalItems")]
         public int TotalItems { get; set; }
+
+         public DateTime CreatedOn { get; set; }
     }
+    
 }

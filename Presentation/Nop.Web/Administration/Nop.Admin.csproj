@@ -227,6 +227,8 @@
     <Compile Include="Models\Discounts\DiscountListModel.cs" />
     <Compile Include="Models\Home\DashboardModel.cs" />
     <Compile Include="Models\Messages\TestMessageTemplateModel.cs" />
+    <Compile Include="Models\Orders\ReturnRequestTransactionModel.cs" />
+    <Compile Include="Models\Orders\ReturnTransactionListModel.cs" />
     <Compile Include="Models\Orders\CountryReportLineModel.cs" />
     <Compile Include="Models\Orders\CountryReportModel.cs" />
     <Compile Include="Models\Payments\PaymentMethodRestrictionModel.cs" />
@@ -257,7 +259,6 @@
     <Compile Include="Models\SubscriptionOrders\OrderListModel.cs" />
     <Compile Include="Models\SubscriptionOrders\OrderModel.cs" />
     <Compile Include="Models\SubscriptionOrders\RecurringPaymentModel.cs" />
-    <Compile Include="Models\SubscriptionOrders\ReturnRequestModel.cs" />
     <Compile Include="Models\SubscriptionOrders\BorrowTransactionListModel.cs" />
     <Compile Include="Models\SubscriptionOrders\ShipmentListModel.cs" />
     <Compile Include="Models\SubscriptionOrders\ShipmentModel.cs" />
@@ -377,7 +378,6 @@
     <Compile Include="Validators\Settings\ReturnRequestReasonValidator.cs" />
     <Compile Include="Validators\SubscriptionOrders\CheckoutAttributeValidator.cs" />
     <Compile Include="Validators\SubscriptionOrders\CheckoutAttributeValueValidator.cs" />
-    <Compile Include="Validators\SubscriptionOrders\ReturnRequestValidator.cs" />
     <Compile Include="Validators\Templates\TopicTemplateValidator.cs" />
     <Compile Include="Validators\Templates\ProductTemplateValidator.cs" />
     <Compile Include="Validators\Templates\ManufacturerTemplateValidator.cs" />
@@ -1046,6 +1046,8 @@
     <Content Include="Views\City\Edit.cshtml" />
     <Content Include="Views\City\List.cshtml" />
     <Content Include="Views\SubscriptionOrder\BorrowTransactionList.cshtml" />
+    <Content Include="Views\ReturnRequest\EditTransaction.cshtml" />
+    <Content Include="Views\ReturnRequest\_CreateOrUpdateTransaction.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Product\AddAttributeCombinationPopup.cshtml" />

@@ -405,22 +405,24 @@ namespace Nop.Web.Controllers
             var returnRequests = _returnRequestService.SearchReturnRequests(_storeContext.CurrentStore.Id,
                  _workContext.CurrentCustomer.Id, rs: ReturnRequestStatus.Pending);
 
-            var transModel = new CustomerReturnRequestsModel.TransactionItemModel();
+          
+            List<CustomerReturnRequestsModel.TransactionItemModel.ReturnRequestModel> returnRequestItems = new List<CustomerReturnRequestsModel.TransactionItemModel.ReturnRequestModel>();
 
             foreach (var returnRequest in returnRequests)
             {
                 var itemDetail = _orderService.GetItemDetailById(returnRequest.ItemDetailId);
+
                 if (itemDetail != null)
                 {
                     var product = itemDetail.Product;
                   
-                    transModel.Id = itemDetail.OrderItemId;
-
                     var itemModel = new CustomerReturnRequestsModel.TransactionItemModel.ReturnRequestModel
                     {
                         Id = returnRequest.Id,
                         ReturnRequestStatus = returnRequest.ReturnRequestStatus.GetLocalizedEnum(_localizationService, _workContext),
                         ProductId = product.Id,
+                        OrderItemId = itemDetail.OrderItemId,
+                        ItemDetailId = itemDetail.Id,
                         ProductName = product.GetLocalized(x => x.Name),
                         ProductSeName = product.GetSeName(),
                         Quantity = returnRequest.Quantity,
@@ -444,10 +446,25 @@ namespace Nop.Web.Controllers
                         return pictureModel;
                     });
 
-                    transModel.Items.Add(itemModel);
+                    returnRequestItems.Add(itemModel);
                 }
             }
-            model.TransactionItem = transModel;
+
+
+            List<int> result = returnRequestItems.Select(o => o.OrderItemId).Distinct().ToList();
+
+            foreach(int i in result)
+            {
+                var transModel = new CustomerReturnRequestsModel.TransactionItemModel();
+                transModel.Id = i;
+                foreach (var item in returnRequestItems.Where(x => x.OrderItemId == i))
+                {
+                    transModel.Items.Add(item);
+                }
+                model.TransactionItems.Add(transModel);
+            }
+
+          //  model.TransactionItem = transModel;
             return View(model);
         }
 
@@ -461,19 +478,23 @@ namespace Nop.Web.Controllers
 
             var returnRequests = _returnRequestService.SearchReturnRequests(_storeContext.CurrentStore.Id,
                 _workContext.CurrentCustomer.Id,rs:ReturnRequestStatus.Received);
-            var transModel = new CustomerReturnRequestsModel.TransactionItemModel();
+           List<CustomerReturnRequestsModel.TransactionItemModel.ReturnRequestModel> returnRequestItems = new List<CustomerReturnRequestsModel.TransactionItemModel.ReturnRequestModel>();
+
             foreach (var returnRequest in returnRequests)
             {
-                var orderItem = _orderService.GetItemDetailById(returnRequest.ItemDetailId);
-                if (orderItem != null)
-                {
-                    var product = orderItem.Product;
+                var itemDetail = _orderService.GetItemDetailById(returnRequest.ItemDetailId);
 
+                if (itemDetail != null)
+                {
+                    var product = itemDetail.Product;
+                  
                     var itemModel = new CustomerReturnRequestsModel.TransactionItemModel.ReturnRequestModel
                     {
                         Id = returnRequest.Id,
                         ReturnRequestStatus = returnRequest.ReturnRequestStatus.GetLocalizedEnum(_localizationService, _workContext),
                         ProductId = product.Id,
+                        OrderItemId = itemDetail.OrderItemId,
+                        ItemDetailId = itemDetail.Id,
                         ProductName = product.GetLocalized(x => x.Name),
                         ProductSeName = product.GetSeName(),
                         Quantity = returnRequest.Quantity,
@@ -482,11 +503,42 @@ namespace Nop.Web.Controllers
                         Comments = returnRequest.CustomerComments,
                         CreatedOn = _dateTimeHelper.ConvertToUserTime(returnRequest.CreatedOnUtc, DateTimeKind.Utc),
                     };
-                    transModel.Items.Add(itemModel);
+                    int pictureSize = 150;
+                    //prepare picture model
+                    var defaultProductPictureCacheKey = string.Format(ModelCacheEventConsumer.PRODUCT_DEFAULTPICTURE_MODEL_KEY, itemDetail.ProductId, pictureSize, true, _workContext.WorkingLanguage.Id, false, _storeContext.CurrentStore.Id);
+                    itemModel.DefaultPictureModel = _cacheManager.Get(defaultProductPictureCacheKey, () =>
+                    {
+                        var picture = _pictureService.GetPicturesByProductId(itemDetail.ProductId, 1).FirstOrDefault();
+                        var pictureModel = new PictureModel
+                        {
+                            ImageUrl = _pictureService.GetPictureUrl(picture, pictureSize),
+                            FullSizeImageUrl = _pictureService.GetPictureUrl(picture)
+                        };
+
+                        return pictureModel;
+                    });
+
+                    returnRequestItems.Add(itemModel);
                 }
             }
-            model.TransactionItem = transModel;
+
+
+            List<int> result = returnRequestItems.Select(o => o.OrderItemId).Distinct().ToList();
+
+            foreach(int i in result)
+            {
+                var transModel = new CustomerReturnRequestsModel.TransactionItemModel();
+                transModel.Id = i;
+                foreach (var item in returnRequestItems.Where(x => x.OrderItemId == i))
+                {
+                    transModel.Items.Add(item);
+                }
+                model.TransactionItems.Add(transModel);
+            }
+
+          //  model.TransactionItem = transModel;
             return View(model);
+        
         }
 
         [NopHttpsRequirement(SslRequirement.Yes)]
@@ -588,6 +640,7 @@ namespace Nop.Web.Controllers
             return View(model);
         }
 
+      
         [NopHttpsRequirement(SslRequirement.Yes)]
         public ActionResult CustomerDeliveredItems()
         {
@@ -634,6 +687,9 @@ namespace Nop.Web.Controllers
                                 {
                                     deliveryModel.IsPendingReturn = true;
                                 }
+
+                                if (returnRequest.FirstOrDefault().ReturnRequestStatus == ReturnRequestStatus.Received)
+                                    deliveryModel.IsPendingReturn = false;
 
                                 model1.ReturnStatus = "Return " + returnRequest.FirstOrDefault().ReturnRequestStatus.ToString();
                             }else
@@ -704,6 +760,7 @@ namespace Nop.Web.Controllers
             return View(model);
         }
 
+     
         [NopHttpsRequirement(SslRequirement.Yes)]
         public ActionResult ReturnRequest(int orderId)
         {

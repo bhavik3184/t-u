@@ -186,6 +186,47 @@ namespace Nop.Services.Catalog
             return _cacheManager.Get(key, () => _productAttributeRepository.GetById(productAttributeId));
         }
 
+
+        public virtual List<ProductAttribute> GetProductAttributeByName(string name)
+        {
+            if (name.Length == 0)
+                return null;
+
+            var query = from p in _productAttributeRepository.Table
+                        orderby p.Name
+                        where p.Name == name
+                        select p;
+            var specificationAttribute = query.ToList();
+
+            return specificationAttribute;
+        }
+
+        public virtual List<PredefinedProductAttributeValue> GetPredefinedProductAttributeValueByName(string name)
+        {
+            if (name.Length == 0)
+                return null;
+
+            var query = from p in _predefinedProductAttributeValueRepository.Table
+                        orderby p.Name
+                        where p.Name == name
+                        select p;
+            var specificationAttribute = query.ToList();
+
+            return specificationAttribute;
+        }
+
+        public virtual List<ProductAttributeValue> GetProductAttributeValuesByProductAndByName(int productId, string color)
+        {
+
+            var query = from pav in _productAttributeValueRepository.Table
+                        orderby pav.DisplayOrder
+                        where pav.ProductAttributeMapping.ProductId == productId && pav.Name == color
+                        select pav;
+            var productAttributeValues = query.ToList();
+            return productAttributeValues;
+
+        }
+
         /// <summary>
         /// Inserts a product attribute
         /// </summary>

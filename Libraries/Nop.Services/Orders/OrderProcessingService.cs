@@ -58,7 +58,6 @@ namespace Nop.Services.SubscriptionOrders
         private readonly IShipmentService _shipmentService;
         private readonly ITaxService _taxService;
         private readonly ICustomerService _customerService;
-        private readonly IDiscountService _discountService;
         private readonly IEncryptionService _encryptionService;
         private readonly IWorkContext _workContext;
         private readonly IWorkflowMessageService _workflowMessageService;
@@ -1014,8 +1013,8 @@ namespace Nop.Services.SubscriptionOrders
                         {
                             //prices
                             decimal taxRate;
-                            Discount scDiscount;
-                            decimal discountAmount;
+                            //Discount scDiscount;
+                            //decimal discountAmount;
                             decimal scUnitPrice = decimal.Zero;
                             decimal scSubTotal = decimal.Zero;
                             decimal scUnitPriceInclTax = _taxService.GetProductPrice(sc.Product, scUnitPrice, true, details.Customer, out taxRate);
@@ -1273,11 +1272,11 @@ namespace Nop.Services.SubscriptionOrders
                         #region Save order details
                         if (order != null) { 
                             //prices
-                            decimal taxRate;
-                            Discount scDiscount;
-                            decimal discountAmount;
-                            decimal scUnitPrice = decimal.Zero;
-                            decimal scSubTotal = decimal.Zero;
+                            //decimal taxRate;
+                            //Discount scDiscount;
+                            //decimal discountAmount;
+                            //decimal scUnitPrice = decimal.Zero;
+                            //decimal scSubTotal = decimal.Zero;
                             decimal scUnitPriceInclTax = decimal.Zero;
                             decimal scUnitPriceExclTax = decimal.Zero;
                             decimal scSubTotalInclTax = decimal.Zero;
@@ -1307,6 +1306,8 @@ namespace Nop.Services.SubscriptionOrders
                                 //ItemWeight = itemWeight,
                                 //RentalStartDateUtc = sc.RentalStartDateUtc,
                                 //RentalEndDateUtc = sc.RentalEndDateUtc
+                                UpdatedOnUtc = DateTime.UtcNow,
+                                CreatedOnUtc = DateTime.UtcNow,
                             };
                            
                         
@@ -1337,6 +1338,8 @@ namespace Nop.Services.SubscriptionOrders
                                       ItemWeight = itemWeight,
                                       //RentalStartDateUtc = sc.RentalStartDateUtc,
                                       //RentalEndDateUtc = sc.RentalEndDateUtc
+                                      UpdatedOnUtc = DateTime.UtcNow,
+                                      CreatedOnUtc = DateTime.UtcNow,
                                   };
                                   orderItem.ItemDetails.Add(itemDetail);
 

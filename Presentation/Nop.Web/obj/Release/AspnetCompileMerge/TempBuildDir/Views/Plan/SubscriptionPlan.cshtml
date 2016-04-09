@@ -1,0 +1,139 @@
+﻿@model Nop.Web.Models.Catalog.SubscriptionCartPlansModel
+
+@using Nop.Web.Models.Catalog;
+<div class="woocommerce product-grid bestsellers col-md-9 col-sm-12" style="padding: 0 !important">
+    <link href="/Content/kendo/2014.1.318/kendo.common.min.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/kendo/2014.1.318/kendo.default.min.css" rel="stylesheet" type="text/css" />
+    <style>
+        .tabs li {
+            list-style: none;
+            display: inline;
+        }
+
+        .tabs a {
+            padding: 5px 10px;
+            display: inline-block;
+            background: #198ce3;
+            color: #fff;
+            text-decoration: none;
+        }
+
+            .tabs a.active {
+                background: #004694;
+                color: #fff;
+            }
+
+        .tab_wrap .nav-tabs li .active {
+            background: #fff;
+            border: none;
+            color: #637f87;
+        }
+    </style>
+    <script>
+        // Wait until the DOM has loaded before querying the document
+        $(document).ready(function () {
+            $('#tabs').each(function () {
+                // For each set of tabs, we want to keep track of
+                // which tab is active and its associated content
+                var $active, $content, $links = $(this).find('a');
+
+                // If the location.hash matches one of the links, use that as the active tab.
+                // If no match is found, use the first link as the initial active tab.
+                $active = $($links.filter('[href="' + location.hash + '"]')[0] || $links[0]);
+                $active.addClass('active');
+
+                $content = $($active[0].hash);
+
+                // Hide the remaining content
+                $links.not($active).each(function () {
+                    $(this.hash).hide();
+                });
+
+                // Bind the click event handler
+                $(this).on('click', 'a', function (e) {
+                    // Make the old tab inactive.
+                    $active.removeClass('active');
+                    $content.hide();
+
+                    // Update the variables with the new link and content
+                    $active = $(this);
+                    $content = $(this.hash);
+
+                    // Make the tab active.
+                    $active.addClass('active');
+                    $content.show();
+
+                    // Prevent the anchor's default click action
+                    e.preventDefault();
+                });
+            });
+        });
+    </script>
+
+    <div class="item-grid">
+
+    </div>
+    <div class="tab_wrap">
+        <ul id="tabs" class='nav nav-tabs'>
+            @foreach (var itemcat in Model.MembershipCategories)
+            {
+                <li><a href='#tab@(itemcat.Id)'>@itemcat.Name</a></li>
+            }
+        </ul>
+        @foreach (var itemcat in Model.MembershipCategories)
+        {
+            <div id='tab@(itemcat.Id)'>
+                <h3>@itemcat.Name</h3>
+                <div class="woocommerce-checkout-review-order">
+                    <table class="shop_table woocommerce-checkout-review-order-table">
+                        <colgroup>
+                            <col width="1" />
+                            <col width=".5" />
+                            <col width="1" />
+                            <col width="1" />
+                            <col width="1" />
+                            <col width="1" />
+                            <col width="1" />
+                            <col width="1" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="product">
+                                    @T("SubscriptionCart.Plan(s)")
+                                </th>
+                                <th class="unit-price">
+                                    No. of Items <br />borrowed at a time
+                                </th>
+                                <th class="unit-price">
+                                    Duration
+                                </th>
+                                <th class="unit-price" style="visibility:hidden;display:none;">
+                                    No. of Items <br />borrowed at a time
+                                </th>
+
+                                <th class="unit-price">
+                                    @T("SubscriptionCart.UnitPrice")
+                                </th>
+                                <th class="unit-price">
+                                    SubscriptionOrder Fee <br />Refundable Security<br /> Deposit*
+                                </th>
+                                <th>
+                                    Maximum No. of <br />Deliveries** allowed in<br /> a month
+                                </th>
+                                <th>
+                                    Choose
+                                </th>
+                            </tr>
+                        </thead>
+                        @foreach (var item in itemcat.Products)
+                        {
+                            @Html.Partial("_PlanBox", item)
+                        }
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+

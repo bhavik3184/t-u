@@ -26,7 +26,16 @@ namespace Nop.Core.Domain.SubscriptionOrders
         /// Gets or sets the shipping status identifier
         /// </summary>
         public int ShippingStatusId { get; set; }
- 
+
+        /// <summary>
+        /// Gets or sets the date and time of instance creation
+        /// </summary>
+        public DateTime CreatedOnUtc { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date and time of instance update
+        /// </summary>
+        public DateTime UpdatedOnUtc { get; set; }
          
         /// <summary>
         /// Gets the order

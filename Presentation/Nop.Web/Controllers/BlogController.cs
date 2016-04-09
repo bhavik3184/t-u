@@ -261,6 +261,19 @@ namespace Nop.Web.Controllers
             return View(model);
         }
 
+        public ActionResult HomeBlogPost()
+        {
+            if (!_blogSettings.Enabled)
+                return RedirectToRoute("HomePage");
+
+            var blogPost = _blogService.GetBlogPostById(1);
+            var model = new BlogPostModel();
+            if (blogPost != null) { 
+                PrepareBlogPostModel(model, blogPost, true);
+            }
+            return PartialView(model);
+        }
+
         [HttpPost, ActionName("BlogPost")]
         [PublicAntiForgery]
         [FormValueRequired("add-comment")]

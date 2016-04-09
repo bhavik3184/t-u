@@ -3367,6 +3367,7 @@ namespace Nop.Admin.Controllers
         
         #endregion
 
+        #region Pending Shipment
         public ActionResult BorrowTransactionList()
         {
             if (!_permissionService.Authorize(StandardPermissionProvider.ManageSubscriptionOrders))
@@ -3446,6 +3447,7 @@ namespace Nop.Admin.Controllers
                     PaymentStatus = x.SubscriptionOrder.PaymentStatus.GetLocalizedEnum(_localizationService, _workContext),
                     ShippingStatus = x.ShippingStatus.GetLocalizedEnum(_localizationService, _workContext),
                     CustomerEmail =x.SubscriptionOrder.Customer.Email,
+                    CreatedOn = x.CreatedOnUtc,
                     TotalItems = x.ItemDetails.ToList().Count()
                 }),
                 Total = orderItems.Count()
@@ -3495,8 +3497,10 @@ namespace Nop.Admin.Controllers
             return Json(gridModel);
         }
 
+        #endregion
+
         #region Subscription notes
-        
+
         [HttpPost]
         public ActionResult SubscriptionOrderNotesSelect(int orderId, DataSourceRequest command)
         {

@@ -17,7 +17,7 @@ namespace Nop.Services.Catalog
         /// <param name="specificationAttributeId">The specification attribute identifier</param>
         /// <returns>Specification attribute</returns>
         SpecificationAttribute GetSpecificationAttributeById(int specificationAttributeId);
-
+        List<SpecificationAttribute> GetSpecificationAttributeByName(string name);
         /// <summary>
         /// Gets specification attributes
         /// </summary>
@@ -55,6 +55,8 @@ namespace Nop.Services.Catalog
         /// <returns>Specification attribute option</returns>
         SpecificationAttributeOption GetSpecificationAttributeOptionById(int specificationAttributeOption);
 
+
+        SpecificationAttributeOption GetSpecificationAttributeOptionBySpecificationIdAndValue(int specificationAttributeId, string optionname);
         /// <summary>
         /// Get specification attribute options by identifiers
         /// </summary>
@@ -107,7 +109,16 @@ namespace Nop.Services.Catalog
         /// <returns>Product specification attribute mapping collection</returns>
         IList<ProductSpecificationAttribute> GetProductSpecificationAttributes(int productId = 0,
             int specificationAttributeOptionId = 0, bool? allowFiltering = null, bool? showOnProductPage = null);
+        IList<SpecificationAttributeOption> GetAllSpecificationAttributeOptionsByIds(List<int> specificationAttributeOptionIds);
+        
+        IList<SpecificationAttributeOption> GetAllSpecificationAttributeOptions(bool? allowFiltering = null);
+        void DeleteProductSpecificationAttributeByProductId(int productId = 0,
+          int specificationAttributeId = 0);
+        ProductSpecificationAttribute GetProductSpecificationAttributesByCustomValue(int productId = 0, int attributeid = 0,
+      string CustomValue = "", bool? allowFiltering = null, bool? showOnProductPage = null);
 
+        ProductSpecificationAttribute GetProductSpecificationAttributesOne(int productId = 0,
+          int specificationAttributeOptionId = 0, bool? allowFiltering = null, bool? showOnProductPage = null);
         /// <summary>
         /// Gets a product specification attribute mapping 
         /// </summary>
