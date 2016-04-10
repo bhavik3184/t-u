@@ -14,6 +14,8 @@ using Nop.Services.Seo;
 using OfficeOpenXml;
 using Nop.Services.SubscriptionOrders;
 using Nop.Core.Domain.SubscriptionOrders;
+using System.Net;
+using System.Globalization;
 
 namespace Nop.Services.ExportImport
 {
@@ -843,7 +845,6 @@ namespace Nop.Services.ExportImport
                 {
                     "Name",
                     "FullDescription",
-                    "VendorId",
                     "MetaKeywords",
                     "MetaDescription",
                     "MetaTitle",
@@ -862,8 +863,8 @@ namespace Nop.Services.ExportImport
                     "SpecialPriceStartDateTimeUtc",
                     "SpecialPriceEndDateTimeUtc",
                     "Weight",
-                    "CategoryIds",
-                    "ManufacturerIds",
+                    "Category",
+                    "Brand",
                     "Picture1",
                     "Picture2",
                     "Picture3",
@@ -873,15 +874,18 @@ namespace Nop.Services.ExportImport
                     "Picture7",
                     "Picture8",
                     "Picture9",
-                    "AttributeColor",
+                    "Age",
+                    "AgeType",
+                    "Skill",
+                    "SkillType",
+                    "Color",
+                    "ColorType",
                     "Color",
                     "ColorType",
                     "Player",
                     "PlayerType",
                     "Dimension",
                     "DimensionType",
-                    "Age",
-                    "AgeType",
                     "Gender",
                     "GenderType",
                     "Power",
@@ -914,7 +918,7 @@ namespace Nop.Services.ExportImport
                     string name = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Name")].Value);
                     string shortDescription = name;
                     string fullDescription = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "FullDescription")].Value);
-                    int vendorId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "VendorId")].Value);
+                    //int vendorId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "VendorId")].Value);
                     int productTemplateId = 1;
                     bool showOnHomePage = true;
                     string metaKeywords = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaKeywords")].Value);
@@ -1005,8 +1009,12 @@ namespace Nop.Services.ExportImport
                     decimal width = 0;
                     decimal height = 0;
                     DateTime createdOnUtc = DateTime.Now;
-                    string categoryIds = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "CategoryIds")].Value);
-                    string manufacturerIds = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "ManufacturerIds")].Value);
+                    string categoryIds = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Category")].Value);
+                    string manufacturerIds = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Brand")].Value);
+                    string age = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Age")].Value);
+                    int ageType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "AgeType")].Value);
+                    string skill = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Skill")].Value);
+                    int skillType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "SkillType")].Value);
                     string picture1 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture1")].Value);
                     string picture2 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture2")].Value);
                     string picture3 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture3")].Value);
@@ -1016,15 +1024,12 @@ namespace Nop.Services.ExportImport
                     string picture7 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture7")].Value);
                     string picture8 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture8")].Value);
                     string picture9 = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Picture9")].Value);
-                    string attributeColor = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "AttributeColor")].Value);
                     string color = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Color")].Value);
                     int colorType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "ColorType")].Value);
                     string player = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Player")].Value);
                     int playerType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "PlayerType")].Value);
                     string dimension = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Dimension")].Value);
                     int dimensionType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "DimensionType")].Value);
-                    string age = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Age")].Value);
-                    int ageType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "AgeType")].Value);
                     string gender = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Gender")].Value);
                     int genderType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "GenderType")].Value);
                     string power = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Power")].Value);
@@ -1033,93 +1038,17 @@ namespace Nop.Services.ExportImport
                     int lightType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "LightType")].Value);
                     string material = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "Material")].Value);
                     int materialType = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "MaterialType")].Value);
+                    string importimgdir = "h:\\root\\home\\bhavik3184-001\\www\\site1\\Import\\Product\\";
+                    //string importimgdir = " C:\\projects\\ToysAndUs\\Presentation\\Nop.Web\\Import\\Product\\";
                    
-
-                    if (sku == null && attributeColor != null)
+                    if (sku == null)
                     {
-                        if (attributeColor.Length > 0)
-                        {
-                            var product1 = _productService.GetProductBySku(prevsku);
-
-                            //pictures
-                            foreach (var picturePath in new[] { picture1, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9 })
-                            {
-
-                                if (String.IsNullOrEmpty(picturePath))
-                                    continue;
-
-                                String ext = System.IO.Path.GetExtension(picturePath);
-                                string picturePath1 = "";
-                                if (ext.ToLower() != ".jpg" && ext.ToLower() != ".png" && ext.ToLower() != ".bmp" && ext.ToLower() != ".gif" && ext.ToLower() != ".jpeg")
-                                {
-                                    picturePath1 = "F:\\KhiloonaImport\\Import\\Product\\" + picturePath + ".jpg";
-                                    // picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath + ".jpg";
-
-                                }
-                                else
-                                {
-                                    picturePath1 = "F:\\KhiloonaImport\\Import\\Product\\" + picturePath;
-                                    //  picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath;
-                                }
-
-
-                                if (System.IO.File.Exists(picturePath1))
-                                {
-                                    var mimeType = GetMimeTypeFromFilePath(picturePath1);
-                                    var newPictureBinary = File.ReadAllBytes(picturePath1);
-                                    var pictureAlreadyExists = false;
-
-                                    //compare with existing product pictures
-                                    var existingPictures = _pictureService.GetPicturesByProductId(product1.Id);
-                                    foreach (var existingPicture in existingPictures)
-                                    {
-                                        var existingBinary = _pictureService.LoadPictureBinary(existingPicture);
-                                        //picture binary after validation (like in database)
-                                        var validatedPictureBinary = _pictureService.ValidatePicture(newPictureBinary, mimeType);
-                                        if (existingBinary.SequenceEqual(validatedPictureBinary))
-                                        {
-                                            //the same picture content
-                                            pictureAlreadyExists = true;
-                                            break;
-                                        }
-                                    }
-
-
-                                    if (!pictureAlreadyExists)
-                                    {
-                                        if (attributeColor != null)
-                                            if (attributeColor.Length > 0)
-                                            {
-                                                product1.ProductPictures.Add(new ProductPicture
-                                                {
-                                                    Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product1.Name), attributeColor, _pictureService.GetPictureSeName(product1.Name)),
-                                                    DisplayOrder = 1,
-                                                });
-                                            }
-                                            else
-                                            {
-                                                product1.ProductPictures.Add(new ProductPicture
-                                                {
-                                                    Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product1.Name)),
-                                                    DisplayOrder = 1,
-                                                });
-                                            }
-                                        // _productService.UpdateProduct(product);
-                                    }
-                                }
-
-                                //update "HasTierPrices" and "HasDiscountsApplied" properties
-                                //  _productService.UpdateHasTierPricesProperty(product);
-                                // _productService.UpdateHasDiscountsApplied(product);
-
-
-                            }
-                            SaveProductAttributes("Color", attributeColor, product1);
-                            iRow++;
-                        }
+                         
                     }
                     else
                     {
+                        TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                        
                         sku = sku.Trim();
                         prevsku = sku;
                         var product = _productService.GetProductBySku(sku);
@@ -1133,10 +1062,10 @@ namespace Nop.Services.ExportImport
                         product.ProductTypeId = productTypeId;
                         product.ParentGroupedProductId = parentGroupedProductId;
                         product.VisibleIndividually = visibleIndividually;
-                        product.Name = name;
+                        product.Name = textInfo.ToTitleCase(name);
                         product.ShortDescription = shortDescription;
                         product.FullDescription = fullDescription;
-                        product.VendorId = vendorId;
+                        product.VendorId = 0;
                         product.ProductTemplateId = productTemplateId;
                         product.ShowOnHomePage = showOnHomePage;
                         product.MetaKeywords = metaKeywords;
@@ -1230,23 +1159,69 @@ namespace Nop.Services.ExportImport
                         //category mappings
                         if (!String.IsNullOrEmpty(categoryIds))
                         {
-                            foreach (var id in categoryIds.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt32(x.Trim())))
+                            foreach (var catname in categoryIds.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()))
                             {
-                                if (product.ProductCategories.FirstOrDefault(x => x.CategoryId == id) == null)
-                                {
-                                    //ensure that category exists
-                                    var category = _categoryService.GetCategoryById(id);
-                                    if (category != null)
+                                var cat = _categoryService.GetCategoryByName(catname);
+                                
+                                if (cat != null)
+                                { 
+                                    if (product.ProductCategories.FirstOrDefault(x => x.CategoryId == cat.Id) == null)
                                     {
-                                        var productCategory = new ProductCategory
-                                        {
-                                            ProductId = product.Id,
-                                            CategoryId = category.Id,
-                                            IsFeaturedProduct = false,
-                                            DisplayOrder = 1
-                                        };
-                                        _categoryService.InsertProductCategory(productCategory);
+                                        //ensure that category exists
+                                        // var category = _categoryService.GetCategoryById(cat.FirstOrDefault().Id);
+                                        //if (category != null)
+                                        //{
+                                            var productCategory = new ProductCategory
+                                            {
+                                                ProductId = product.Id,
+                                                CategoryId = cat.Id,
+                                                IsFeaturedProduct = false,
+                                                DisplayOrder = 1
+                                            };
+                                            _categoryService.InsertProductCategory(productCategory);
+                                        //}
                                     }
+                                }
+                                else
+                                {
+                                    //TextInfo textInfo1 = new CultureInfo("en-US", false).TextInfo;
+                                    Category category = new Category();
+                                    category.Name = textInfo.ToTitleCase(catname);
+                                    category.Description = textInfo.ToTitleCase(catname);
+                                    category.CategoryTemplateId = 1;
+                                    category.MetaKeywords = metaKeywords;
+                                    category.MetaDescription = metaDescription;
+                                    category.MetaTitle = metaTitle;
+                                    category.ParentCategoryId = 1;
+                                    category.PictureId = 0;
+                                    category.PageSize = 12;
+                                    category.AllowCustomersToSelectPageSize = true;
+                                    category.PageSizeOptions = "12, 20, 28"; 
+                                    category.PriceRanges = "";
+                                    category.ShowOnHomePage = showOnHomePage;
+                                    category.IncludeInTopMenu = false;
+                                    //category.HasDiscountsApplied = HasDiscountsApplied;
+                                    category.SubjectToAcl = true;
+                                    category.LimitedToStores = false;
+                                    category.Published = true;
+                                    category.UpdatedOnUtc = DateTime.Now;
+                                    category.CreatedOnUtc = DateTime.Now;
+                                    category.DisplayOrder = 0;
+
+                                    _categoryService.InsertCategory(category);
+
+                                    string seourl = category.ValidateSeName(category.Name, category.Name, true);
+
+                                    _urlRecordService.SaveSlug(category, seourl, 0);
+
+                                    var productCategory = new ProductCategory
+                                    {
+                                        ProductId = product.Id,
+                                        CategoryId = category.Id,
+                                        IsFeaturedProduct = false,
+                                        DisplayOrder = 1
+                                    };
+                                    _categoryService.InsertProductCategory(productCategory);
                                 }
                             }
                         }
@@ -1273,100 +1248,153 @@ namespace Nop.Services.ExportImport
                                             };
                                             _manufacturerService.InsertProductManufacturer(productManufacturer);
                                         }
+                                        else
+                                        {
+                                          // TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                                            manufacturer = new Manufacturer();
+
+                                            manufacturer.Name = textInfo.ToTitleCase(id); 
+                                            manufacturer.Description = textInfo.ToTitleCase(id); 
+                                            manufacturer.ManufacturerTemplateId = 1;
+                                            manufacturer.Description = textInfo.ToTitleCase(id);
+                                            manufacturer.MetaDescription = textInfo.ToTitleCase(id); 
+                                            manufacturer.MetaTitle = id;
+                                            manufacturer.PageSize = 12;
+                                            manufacturer.AllowCustomersToSelectPageSize = true;
+                                            manufacturer.PageSizeOptions = "12, 20, 28";
+                                            manufacturer.PriceRanges = "";
+                                            //  manufacturer.HasDiscountsApplied = HasDiscountsApplied;
+                                            manufacturer.SubjectToAcl = true;
+                                            manufacturer.LimitedToStores = true;
+                                            manufacturer.Published = true;
+                                            manufacturer.Deleted = false;
+                                            manufacturer.DisplayOrder = 0;
+                                            manufacturer.UpdatedOnUtc = DateTime.Now;
+                                            manufacturer.CreatedOnUtc = DateTime.Now;
+
+                                           _manufacturerService.InsertManufacturer(manufacturer);
+
+                                           var productManufacturer = new ProductManufacturer
+                                           {
+                                               ProductId = product.Id,
+                                               ManufacturerId = manufacturer.Id,
+                                               IsFeaturedProduct = false,
+                                               DisplayOrder = 1
+                                           };
+                                           _manufacturerService.InsertProductManufacturer(productManufacturer);
+                                            
+                                        }
+                                        
                                     }
                                 }
                             }
                         }
-
-
+                      
+                        int inc =0;
                         //pictures
                         foreach (var picturePath in new[] { picture1, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9 })
                         {
-
+                            inc++;
                             if (String.IsNullOrEmpty(picturePath))
                                 continue;
 
                             String ext = System.IO.Path.GetExtension(picturePath);
                             string picturePath1 = "";
-                            if (ext.ToLower() != ".jpg" && ext.ToLower() != ".png" && ext.ToLower() != ".bmp" && ext.ToLower() != ".gif" && ext.ToLower() != ".jpeg")
+                            if (picturePath.Contains("http://") || picturePath.Contains("https://") || picturePath.Contains("www."))
                             {
-                                picturePath1 = "F:\\KhiloonaImport\\Import\\Product\\" + picturePath + ".jpg";
-                                //picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath + ".jpg";
+                                try
+                                {
+                                    WebClient webClient = new WebClient();
+                                    webClient.DownloadFile(picturePath, System.IO.Path.Combine(importimgdir, sku + "_" + inc + ext));
 
+                                    picturePath1 = importimgdir + sku + "_" + inc + ext;
+                                    //string aURL = picturePath;
+
+                                    //Stream rtn = null;
+
+                                    //HttpWebRequest aRequest = (HttpWebRequest)WebRequest.Create(aURL);
+
+                                    //HttpWebResponse aResponse = (HttpWebResponse)aRequest.GetResponse();
+
+                                    //rtn = aResponse.GetResponseStream(); 
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
                             }
                             else
                             {
-                                picturePath1 = "F:\\KhiloonaImport\\Import\\Product\\" + picturePath;
-                                //picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath;
+                                if (ext.ToLower() != ".jpg" && ext.ToLower() != ".png" && ext.ToLower() != ".bmp" && ext.ToLower() != ".gif" && ext.ToLower() != ".jpeg")
+                                {
+                                    picturePath1 = importimgdir + picturePath + ".jpg";
+                                    //picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath + ".jpg";
+
+                                }
+                                else
+                                {
+                                    picturePath1 = importimgdir + picturePath;
+                                    //picturePath1 = "H:\\Khiloonadeploy\\Import\\Product\\" + picturePath;
+                                }
                             }
 
 
                             if (System.IO.File.Exists(picturePath1))
-                            {
-                                var mimeType = GetMimeTypeFromFilePath(picturePath1);
-                                var newPictureBinary = File.ReadAllBytes(picturePath1);
-                                var pictureAlreadyExists = false;
-                                if (!newProduct)
+                            { 
+                                try
                                 {
-                                    //compare with existing product pictures
-                                    var existingPictures = _pictureService.GetPicturesByProductId(product.Id);
-                                    foreach (var existingPicture in existingPictures)
+                                    var mimeType = GetMimeTypeFromFilePath(picturePath1);
+                                    var newPictureBinary = File.ReadAllBytes(picturePath1);
+                                    var pictureAlreadyExists = false;
+                                    if (!newProduct)
                                     {
-                                        var existingBinary = _pictureService.LoadPictureBinary(existingPicture);
-                                        //picture binary after validation (like in database)
-                                        var validatedPictureBinary = _pictureService.ValidatePicture(newPictureBinary, mimeType);
-                                        if (existingBinary.SequenceEqual(validatedPictureBinary))
+                                        //compare with existing product pictures
+                                        var existingPictures = _pictureService.GetPicturesByProductId(product.Id);
+                                        foreach (var existingPicture in existingPictures)
                                         {
-                                            //the same picture content
-                                            pictureAlreadyExists = true;
-                                            break;
+                                            var existingBinary = _pictureService.LoadPictureBinary(existingPicture);
+                                            //picture binary after validation (like in database)
+                                            var validatedPictureBinary = _pictureService.ValidatePicture(newPictureBinary, mimeType);
+                                            if (existingBinary.SequenceEqual(validatedPictureBinary))
+                                            {
+                                                //the same picture content
+                                                pictureAlreadyExists = true;
+                                                break;
+                                            }
                                         }
                                     }
-                                }
 
 
-                                if (!pictureAlreadyExists)
-                                {
-                                    if (attributeColor != null)
-                                    {
-                                        if (attributeColor.Length > 0)
-                                        {
-                                            product.ProductPictures.Add(new ProductPicture
-                                            {
-                                                Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product.Name), attributeColor, _pictureService.GetPictureSeName(product.Name)),
-                                                DisplayOrder = 1,
-                                            });
-                                        }
-                                        else
-                                        {
-                                            product.ProductPictures.Add(new ProductPicture
-                                            {
-                                                Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product.Name)),
-                                                DisplayOrder = 1,
-                                            });
-                                        }
-                                    }
-                                    else
+                                    if (!pictureAlreadyExists)
                                     {
                                         product.ProductPictures.Add(new ProductPicture
                                         {
                                             Picture = _pictureService.InsertPicture(newPictureBinary, mimeType, _pictureService.GetPictureSeName(product.Name)),
                                             DisplayOrder = 1,
                                         });
+                                        // _productService.UpdateProduct(product);
                                     }
-                                    // _productService.UpdateProduct(product);
+                            
+                                }
+                            
+                                catch(Exception ex){
                                 }
                             }
-
                             //update "HasTierPrices" and "HasDiscountsApplied" properties
                             //  _productService.UpdateHasTierPricesProperty(product);
                             // _productService.UpdateHasDiscountsApplied(product);
-
-
                         }
 
                         if (product != null)
                         {
+                            if (skill != null)
+                                if (skill.Length > 0)
+                                    SaveSpecificationAttributes("Skill", skill, skillType, product);
+
+                            if (age != null)
+                                if (age.Length > 0)
+                                    SaveSpecificationAttributes("Age", age, ageType, product);
+
                             if (color != null)
                                 if (color.Length > 0)
                                     SaveSpecificationAttributes("Color", color, colorType, product);
@@ -1378,10 +1406,6 @@ namespace Nop.Services.ExportImport
                             if (dimension != null)
                                 if (dimension.Length > 0)
                                     SaveSpecificationAttributes("Dimension", dimension, dimensionType, product);
-
-                            if (age != null)
-                                if (age.Length > 0)
-                                    SaveSpecificationAttributes("Age", age, ageType, product);
 
                             if (gender != null)
                                 if (gender.Length > 0)
@@ -1400,9 +1424,7 @@ namespace Nop.Services.ExportImport
                                     SaveSpecificationAttributes("Material", material, materialType, product);
 
 
-                            if (attributeColor != null)
-                                if (attributeColor.Length > 0)
-                                    SaveProductAttributes("Color", attributeColor, product);
+                             
                         }
 
                         //next product

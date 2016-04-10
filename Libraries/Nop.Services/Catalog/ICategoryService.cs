@@ -15,6 +15,7 @@ namespace Nop.Services.Catalog
         /// </summary>
         /// <param name="category">Category</param>
         void DeleteCategory(Category category);
+        Category GetCategoryByName(string categoryName);
 
         /// <summary>
         /// Gets all categories

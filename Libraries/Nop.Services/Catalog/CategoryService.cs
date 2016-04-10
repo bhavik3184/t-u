@@ -352,7 +352,23 @@ namespace Nop.Services.Catalog
 
             return categories;
         }
-                
+
+        public virtual Category GetCategoryByName(string categoryName)
+        {
+            if (String.IsNullOrEmpty(categoryName))
+                return null;
+
+            categoryName = categoryName.Trim();
+
+            var query = from p in _categoryRepository.Table
+                        where !p.Deleted &&
+                        p.Name == categoryName
+                        select p;
+            var category = query.FirstOrDefault();
+            return category;
+        }
+
+        
         /// <summary>
         /// Gets a category
         /// </summary>
