@@ -920,12 +920,12 @@ namespace Nop.Services.ExportImport
                     string fullDescription = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "FullDescription")].Value);
                     //int vendorId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "VendorId")].Value);
                     int productTemplateId = 1;
-                    bool showOnHomePage = true;
+                    bool showOnHomePage = false;
                     string metaKeywords = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaKeywords")].Value);
                     string metaDescription = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaDescription")].Value);
                     string metaTitle = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "MetaTitle")].Value);
                     string seName = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "SeName")].Value);
-                    bool allowCustomerReviews = true;
+                    bool allowCustomerReviews = false;
                     bool published = Convert.ToBoolean(worksheet.Cells[iRow, GetColumnIndex(properties, "Published")].Value);
                     string sku = ConvertColumnToString(worksheet.Cells[iRow, GetColumnIndex(properties, "SKU")].Value);
                     string manufacturerPartNumber = "";
@@ -952,11 +952,11 @@ namespace Nop.Services.ExportImport
                     int rentalPriceLength = 0;
                     int rentalPricePeriodId = 0;
                     bool isShipEnabled = true;
-                    bool isFreeShipping = false;
+                    bool isFreeShipping = true;
                     bool shipSeparately = false;
                     decimal additionalShippingCharge = Convert.ToDecimal(worksheet.Cells[iRow, GetColumnIndex(properties, "AdditionalShippingCharge")].Value);
                     int deliveryDateId = 1;
-                    bool isTaxExempt = false;
+                    bool isTaxExempt = true;
                     int taxCategoryId = Convert.ToInt32(worksheet.Cells[iRow, GetColumnIndex(properties, "TaxCategoryId")].Value);
                     bool isTelecommunicationsOrBroadcastingOrElectronicServices = false;
                     int manageInventoryMethodId = 1;
@@ -975,8 +975,8 @@ namespace Nop.Services.ExportImport
                     string allowedQuantities = "";
                     bool allowAddingOnlyExistingAttributeCombinations = false;
                     bool disableBuyButton = false;
-                    bool disableWishlistButton = true;
-                    bool availableForPreOrder = true;
+                    bool disableWishlistButton = false;
+                    bool availableForPreOrder = false;
                     DateTime? preOrderAvailabilityStartDateTimeUtc = null;
 
                     bool callForPrice = false;

@@ -995,22 +995,18 @@ namespace Nop.Services.SubscriptionOrders
             if (borrowCartItem != null)
             {
                 //update existing shopping cart item
-                int newQuantity = borrowCartItem.Quantity + quantity;
-                warnings.AddRange(GetBorrowCartItemWarnings(customer, borrowCartType, product,
-                    storeId, attributesXml, 
-                    customerEnteredPrice ,
-                    newQuantity, automaticallyAddRequiredProductsIfEnabled));
+                warnings.Add("Your borrow list already contains " + product.Name + " product.");
 
-                if (warnings.Count == 0)
-                {
-                    borrowCartItem.AttributesXml = attributesXml;
-                    borrowCartItem.Quantity = newQuantity;
-                    borrowCartItem.UpdatedOnUtc = DateTime.UtcNow;
-                    _customerService.UpdateCustomer(customer);
+                //if (warnings.Count == 0)
+                //{
+                //    borrowCartItem.AttributesXml = attributesXml;
+                //    borrowCartItem.Quantity = newQuantity;
+                //    borrowCartItem.UpdatedOnUtc = DateTime.UtcNow;
+                //    _customerService.UpdateCustomer(customer);
 
-                    //event notification
-                    _eventPublisher.EntityUpdated(borrowCartItem);
-                }
+                //    //event notification
+                //    _eventPublisher.EntityUpdated(borrowCartItem);
+                //}
             }
             else
             {

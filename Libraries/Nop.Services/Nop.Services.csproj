@@ -187,7 +187,9 @@
     <Compile Include="Catalog\CategoryExtensions.cs" />
     <Compile Include="Catalog\CompareProductsService.cs" />
     <Compile Include="Catalog\CategoryTemplateService.cs" />
+    <Compile Include="Catalog\CopyPlanService.cs" />
     <Compile Include="Catalog\IBackInStockSubscriptionService.cs" />
+    <Compile Include="Catalog\ICopyPlanService.cs" />
     <Compile Include="Catalog\IManufacturerTemplateService.cs" />
     <Compile Include="Catalog\IMembershipCategoryService.cs" />
     <Compile Include="Catalog\IPlanAttributeFormatter.cs" />

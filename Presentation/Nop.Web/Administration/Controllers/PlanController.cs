@@ -47,6 +47,7 @@ namespace Nop.Admin.Controllers
 
         private readonly IPlanService _planService;
         private readonly IMembershipCategoryService _membershipCategoryService;
+        private readonly ICopyPlanService _copyPlanService;
         private readonly ICategoryService _categoryService;
         private readonly IManufacturerService _manufacturerService;
         private readonly ICustomerService _customerService;
@@ -88,6 +89,7 @@ namespace Nop.Admin.Controllers
 
         public PlanController(IPlanService planService,
             IMembershipCategoryService membershipCategoryService,
+            ICopyPlanService copyPlanService,
             ICategoryService categoryService, 
             IManufacturerService manufacturerService,
             ICustomerService customerService,
@@ -125,6 +127,7 @@ namespace Nop.Admin.Controllers
         {
             this._planService = planService;
             this._membershipCategoryService = membershipCategoryService;
+            this._copyPlanService = copyPlanService;
             this._categoryService = categoryService;
             this._manufacturerService = manufacturerService;
             this._customerService = customerService;
@@ -932,7 +935,32 @@ namespace Nop.Admin.Controllers
             return Json(new { Result = true });
         }
 
-      
+        [HttpPost]
+        public ActionResult CopyPlan(PlanModel model)
+        {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageProducts))
+                return AccessDeniedView();
+
+            var copyModel = model.CopyPlanModel;
+            try
+            {
+                var originalPlan = _planService.GetPlanById(copyModel.Id);
+
+                //a vendor should have access only to his products
+                if (_workContext.CurrentVendor != null && originalPlan.VendorId != _workContext.CurrentVendor.Id)
+                    return RedirectToAction("List");
+
+                var newProduct = _copyPlanService.CopyPlan(originalPlan,
+                    copyModel.Name, copyModel.Published, copyModel.CopyImages,true);
+                SuccessNotification("The product has been copied successfully");
+                return RedirectToAction("Edit", new { id = newProduct.Id });
+            }
+            catch (Exception exc)
+            {
+                ErrorNotification(exc.Message);
+                return RedirectToAction("Edit", new { id = copyModel.Id });
+            }
+        }
         
         #endregion
 
