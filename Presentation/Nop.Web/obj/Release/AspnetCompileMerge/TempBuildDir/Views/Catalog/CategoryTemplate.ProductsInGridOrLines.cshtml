@@ -113,6 +113,7 @@
         @if (Model.Products.Count > 0)
         {
             @Html.Partial("_CatalogSelectors", Model.PagingFilteringContext, new ViewDataDictionary())
+             
         }
         @Html.Widget("categorydetails_before_filters", Model.Id)
         <div class="product-filters" style="visibility:hidden;display:none;">
@@ -149,7 +150,7 @@
         <input type="text" ng-hide="true" value="@Model.ViewMode" ng-model="ViewMode" id="viewmode" ng-change="addRowAsyncAsJSON()" />
         <input type="text" ng-hide="true" value="@Model.PageNumber" ng-model="PageNumber" id="pagenumber" ng-change="addRowAsyncAsJSON()" />
         <div class="product-grid">
-            <div class="item-grid" infinite-scroll='nextPage(list.Products.length)' infinite-scroll-disabled='Reddit.busy' infinite-scroll-distance='0'>
+            <div class="item-grid" infinite-scroll='nextPage()' infinite-scroll-disabled='Reddit.busy' infinite-scroll-distance='0'>
                 <div class="item-box" ng-repeat="product in list.Products">
                     <div class="product-item" data-productid="{{product.Id}}">
 
@@ -214,7 +215,7 @@
                     <img src="/content/images/loader.gif" style="width:90px;" />
                 </div>
                 <div class="col-xs-12 show-more-section">
-                    <div id="see-more-products" class="show-more" style="visibility: visible;" ng-click="nextPage(list.Products.length)">
+                    <div id="see-more-products" class="show-more" style="visibility: visible;" ng-click="nextPage()">
                         {{Reddit.TotalDesc}}
                         <i class="sd-icon sd-icon-expand-arrow pagination-arrow"></i>
                     </div>

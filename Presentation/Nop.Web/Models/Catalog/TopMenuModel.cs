@@ -18,6 +18,9 @@ namespace Nop.Web.Models.Catalog
         public bool NewProductsEnabled { get; set; }
         public bool ForumEnabled { get; set; }
 
+        public bool IsAuthenticated { get; set; }
+
+        
         #region Nested classes
 
         public class TopMenuTopicModel : BaseNopEntityModel

@@ -17,19 +17,20 @@
 <link rel="stylesheet" href="/Themes/DefaultClean/Content/css/bootstrap-dropdownhover.min.css" type='text/css' media='all' / >
 <div class="header" id="header">
     @Html.Widget("header")
-    <div class="header-upper">
-        <div class="header-links-wrapper" style="width:100%;">
-            @Html.Action("HeaderLinks", "Common")
-            @*@Html.Action("FlyoutBorrowCart", "BorrowCart")*@
+    <nav class="hidden-xs">
+        <div class="header-upper">
+            <div class="header-links-wrapper" style="width:100%;">
+                @Html.Action("HeaderLinks", "Common")
+                @*@Html.Action("FlyoutBorrowCart", "BorrowCart")*@
+
+            </div>
 
         </div>
-      
-    </div>
-   
-     
-    <div class="logo">
-        <a href="@Url.RouteUrl("HomePage")">
-            <img title="" alt="@storeName" src="@Url.Content(logoPath)">
-        </a>
-    </div>
+
+        </nav>
+        <div class="logo">
+            <a href="@Url.RouteUrl("HomePage")">
+                <img title="" alt="@storeName" src="@Url.Content(logoPath)">
+            </a>
+        </div>
 </div>

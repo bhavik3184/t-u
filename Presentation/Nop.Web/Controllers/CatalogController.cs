@@ -1444,6 +1444,7 @@ namespace Nop.Web.Controllers
         [ChildActionOnly]
         public ActionResult TopMenu()
         {
+           
             //categories
             string categoryCacheKey = string.Format(ModelCacheEventConsumer.CATEGORY_MENU_MODEL_KEY,
                 _workContext.WorkingLanguage.Id,
@@ -1475,6 +1476,12 @@ namespace Nop.Web.Controllers
                 BlogEnabled = _blogSettings.Enabled,
                 ForumEnabled = _forumSettings.ForumsEnabled
             };
+            if (_workContext.CurrentCustomer.IsRegistered())
+
+                model.IsAuthenticated = true;
+            else
+                model.IsAuthenticated = false;
+
             return PartialView(model);
         }
         

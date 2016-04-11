@@ -2,12 +2,12 @@
 @using Nop.Web.Models.Customer;
 @using Nop.Core;
 @using Nop.Core.Infrastructure;
- 
+@if (!Model.IsLoggedIn) {
 <div id="opentimes_widget-2" class="widget widget_opentimes_widget homepagewidget orange">
     <div class="widgetnails"></div>
     <h3 class="widget-title">Login</h3>
-    @if (!Model.IsLoggedIn) { 
-       using (Html.BeginForm())
+  
+       @using (Html.BeginForm())
         {
             var validationSummary = Html.ValidationSummary(true, T("Account.Login.Unsuccessful").Text);
             if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
@@ -68,18 +68,12 @@
             @Html.Partial("_ExternalAuthentication.AssociateMessage")
             @Html.Partial("_ExternalAuthentication.Errors")
 
-        }
-    }
-    else
-    {
-        <fieldset>
-         
-            <p class="form-row" style=" margin: 50px auto; width: 100px;">
-                <a class="loginbutton" href="@Url.RouteUrl("Logout")" >@T("Account.Logout")</a>
-            </p>
-        </fieldset>
-    }
+       
         <div class="widgetnails widgetnailsbottom"></div>
+        }
 </div>
 
+           
+    }
+    
  

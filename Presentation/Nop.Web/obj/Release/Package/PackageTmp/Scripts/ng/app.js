@@ -241,12 +241,16 @@ mainApp.controller("CategoryFilterCtrl", ['$scope', '$rootScope', '$http', 'ngDi
                if ($scope.list.TotalRecords != 0) {
                    $scope.Reddit.TotalRecords = $scope.list.TotalRecords;
                    $scope.Reddit.PendingRecords = $scope.list.TotalRecords - $scope.list.Products.length;
-                   $scope.Reddit.TotalDesc = "Show " + $scope.Reddit.PendingRecords + " - " + $scope.Reddit.TotalRecords + " Items";
+                   if ((parseInt($scope.list.Products.length) + parseInt($scope.PageSize)) < $scope.list.TotalRecords){
+                       $scope.Reddit.TotalDesc = "Show " + ($scope.list.Products.length + 1) + " - " + (parseInt($scope.list.Products.length) + parseInt($scope.PageSize)) + " Items";
+                   } else {
+                       $scope.Reddit.TotalDesc = "Show Next Items";
+                   }
                } else {
                    $scope.Reddit.TotalDesc = "No products found.";
                }
                $scope.Reddit.busy = false;
-               console.log("catfilter " + data);
+               console.log("catfilter " + $scope.list.Products.length);
            })
            .error(function (data) {
                console.log("Error !" + data);
@@ -293,9 +297,10 @@ mainApp.controller("CategoryFilterCtrl", ['$scope', '$rootScope', '$http', 'ngDi
 
     }
 
-    $scope.nextPage = function (i) {
-        if (i > 0) {
-            if ($scope.Reddit.PendingRecords!=0){
+    $scope.nextPage = function () {
+        
+        console.log('next');
+        if ($scope.Reddit.PendingRecords != 0) {
                 console.log("busy" + $scope.Reddit.busy);
                 $scope.Reddit.busy = true;
                 $scope.SearchTruckModel.PageNumber = parseInt($scope.SearchTruckModel.PageNumber) + 1;
@@ -312,7 +317,12 @@ mainApp.controller("CategoryFilterCtrl", ['$scope', '$rootScope', '$http', 'ngDi
                        $scope.Reddit.TotalRecords = $scope.list.TotalRecords;
                        $scope.Reddit.PendingRecords = $scope.list.TotalRecords - $scope.list.Products.length;
 
-                       $scope.Reddit.TotalDesc = "Show " + $scope.Reddit.PendingRecords + " - " + $scope.Reddit.TotalRecords + " Items";
+                       if ((parseInt($scope.list.Products.length) + parseInt($scope.PageSize)) < $scope.list.TotalRecords) {
+                           $scope.Reddit.TotalDesc = "Show " + ($scope.list.Products.length + 1) + " - " + (parseInt($scope.list.Products.length) + parseInt($scope.PageSize)) + " Items";
+                       } else {
+                           $scope.Reddit.TotalDesc = "Show Next Items";
+                       }
+                       console.log("catfilter1 " + $scope.list.Products.length);
                    })
                    .error(function (data) {
                        console.log("Error !" + data);
@@ -321,7 +331,6 @@ mainApp.controller("CategoryFilterCtrl", ['$scope', '$rootScope', '$http', 'ngDi
                  $scope.Reddit.TotalDesc = "All products loaded.";
             }
             // $scope.addRowAsyncAsJSON();
-        }
     };
 
     $scope.addRowAsyncAsJSON = function () {
