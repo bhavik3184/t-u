@@ -6,7 +6,7 @@
 @{
    var webHelper = EngineContext.Current.Resolve<IWebHelper>();
 }
-<div class="order-summary-content  col-md-3 col-sm-12" style="padding: 0 !important; margin-top: 90px;">
+<div class="woocommerce  order-summary-content  col-md-3 col-sm-12" style="padding: 0 !important; margin-top: 90px;">
     @Html.Widget("order_summary_content_before")
     @Html.Partial("_SubscriptionOrderReviewData", Model.SubscriptionOrderReviewData)
     @if (Model.Items.Count > 0)
@@ -22,11 +22,11 @@
                 </ul>
             </div>
         }
-       
-         using (Html.BeginRouteForm("CartConfirm", FormMethod.Post, new { id = "confirm-order-form" }))
-            {
+
+        using (Html.BeginRouteForm("CartConfirm", FormMethod.Post, new { id = "confirm-order-form" }))
+        {
             @Html.AntiForgeryToken()
-          
+
             if (Model.IsEditable && Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
             {
                 var inclTax = EngineContext.Current.Resolve<IWorkContext>().TaxDisplayType == TaxDisplayType.IncludingTax;
@@ -110,7 +110,7 @@
                                         });
                                     });
                                 </script>
-                             <input type="submit" name="nextstep" value="@T("Checkout.ConfirmButton")" class="button-1 confirm-order-next-step-button" />
+    <input type="submit" name="nextstep" value="@T("Checkout.ConfirmButton")" style="min-width:200px;" class="register-next-step-button woocommerce_checkout_place_order button-1 confirm-order-next-step-button" />
 
                             }
                         </div>

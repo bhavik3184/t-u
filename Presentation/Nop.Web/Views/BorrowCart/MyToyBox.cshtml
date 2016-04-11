@@ -346,12 +346,15 @@
                 cache: false,
                 success: function (data) {
                     if (data.success == 1) {
+                        displayPopupNotification("Added to borrow list.", 'success', true);
                         window.location.reload(true);
+                       
                     } else if (data.success == 99) {
                         alert("No paid subscription order found.");
                     } else {
                         if (data.message.length > 0) {
-                            alert(data.message);
+                            displayPopupNotification(data.message, 'error', true);
+                            //alert(data.message);
                         } else {
                             alert("No paid subscription order found.");
                         }

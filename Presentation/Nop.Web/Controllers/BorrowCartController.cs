@@ -1344,10 +1344,13 @@ namespace Nop.Web.Controllers
                 {
                     //cannot be added to the cart
                     //let's display standard warnings
+                    foreach(var warn in addToCartWarnings){
+                            errorMessage = errorMessage + " " + warn;
+                        }
                     return Json(new
                     {
                         success = false,
-                        message = addToCartWarnings.ToArray()
+                        message = errorMessage
                     });
                 }
 
@@ -2814,10 +2817,25 @@ namespace Nop.Web.Controllers
             }
 
             //no items added. redisplay the mytoybox page
+            //if (allWarnings.Count > 0)
+            //{
+            //    ErrorNotification(_localizationService.GetResource("MyToyBox.AddToCart.Error"), false);
+            //}
             if (allWarnings.Count > 0)
             {
-                ErrorNotification(_localizationService.GetResource("MyToyBox.AddToCart.Error"), false);
+                //cannot be added to the cart
+                //let's display standard warnings
+                foreach (var warn in allWarnings)
+                {
+                    errorMessage = errorMessage + " " + warn;
+                }
+                return Json(new
+                {
+                    success = false,
+                    message = errorMessage
+                });
             }
+
             //var cart1 = pageCustomer.BorrowCartItems
             //    .Where(sci => sci.BorrowCartType == BorrowCartType.MyToyBox)
             //    .LimitPerStore(_storeContext.CurrentStore.Id)
