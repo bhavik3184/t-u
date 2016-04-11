@@ -347,7 +347,7 @@
                             </div>
 
                             <!--availability-->
-                            <div class="availability">
+                            <div class="availability" ng-show="product.StockAvailability.length >0" >
                                 <div class="stock">
                                     <span class="label">Availability:</span>
                                     <span class="value" id="stock-availability-value-{{product.Id}}">{{product.StockAvailability}} </span>
