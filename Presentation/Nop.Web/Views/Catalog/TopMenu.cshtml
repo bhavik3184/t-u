@@ -22,12 +22,64 @@
         //standard design (only categories with "IncludeInTopMenu")
         category.SubCategories.Where(x => x.IncludeInTopMenu).ToList();
 
+
+    if (subCategories.Count > 0)
+    {  <li class="dropdown">
+        <a href="@Url.RouteUrl("Category", new { SeName = category.SeName })">
+            @category.Name
+            <span class="caret"></span>
+            @if (category.NumberOfProducts.HasValue)
+            {
+                <text> </text>@T("Categories.TotalProducts", category.NumberOfProducts.Value)
+            }
+        </a>
+        @{
+            var levelClass = "";
+            if (level == 0)
+            {
+                levelClass = "first-level";
+            }
+
+            <ul class="dropdown-menu">
+                @foreach (var subCategory in subCategories)
+                {
+                    @RenderCategoryLine(subCategory, level + 1, responsiveMobileMenu)
+                }
+            </ul>
+        }
+    </li>
+    }
+    else
+    {
+        <li>
+            <a href="@Url.RouteUrl("Category", new { SeName = category.SeName })">
+                @category.Name
+                @if (category.NumberOfProducts.HasValue)
+                {
+                    <text> </text>@T("Categories.TotalProducts", category.NumberOfProducts.Value)
+                }
+            </a>
+
+
+        </li>
+    }
+}
+@helper RenderMobileCategoryLine(CategorySimpleModel category, int level, bool responsiveMobileMenu)
+{
+
+
+    //subcategories
+    var subCategories = responsiveMobileMenu ?
+        //responsive (all categories)
+        category.SubCategories :
+        //standard design (only categories with "IncludeInTopMenu")
+        category.SubCategories.Where(x => x.IncludeInTopMenu).ToList();
+
         
             if (subCategories.Count > 0)
             {  <li class="dropdown">
                 <a   href="@Url.RouteUrl("Category", new { SeName = category.SeName })">
                     @category.Name
-                    <span class="caret"></span>
                     @if (category.NumberOfProducts.HasValue)
                     {
                         <text> </text>@T("Categories.TotalProducts", category.NumberOfProducts.Value)
@@ -146,7 +198,7 @@
         @Html.Widget("mob_header_menu_before")
         @foreach (var category in rootCategoriesResponsive)
         {
-            @RenderCategoryLine(category, 0, true)
+            @RenderMobileCategoryLine(category, 0, true)
         }
         @foreach (var topic in Model.Topics)
         {
