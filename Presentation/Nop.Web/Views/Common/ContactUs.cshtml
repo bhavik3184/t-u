@@ -6,7 +6,37 @@
     //title
     Html.AddTitleParts(T("PageTitle.ContactUs").Text);
 }
-<div class="page contact-page article">
+<style>
+    ol, ul {
+        list-style: none;
+        
+    }
+    table tr td {
+        background-color:white !important;
+    }
+    .address ul {
+        padding-top: 15px;
+        margin-right: 30px;
+        float: left;
+    }
+        .address ul li {
+            background: url("/Themes/DefaultClean/Content/images/contact.png") no-repeat scroll 0 0 transparent;
+            line-height: 20px;
+            margin-bottom: 10px;
+            padding-left: 33px;
+            list-style-type: none;
+        }
+            .address ul li.website {
+                background-position: 0 -66px;
+            }
+            .address ul li.email {
+                background-position: 0 -88px;
+            }
+            .address ul li.phone {
+                background-position: 0 0;
+            }
+</style>
+<div class="page contact-page article" style="    background-color: white;">
 
     <div class="title">
         <h1>@T("PageTitle.ContactUs")</h1>
