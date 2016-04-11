@@ -902,10 +902,11 @@ namespace Nop.Web.Controllers
                             //activity log
                             _customerActivityService.InsertActivity("PublicStore.Login", _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
 
-                            if (String.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
-                                return PartialView(model);
-
-                            return PartialView(model);
+                            //if (String.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
+                            //    return PartialView(model);
+                            //return Redirect("Home/Index");
+                            return RedirectToRoute("HomePage");
+                            //return PartialView(model);
                         }
                     case CustomerLoginResults.CustomerNotExist:
                         ModelState.AddModelError("", _localizationService.GetResource("Account.Login.WrongCredentials.CustomerNotExist"));

@@ -7,11 +7,11 @@
     <div class="widgetnails"></div>
     <h3 class="widget-title">Login</h3>
   
-       @using (Html.BeginForm())
-        {
-            var validationSummary = Html.ValidationSummary(true, T("Account.Login.Unsuccessful").Text);
-            if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
-                {
+     @using (Html.BeginForm("LoginBox", "Customer", FormMethod.Post, new { id = "loginform" }))
+{
+    var validationSummary = Html.ValidationSummary(true, T("Account.Login.Unsuccessful").Text);
+    if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
+    {
                     <div class="message-error">@validationSummary</div>
                 }
 
