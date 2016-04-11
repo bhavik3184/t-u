@@ -16,6 +16,13 @@
         registerUrl = webHelper.ModifyQueryString(registerUrl, "returnurl=" + HttpUtility.UrlEncode(this.Context.Request.QueryString["returnUrl"]), null);
     }
 }
+<style>
+    .woocommerce input.text-box, .woocommerce select, .woocommerce input.input-text, .woocommerce textarea, .woocommerce-page form .form-row input.input-text, .woocommerce-page form .form-row textarea {
+       
+        padding: 10px;
+        margin: 10px 0;
+    }
+</style>
 <div class="page login-page article">
     <div class="page-title">
         <h1>@T("Account.Login.Welcome")</h1>
@@ -23,7 +30,7 @@
     @Html.Partial("_ExternalAuthentication.AssociateMessage")
     @Html.Partial("_ExternalAuthentication.Errors")
     <div class="page-body">
-        <div class="customer-blocks">
+        <div class="customer-blocks woocommerce">
             @if (Model.CheckoutAsGuest)
             {
                 <div class="new-wrapper checkout-as-guest-or-register-block">
@@ -60,16 +67,13 @@
                     <div class="title">
                         <strong>@T("Account.Login.ReturningCustomer")</strong>
                     </div>
-                    if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
-                    {
-                        <div class="message-error">@validationSummary</div>
-                    }
+                  
                     <div class="form-fields">
                         @if (Model.UsernamesEnabled)
                         {
                             <div class="inputs">
                                 @Html.LabelFor(m => m.Username, new { }, ":")
-                                @Html.TextBoxFor(m => m.Username, new { @class = "username", autofocus = "autofocus" })
+                                @Html.TextBoxFor(m => m.Username, new { @class = "text-box username", autofocus = "autofocus" })
                                 @Html.ValidationMessageFor(m => m.Username)
                             </div>
                         }
@@ -77,13 +81,13 @@
                         {
                             <div class="inputs">
                                 @Html.LabelFor(m => m.Email, new { }, ":")
-                                @Html.TextBoxFor(m => m.Email, new { @class = "email", autofocus = "autofocus" })
+                                @Html.TextBoxFor(m => m.Email, new { @class = "text-box email", autofocus = "autofocus" })
                                 @Html.ValidationMessageFor(m => m.Email)
                             </div>
                         }
                         <div class="inputs">
                             @Html.LabelFor(m => m.Password, new { }, ":")
-                            @Html.PasswordFor(m => m.Password, new { @class = "password" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "text-box password" })
                             @Html.ValidationMessageFor(m => m.Password)
                         </div>
                         <div class="inputs reversed">
@@ -103,6 +107,10 @@
                     <div class="buttons">
                         <input class="button-1 login-button" type="submit" value="@T("Account.Login.LoginButton")" />
                     </div>
+                      if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
+                    {
+                        <div class="message-error">@validationSummary</div>
+                    }
                 }
             </div>
         </div>
