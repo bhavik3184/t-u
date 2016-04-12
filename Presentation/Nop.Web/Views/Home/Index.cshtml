@@ -1,11 +1,21 @@
 ﻿@{
     Layout = "~/Views/Shared/_ColumnsOne.cshtml";
 }
+<style >
 
+    .home-page .product-grid .item-box, .product-details-page .product-grid .item-box, .borrow-cart-page .product-grid .item-box {
+        width: 19% !important;
+        margin: 0 0.5% 50px;
+        padding:0 8px;
+    }
+        .home-page .product-grid .item-box:nth-child(4n+1), .product-details-page .product-grid .item-box:nth-child(4n+1), .borrow-cart-page .product-grid .item-box:nth-child(4n+1) {
+            clear: none;
+        }
+</style>
 <link href="http://best-wordpress-themes.com/t2/wp-content/themes/toddlers/library/unf/slider/idangerous.swiper.css" rel="stylesheet" />
 <div class="page home-page">
     @Html.Widget("home_page_top")
-    <div class="page-body article col-md-8">
+    <div class="page-body article col-md-12">
 
         @Html.Widget("home_page_before_categories")
         @*@Html.Action("HomepageCategories", "Catalog")*@
@@ -23,109 +33,107 @@
         @Html.Action("HomeBlogPost", "Blog")
         
     </div>
-    <div id="sidebar" class="col-md-4 column homesidebar">
+    <div id="sidebar" class="col-sm-12 column homesidebar nopadding" >
+        <div class="col-sm-4">
+            <div id="search-3" class="widget widget_search homepagewidget" style="margin-right: 20px; min-height: 400px;">
+                <div class="widgetnails"></div><h3 class="widget-title">Why toys &amp; us</h3>
+                <ul>
+                    <li>• It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</li>
+                    <li>• It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</li>
+                    <li>• It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</li>
+                </ul>
 
-        @Html.Action("LoginBox", "Customer")
-
-        <div id="search-3" class="widget widget_search homepagewidget">
-            <div class="widgetnails"></div><h3 class="widget-title">Why toys &amp; us</h3>
-            <ul>
-                <li>• It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</li>
-                <li>• It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</li>
-                <li>• It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</li>
-            </ul>
-
+            </div>
         </div>
-        <div id="contact_widget-2" class="widget widget_contact_widget homepagewidget purple" >
-            <div class="widgetnails"></div>
-            @Html.Action("HomepageNews", "News")
+        <div class="col-sm-4">
+            <div id="contact_widget-2" class="widget widget_contact_widget homepagewidget purple" style="margin-right: 20px; min-height: 400px;">
+                <div class="widgetnails"></div>
+                @Html.Action("HomepageNews", "News")
+            </div>
         </div>
-
-
-
-        <div id="dtbaker_google_map-2" class="widget widget_dtbaker_google_map homepagewidget blue">
-            <div class="widgetnails"></div><h3 class="widget-title"></h3>
-
-
-            <div id="contact_widget-2">
-                <div class="widgetnails"></div><h3 class="widget-title">Brands</h3>
-                <div id="recent-post-loop" class="swiper-container swiper-container-recent swiper-container-horizontal">
-                    <div class="swiper-wrapper" style="transition-duration: 0ms; transform: translate3d(-840px, 0px, 0px);">
-                        <div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="1" style="width: 280px;">
-                            <div class="news-item row clearfix">
-                                <br>
-                                <div class="col-sm-12 column">
-                                    <div class="post-image">
-                                        <a href="2014/09/16/hello-world/"><img width="280" height="280" src="/Themes/DefaultClean/Content/images/toddlersplayground-125x125.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="toddlersplayground" srcset="/Themes/DefaultClean/Content/images/toddlersplayground-150x150.jpg 150w, /Themes/DefaultClean/Content/images/toddlersplayground-240x240.jpg 240w, /Themes/DefaultClean/Content/images/toddlersplayground-720x720.jpg 720w, /Themes/DefaultClean/Content/images/toddlersplayground-180x180.jpg 180w, /Themes/DefaultClean/Content/images/toddlersplayground-150x150@2x.jpg 300w, /Themes/DefaultClean/Content/images/toddlersplayground-300x300@2x.jpg 600w, /Themes/DefaultClean/Content/images/toddlersplayground-125x125.jpg 125w, /Themes/DefaultClean/Content/images/toddlersplayground-240x240@2x.jpg 480w, /Themes/DefaultClean/Content/images/toddlersplayground-180x180@2x.jpg 360w, /Themes/DefaultClean/Content/images/toddlersplayground-125x125@2x.jpg 250w" sizes="(max-width: 125px) 100vw, 125px"></a>
+        <div class="col-sm-4">
+            <div id="dtbaker_google_map-2" class="widget widget_dtbaker_google_map homepagewidget blue" style="  min-height: 400px;">
+                <div class="widgetnails"></div><h3 class="widget-title"></h3>
+                <div id="contact_widget-2">
+                    <div class="widgetnails"></div><h3 class="widget-title">Brands</h3>
+                    <div id="recent-post-loop" class="swiper-container swiper-container-recent swiper-container-horizontal">
+                        <div class="swiper-wrapper" style="transition-duration: 0ms; transform: translate3d(-840px, 0px, 0px);">
+                            <div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="1" style="width: 280px;">
+                                <div class="news-item row clearfix">
+                                    <br>
+                                    <div class="col-sm-12 column">
+                                        <div class="post-image">
+                                            <a href="2014/09/16/hello-world/"><img width="280" height="280" src="/Themes/DefaultClean/Content/images/toddlersplayground-125x125.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="toddlersplayground" srcset="/Themes/DefaultClean/Content/images/toddlersplayground-150x150.jpg 150w, /Themes/DefaultClean/Content/images/toddlersplayground-240x240.jpg 240w, /Themes/DefaultClean/Content/images/toddlersplayground-720x720.jpg 720w, /Themes/DefaultClean/Content/images/toddlersplayground-180x180.jpg 180w, /Themes/DefaultClean/Content/images/toddlersplayground-150x150@2x.jpg 300w, /Themes/DefaultClean/Content/images/toddlersplayground-300x300@2x.jpg 600w, /Themes/DefaultClean/Content/images/toddlersplayground-125x125.jpg 125w, /Themes/DefaultClean/Content/images/toddlersplayground-240x240@2x.jpg 480w, /Themes/DefaultClean/Content/images/toddlersplayground-180x180@2x.jpg 360w, /Themes/DefaultClean/Content/images/toddlersplayground-125x125@2x.jpg 250w" sizes="(max-width: 125px) 100vw, 125px"></a>
+                                        </div>
                                     </div>
+                                    <!--
+                            <div class="col-sm-12 column">
+                                            <h4><a href="2014/09/16/hello-world/">New Toddlers Playground!</a></h4>
+
+                                            <p class="byline vcard post-meta">
+                                                <time class="updated" datetime="2014-09-16">September 16, 2014
+                                                </time>
+
+                                                <i class="icon icon-star"></i>
+                                                <span class="cats"><a href="category/toddlers-news/" rel="category tag">News</a>
+                                                </span>
+                                                <span class="sticky-ind pull-right">
+                                                    <i class="icon icon-pin"></i>
+                                                </span>
+                                            </p><span class="post-exc">Kitsch hoodie beard four loko polaroid, heirloom narwhal chambray brunch Odd Future. Nulla qui whatever raw denim, excepteur trust...</span></div>
+                                            -->
                                 </div>
-                                <!--
-                                <div class="col-sm-12 column">
-                                                <h4><a href="2014/09/16/hello-world/">New Toddlers Playground!</a></h4>
-
-                                                <p class="byline vcard post-meta">
-                                                    <time class="updated" datetime="2014-09-16">September 16, 2014
-                                                    </time>
-
-                                                    <i class="icon icon-star"></i>
-                                                    <span class="cats"><a href="category/toddlers-news/" rel="category tag">News</a>
-                                                    </span>
-                                                    <span class="sticky-ind pull-right">
-                                                        <i class="icon icon-pin"></i>
-                                                    </span>
-                                                </p><span class="post-exc">Kitsch hoodie beard four loko polaroid, heirloom narwhal chambray brunch Odd Future. Nulla qui whatever raw denim, excepteur trust...</span></div>
-                                                -->
                             </div>
-                        </div>
-                        <div class="swiper-slide" data-swiper-slide-index="0" style="width: 280px;">
-                            <div class="news-item row clearfix">
-                                <br>
-                                <div class="col-sm-12 column">
-                                    <div class="post-image">
-                                        <a href="2015/03/03/new-toddlers-shortcodes/">
-                                            <img width="280" height="280" src="/Themes/DefaultClean/Content/images/shortcodes-125x125.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="shortcodes" srcset="/Themes/DefaultClean/Content/images/shortcodes-150x150.jpg 150w, /Themes/DefaultClean/Content/images/shortcodes-240x240.jpg 240w, /Themes/DefaultClean/Content/images/shortcodes-180x180.jpg 180w, /Themes/DefaultClean/Content/images/shortcodes-150x150@2x.jpg 300w, /Themes/DefaultClean/Content/images/shortcodes-125x125.jpg 125w, /Themes/DefaultClean/Content/images/shortcodes-240x240@2x.jpg 480w, /Themes/DefaultClean/Content/images/shortcodes-180x180@2x.jpg 360w, /Themes/DefaultClean/Content/images/shortcodes-125x125@2x.jpg 250w" sizes="(max-width: 125px) 100vw, 125px">
+                            <div class="swiper-slide" data-swiper-slide-index="0" style="width: 280px;">
+                                <div class="news-item row clearfix">
+                                    <br>
+                                    <div class="col-sm-12 column">
+                                        <div class="post-image">
+                                            <a href="2015/03/03/new-toddlers-shortcodes/">
+                                                <img width="280" height="280" src="/Themes/DefaultClean/Content/images/shortcodes-125x125.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="shortcodes" srcset="/Themes/DefaultClean/Content/images/shortcodes-150x150.jpg 150w, /Themes/DefaultClean/Content/images/shortcodes-240x240.jpg 240w, /Themes/DefaultClean/Content/images/shortcodes-180x180.jpg 180w, /Themes/DefaultClean/Content/images/shortcodes-150x150@2x.jpg 300w, /Themes/DefaultClean/Content/images/shortcodes-125x125.jpg 125w, /Themes/DefaultClean/Content/images/shortcodes-240x240@2x.jpg 480w, /Themes/DefaultClean/Content/images/shortcodes-180x180@2x.jpg 360w, /Themes/DefaultClean/Content/images/shortcodes-125x125@2x.jpg 250w" sizes="(max-width: 125px) 100vw, 125px">
 
-                                        </a>
+                                            </a>
+                                        </div>
                                     </div>
+
                                 </div>
-                                 
                             </div>
-                        </div>
 
-                        <div class="swiper-slide swiper-slide-prev" data-swiper-slide-index="1" style="width: 280px;">
-                            <div class="news-item row clearfix">
-                                <br>
-                                <div class="col-sm-12 column">
-                                    <div class="post-image">
-                                        <a href="2014/09/16/hello-world/"><img width="280" height="280" src="/Themes/DefaultClean/Content/images/toddlersplayground-125x125.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="toddlersplayground" srcset="/Themes/DefaultClean/Content/images/toddlersplayground-150x150.jpg 150w, /Themes/DefaultClean/Content/images/toddlersplayground-240x240.jpg 240w, /Themes/DefaultClean/Content/images/toddlersplayground-720x720.jpg 720w, /Themes/DefaultClean/Content/images/toddlersplayground-180x180.jpg 180w, /Themes/DefaultClean/Content/images/toddlersplayground-150x150@2x.jpg 300w, /Themes/DefaultClean/Content/images/toddlersplayground-300x300@2x.jpg 600w, /Themes/DefaultClean/Content/images/toddlersplayground-125x125.jpg 125w, /Themes/DefaultClean/Content/images/toddlersplayground-240x240@2x.jpg 480w, /Themes/DefaultClean/Content/images/toddlersplayground-180x180@2x.jpg 360w, /Themes/DefaultClean/Content/images/toddlersplayground-125x125@2x.jpg 250w" sizes="(max-width: 125px) 100vw, 125px"></a>
+                            <div class="swiper-slide swiper-slide-prev" data-swiper-slide-index="1" style="width: 280px;">
+                                <div class="news-item row clearfix">
+                                    <br>
+                                    <div class="col-sm-12 column">
+                                        <div class="post-image">
+                                            <a href="2014/09/16/hello-world/"><img width="280" height="280" src="/Themes/DefaultClean/Content/images/toddlersplayground-125x125.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="toddlersplayground" srcset="/Themes/DefaultClean/Content/images/toddlersplayground-150x150.jpg 150w, /Themes/DefaultClean/Content/images/toddlersplayground-240x240.jpg 240w, /Themes/DefaultClean/Content/images/toddlersplayground-720x720.jpg 720w, /Themes/DefaultClean/Content/images/toddlersplayground-180x180.jpg 180w, /Themes/DefaultClean/Content/images/toddlersplayground-150x150@2x.jpg 300w, /Themes/DefaultClean/Content/images/toddlersplayground-300x300@2x.jpg 600w, /Themes/DefaultClean/Content/images/toddlersplayground-125x125.jpg 125w, /Themes/DefaultClean/Content/images/toddlersplayground-240x240@2x.jpg 480w, /Themes/DefaultClean/Content/images/toddlersplayground-180x180@2x.jpg 360w, /Themes/DefaultClean/Content/images/toddlersplayground-125x125@2x.jpg 250w" sizes="(max-width: 125px) 100vw, 125px"></a>
+                                        </div>
                                     </div>
+
                                 </div>
-                                
                             </div>
-                        </div>
-                         
 
-                        <div class="swiper-slide swiper-slide-duplicate swiper-slide-active" data-swiper-slide-index="0" style="width: 280px;">
-                            <div class="news-item row clearfix">
-                                <br>
-                                <div class="col-sm-12 column">
-                                    <div class="post-image">
-                                        <a href="2015/03/03/new-toddlers-shortcodes/">
-                                            <img width="280" height="280" src="/Themes/DefaultClean/Content/images/shortcodes-125x125.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="shortcodes" srcset="/Themes/DefaultClean/Content/images/shortcodes-150x150.jpg 150w, /Themes/DefaultClean/Content/images/shortcodes-240x240.jpg 240w, /Themes/DefaultClean/Content/images/shortcodes-180x180.jpg 180w, /Themes/DefaultClean/Content/images/shortcodes-150x150@2x.jpg 300w, /Themes/DefaultClean/Content/images/shortcodes-125x125.jpg 125w, /Themes/DefaultClean/Content/images/shortcodes-240x240@2x.jpg 480w, /Themes/DefaultClean/Content/images/shortcodes-180x180@2x.jpg 360w, /Themes/DefaultClean/Content/images/shortcodes-125x125@2x.jpg 250w" sizes="(max-width: 125px) 100vw, 125px">
 
-                                        </a>
+                            <div class="swiper-slide swiper-slide-duplicate swiper-slide-active" data-swiper-slide-index="0" style="width: 280px;">
+                                <div class="news-item row clearfix">
+                                    <br>
+                                    <div class="col-sm-12 column">
+                                        <div class="post-image">
+                                            <a href="2015/03/03/new-toddlers-shortcodes/">
+                                                <img width="280" height="280" src="/Themes/DefaultClean/Content/images/shortcodes-125x125.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="shortcodes" srcset="/Themes/DefaultClean/Content/images/shortcodes-150x150.jpg 150w, /Themes/DefaultClean/Content/images/shortcodes-240x240.jpg 240w, /Themes/DefaultClean/Content/images/shortcodes-180x180.jpg 180w, /Themes/DefaultClean/Content/images/shortcodes-150x150@2x.jpg 300w, /Themes/DefaultClean/Content/images/shortcodes-125x125.jpg 125w, /Themes/DefaultClean/Content/images/shortcodes-240x240@2x.jpg 480w, /Themes/DefaultClean/Content/images/shortcodes-180x180@2x.jpg 360w, /Themes/DefaultClean/Content/images/shortcodes-125x125@2x.jpg 250w" sizes="(max-width: 125px) 100vw, 125px">
+
+                                            </a>
+                                        </div>
                                     </div>
+
                                 </div>
-                                 
                             </div>
                         </div>
                     </div>
+
+                    <div class="widgetnails widgetnailsbottom"></div>
                 </div>
-                 
+
                 <div class="widgetnails widgetnailsbottom"></div>
             </div>
-
-            <div class="widgetnails widgetnailsbottom"></div>
         </div>
     </div>
 </div>

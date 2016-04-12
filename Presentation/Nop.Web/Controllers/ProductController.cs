@@ -1197,18 +1197,33 @@ namespace Nop.Web.Controllers
         [ChildActionOnly]
         public ActionResult HomepageBestSellers(int? productThumbPictureSize)
         {
-            if (!_catalogSettings.ShowBestsellersOnHomepage || _catalogSettings.NumberOfBestsellersOnHomepage == 0)
-                return Content("");
+            //if (!_catalogSettings.ShowBestsellersOnHomepage || _catalogSettings.NumberOfBestsellersOnHomepage == 0)
+            //    return Content("");
 
-            //load and cache report
-            var report = _cacheManager.Get(string.Format(ModelCacheEventConsumer.HOMEPAGE_BESTSELLERS_IDS_KEY, _storeContext.CurrentStore.Id), 
-                () =>
-                    _orderReportService.BestSellersReport(storeId: _storeContext.CurrentStore.Id,
-                    pageSize: _catalogSettings.NumberOfBestsellersOnHomepage));
+            ////load and cache report
+            ////var report = _cacheManager.Get(string.Format(ModelCacheEventConsumer.HOMEPAGE_BESTSELLERS_IDS_KEY, _storeContext.CurrentStore.Id), 
+            ////    () =>
+            ////        _orderReportService.BestSellersReport(storeId: _storeContext.CurrentStore.Id,
+            ////        pageSize: _catalogSettings.NumberOfBestsellersOnHomepage));
 
 
-            //load products
-            var products = _productService.GetProductsByIds(report.Select(x => x.PlanId).ToArray());
+            //////load products
+            ////var products = _productService.GetProductsByIds(report.Select(x => x.PlanId).ToArray());
+
+
+            ////ACL and store mapping
+            //products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
+            ////availability dates
+            //products = products.Where(p => p.IsAvailable()).ToList();
+
+            //if (products.Count == 0)
+            //    return Content("");
+
+            ////prepare model
+            //var model = PrepareProductOverviewModels(products, true, true, productThumbPictureSize).ToList();
+            //return PartialView(model);
+
+            var products = _productService.GetAllProductsBestSellersOnHomePage();
             //ACL and store mapping
             products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
             //availability dates
@@ -1217,7 +1232,6 @@ namespace Nop.Web.Controllers
             if (products.Count == 0)
                 return Content("");
 
-            //prepare model
             var model = PrepareProductOverviewModels(products, true, true, productThumbPictureSize).ToList();
             return PartialView(model);
         }
@@ -1225,7 +1239,7 @@ namespace Nop.Web.Controllers
         [ChildActionOnly]
         public ActionResult HomepageNewProducts(int? productThumbPictureSize)
         {
-            var products = _productService.GetAllProductsDisplayedOnHomePage();
+            var products = _productService.GetAllProductsNewOnHomePage();
             //ACL and store mapping
             products = products.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
             //availability dates

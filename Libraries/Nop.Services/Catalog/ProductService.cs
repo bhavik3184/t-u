@@ -189,6 +189,31 @@ namespace Nop.Services.Catalog
             var products = query.ToList();
             return products;
         }
+
+        public virtual IList<Product> GetAllProductsNewOnHomePage()
+        {
+            var query = from p in _productRepository.Table
+                        orderby p.DisplayOrder, p.Name
+                        where p.Published &&
+                        !p.Deleted &&
+                        p.MarkAsNew
+                        select p;
+            var products = query.ToList();
+            return products;
+        }
+
+
+        public virtual IList<Product> GetAllProductsBestSellersOnHomePage()
+        {
+            var query = (from p in _productRepository.Table
+                        orderby p.CreatedOnUtc, p.Name
+                        where p.Published &&
+                        !p.Deleted &&
+                        p.MarkAsNew
+                        select p).Take(5);
+            var products = query.ToList();
+            return products;
+        }
         
         /// <summary>
         /// Gets product

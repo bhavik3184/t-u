@@ -9241,7 +9241,9 @@ blockquote:before {
 }
 .post-featured-image {
   position: relative;
-  margin-bottom: 40px;
+  
+      width: 50%;
+    margin: 0 auto 40px;
 }
 @media (max-width: 1199px) {
   .post-featured-image {
@@ -12873,8 +12875,8 @@ div.wpcf7 #contactForm .screenReader {
 #content .article .contactdetails > div div {
   display: table-cell;
   vertical-align: middle;
-  height: 140px;
-  padding-left: 70px;
+  height: 160px;
+  padding-left: 80px;
 }
 @media (max-width: 991px) {
   #content .article .contactdetails > div div {
@@ -12915,7 +12917,7 @@ div.wpcf7 #contactForm .screenReader {
   background-image: url('../images/phonedetailsicon.svg');
   background-repeat: no-repeat;
   background-size: 40px auto;
-  background-position: 30px center;
+  background-position: 20px center;
 }
 @media (min-width: 992px) and (max-width: 1199px) {
   .phonedetailswrap {
@@ -12935,7 +12937,7 @@ div.wpcf7 #contactForm .screenReader {
   background-image: url('../images/addressdetailsicon.svg');
   background-repeat: no-repeat;
   background-size: 40px auto;
-  background-position: 30px center;
+  background-position: 20px center;
   color: #A06A3E;
 }
 @media (min-width: 992px) and (max-width: 1199px) {
@@ -12966,7 +12968,11 @@ body #content .block_map img {
   padding: 40px;
   border-radius: 10px;
   margin-bottom: 40px;
+  margin-top: 40px;
+ 
 }
+
+ 
 @media (max-width: 767px) {
   #sidebar .widget {
     padding: 30px;

@@ -160,9 +160,9 @@ namespace Nop.Web.Framework
              builder.RegisterType<SubscriptionOrderReportService>().As<ISubscriptionOrderReportService>().InstancePerLifetimeScope();
              builder.RegisterType<SubscriptionOrderTotalCalculationService>().As<ISubscriptionOrderTotalCalculationService>().InstancePerLifetimeScope();
              builder.RegisterType<MembershipCategoryService>().As<IMembershipCategoryService>().InstancePerLifetimeScope();
+             builder.RegisterType<CopyPlanService>().As<ICopyPlanService>().InstancePerLifetimeScope();
 
            
-
             //services
             builder.RegisterType<BackInStockSubscriptionService>().As<IBackInStockSubscriptionService>().InstancePerLifetimeScope();
             builder.RegisterType<CategoryService>().As<ICategoryService>().InstancePerLifetimeScope();

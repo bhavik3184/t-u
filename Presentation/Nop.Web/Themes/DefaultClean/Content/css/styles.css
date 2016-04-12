@@ -277,8 +277,8 @@ label, label + * {
 }
 .form-fields {
 	position: relative;
-	border-top: 1px solid #e6e6e6;
-	background-color: #f9f9f9;
+	/*border-top: 1px solid #e6e6e6;
+	background-color: #f9f9f9;*/
 	padding: 10px 15px;
 }
  .inputs:after {
@@ -1417,6 +1417,10 @@ label, label + * {
 	display: block;
 	position: relative;
 }
+
+.item-box .picture a:hover {
+   
+}
 .item-box .picture a:before {
 	content: "";
 	display: block;
@@ -1437,6 +1441,9 @@ label, label + * {
 }
 .item-box:hover .picture a img {
 	opacity: 0.85;
+     -webkit-box-shadow: 0px 0px 0px 2px #FFF, 0px 0px 0px 4px #E8F6E3, 0px 0px 0px 6px #CFE4BA;
+    -moz-box-shadow: 0px 0px 0px 2px #FFF, 0px 0px 0px 4px #E8F6E3, 0px 0px 0px 6px #CFE4BA;
+    box-shadow: 0px 0px 0px 2px #FFF, 0px 0px 0px 4px #E8F6E3, 0px 0px 0px 6px #CFE4BA;
 }
 .item-box .details {
 	padding: 0 10px;
@@ -1448,6 +1455,7 @@ label, label + * {
     line-height: 1.2;
 	font-weight: normal;
 	color: #4ab2f1;
+    text-align:center;
 }
 .item-box .product-title a {
 	display: block;
@@ -1478,6 +1486,8 @@ label, label + * {
 .item-box .prices {
     margin: 0 0 10px;
     overflow: hidden;
+    text-align: center;
+     color: #77a464;
 }
 .item-box .old-price {
 	margin: 0 5px 0 0;
@@ -1488,7 +1498,7 @@ label, label + * {
 .item-box .actual-price {
 	margin: 0 5px 0 0;
 	font-size: 16px;
-	color: #666;
+	color: #77a464;
 }
 .item-box .tax-shipping-info a {
 	color: #4ab2f1;

@@ -7,101 +7,130 @@
     Html.AddTitleParts(T("PageTitle.ContactUs").Text);
 }
 <style>
-    ol, ul {
-        list-style: none;
-        
+    .center-1 {
+        margin: 0 0 0px;
     }
-    table tr td {
-        background-color:white !important;
+    .widget_contact_widget a{
+        padding:16px;
     }
-    .address ul {
-        padding-top: 15px;
-        margin-right: 30px;
-        float: left;
+    .addressdetailswrap {
+        padding-top:10px;
     }
-        .address ul li {
-            background: url("/Themes/DefaultClean/Content/images/contact.png") no-repeat scroll 0 0 transparent;
-            line-height: 20px;
-            margin-bottom: 10px;
-            padding-left: 33px;
-            list-style-type: none;
-        }
-            .address ul li.website {
-                background-position: 0 -66px;
-            }
-            .address ul li.email {
-                background-position: 0 -88px;
-            }
-            .address ul li.phone {
-                background-position: 0 0;
-            }
+    .addressdetailswrap, .phonedetailswrap {
+        font-weight: normal;
+        font-size: 15px;
+    }
 </style>
-<div class="page contact-page article" style="    background-color: white;">
+ <div class="col-sm-12">
+    <div class="page contact-page article col-md-8" style="    background-color: white;">
 
-    <div class="title">
-        <h1>@T("PageTitle.ContactUs")</h1>
-    </div>
-    <div class="page-body ">
-        @Html.Action("TopicBlock", "Topic", new { systemName = "ContactUs" })
-        @Html.Widget("contactus_top")
-        @if (Model.SuccessfullySent)
+        <div class="title">
+            <h1>@T("PageTitle.ContactUs")</h1>
+        </div>
+        <div class="page-body ">
+            @Html.Action("TopicBlock", "Topic", new { systemName = "ContactUs" })
+            @Html.Widget("contactus_top")
+            @if (Model.SuccessfullySent)
         {
-            <div class="result">
-                @Model.Result
-            </div>
+                <div class="result">
+                    @Model.Result
+                </div>
         }
         else
         {
-            using (Html.BeginForm())
-            {
-                @Html.AntiForgeryToken()
-                var validationSummary = Html.ValidationSummary(true);
-                if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
-                {
-                    <div class="message-error">@validationSummary</div>
-                }
-                <div class="fieldset">
-                    <div class="form-fields">
-                        <div class="inputs">
-                            @Html.LabelFor(model => model.FullName)
-                            @Html.TextBoxFor(model => model.FullName, new { @class = "fullname", placeholder = T("ContactUs.FullName.Hint") })
-                            @Html.RequiredHint()
-                            @Html.ValidationMessageFor(model => model.FullName)
-                        </div>
-                        <div class="inputs">
-                            @Html.LabelFor(model => model.Email)
-                            @Html.TextBoxFor(model => model.Email, new { @class = "email", placeholder = T("ContactUs.Email.Hint") })
-                            @Html.RequiredHint()
-                            @Html.ValidationMessageFor(model => model.Email)
-                        </div>
-                        @if (Model.SubjectEnabled)
-                        {
-                            <div class="inputs">
-                                @Html.LabelFor(model => model.Subject)
-                                @Html.TextBoxFor(model => model.Subject, new { @class = "subject", placeholder = T("ContactUs.Subject.Hint") })
-                                @Html.RequiredHint()
-                                @Html.ValidationMessageFor(model => model.Subject)
-                            </div>
-                        }
-                        <div class="inputs">
-                            @Html.LabelFor(model => model.Enquiry)
-                            @Html.TextAreaFor(model => model.Enquiry, new { @class = "enquiry", placeholder = T("ContactUs.Enquiry.Hint") })
-                            @Html.RequiredHint()
-                            @Html.ValidationMessageFor(model => model.Enquiry)
-                        </div>
-                        @if (Model.DisplayCaptcha)
-                        {
-                            <div class="captcha-box">
-                                @Html.Raw(Html.GenerateCaptcha())
-                            </div>
-                        }
+                <div class="contact-well contact_block">
+                    @using (Html.BeginForm())
+        {
+                        @Html.AntiForgeryToken()
+        var validationSummary = Html.ValidationSummary(true);
+        if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
+        {
+            <div class="message-error">@validationSummary</div>
+        }
+        <div class="fieldset">
+            <div class="form-fields">
+                <div class="form-group">
+                    <div class="controls">
+                        @Html.LabelFor(model => model.FullName)
+                        @Html.TextBoxFor(model => model.FullName, new { @class = "form-control fullname", placeholder = T("ContactUs.FullName.Hint") })
+                        @Html.RequiredHint()
+                        @Html.ValidationMessageFor(model => model.FullName)
                     </div>
                 </div>
-                <div class="buttons widget">
-                    <input type="submit" name="send-email" class="loginbutton" value="@T("ContactUs.Button")" />
+                <div class="form-group">
+                    <div class="controls">
+                        @Html.LabelFor(model => model.Email)
+                        @Html.TextBoxFor(model => model.Email, new { @class = "form-control email", placeholder = T("ContactUs.Email.Hint") })
+                        @Html.RequiredHint()
+                        @Html.ValidationMessageFor(model => model.Email)
+                    </div>
                 </div>
-            }
+
+                @if (Model.SubjectEnabled)
+                    {<div class="form-group">
+                    <div class="controls">
+                        @Html.LabelFor(model => model.Subject)
+                        @Html.TextBoxFor(model => model.Subject, new { @class = "form-control subject", placeholder = T("ContactUs.Subject.Hint") })
+                        @Html.RequiredHint()
+                        @Html.ValidationMessageFor(model => model.Subject)
+                    </div>
+                </div>
+}
+
+                <div class="form-group">
+                    <div class="controls">
+                        @Html.LabelFor(model => model.Enquiry)
+                        @Html.TextAreaFor(model => model.Enquiry, new { @class = "form-control enquiry", placeholder = T("ContactUs.Enquiry.Hint") })
+                        @Html.RequiredHint()
+                        @Html.ValidationMessageFor(model => model.Enquiry)
+                    </div>
+                </div>
+                @if (Model.DisplayCaptcha)
+                {
+                    <div class="captcha-box">
+                        @Html.Raw(Html.GenerateCaptcha())
+                    </div>
+                }
+            </div>
+        </div>
+                        <div class="buttons widget">
+                            <input type="submit" name="send-email" class="btn btn-primary sendmessagebtn" value="Send Message" />
+                        </div>
         }
-        @Html.Widget("contactus_bottom")
+
+                </div>
+
+        }
+            @Html.Widget("contactus_bottom")
+        </div>
+    </div>
+
+    <div id="sidebar" class="col-md-4 column homesidebar">
+
+        <div id="contact_widget-2" class="widget widget_contact_widget homepagewidget purple" style="margin-top:20px;">
+            <div class="widgetnails"></div><h3 class="widget-title">Contact Us</h3><a href="tel:1800 123 345" class="cw-phone-button"><img src="/Themes/DefaultClean/Content/images/callbutton.svg" data-no-retina="" class="contact-callicon"> +91 76666 36123 </a>
+
+            <a href="http://facebook.com/toysandus" class="cw-facebook-button" target="_blank"><img src="/Themes/DefaultClean/Content/images/facebookthumb.svg" data-no-retina="" class="contact-fbthumb"> Our Facebook</a>
+
+            @*<a href="mailto:exampl%65%40%65%6dail%61ddr%65%73s%2eco%6d" class="cw-email-button">
+        <img src="/Themes/DefaultClean/Content/images/emailicon.svg" data-no-retina="" class="contact-emailicon">
+        Email Us
+    </a>*@
+
+            <div class="widgetnails widgetnailsbottom"></div>
+        </div><div id="opentimes_widget-2" class="widget contacus widget_opentimes_widget homepagewidget orange">
+            <div class="widgetnails"></div><h3 class="widget-title">Open Times</h3><div class="opentimesbox">
+
+                <div class="opentimes-content">
+                    <div class="openday">
+                        <span class="times"><strong>10:00am</strong> to <strong>01:00pm</strong></span><br>
+                        <span class="times"><strong>04:00pm</strong> to <strong>07:00pm</strong></span><br>
+                        <span class="days">Moday to Saturday</span>
+                    </div>
+                </div>
+            </div>
+            <div class="widgetnails widgetnailsbottom"></div>
+        </div>
     </div>
 </div>
+

@@ -25,6 +25,10 @@ namespace Nop.Services.Catalog
         /// </summary>
         /// <returns>Products</returns>
         IList<Product> GetAllProductsDisplayedOnHomePage();
+
+        IList<Product> GetAllProductsNewOnHomePage();
+
+        IList<Product> GetAllProductsBestSellersOnHomePage();
         
         /// <summary>
         /// Gets product
