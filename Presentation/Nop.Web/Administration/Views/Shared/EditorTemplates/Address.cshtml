@@ -3,25 +3,78 @@
 {
     <script type="text/javascript">
         $(document).ready(function() {
-            $("#@Html.FieldIdFor(model => model.CountryId)").change(function() {
+          $("#@Html.FieldIdFor(model => model.CountryId)").change(function () {
                 var selectedItem = $(this).val();
                 var ddlStates = $("#@Html.FieldIdFor(model => model.StateProvinceId)");
+                var statesProgress = $("#states-loading-progress");
+                statesProgress.show();
                 $.ajax({
                     cache: false,
                     type: "GET",
-                    url: "@(Url.Action("GetStatesByCountryId", "Country"))",
-                    data: { "countryId": selectedItem, "addSelectStateItem": "false" },
-                    success: function(data) {
+                    url: "@(Url.RouteUrl("GetStatesByCountryId"))",
+                    data: { "countryId": selectedItem, "addSelectStateItem": "true" },
+                    success: function (data) {
                         ddlStates.html('');
-                        $.each(data, function(id, option) {
+                        $.each(data, function (id, option) {
                             ddlStates.append($('<option></option>').val(option.id).html(option.name));
                         });
+                        statesProgress.hide();
                     },
-                    error: function(xhr, ajaxOptions, thrownError) {
+                    error: function (xhr, ajaxOptions, thrownError) {
                         alert('Failed to retrieve states.');
+                        statesProgress.hide();
                     }
                 });
             });
+            $("#@Html.FieldIdFor(model => model.StateProvinceId)").change(function () {
+            var selectedItem = $(this).val();
+            var ddlStates = $("#@Html.FieldIdFor(model => model.CityId)");
+            var statesProgress = $("#city-loading-progress");
+            statesProgress.show();
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "@(Url.RouteUrl("GetCitiesByStateProvinceId"))",
+                data: { "stateProvinceId": selectedItem, "addSelectStateItem": "true" },
+                success: function (data) {
+                    ddlStates.html('');
+                    $.each(data, function (id, option) {
+                        ddlStates.append($('<option></option>').val(option.id).html(option.name));
+                    });
+                    statesProgress.hide();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve cities.');
+                    statesProgress.hide();
+                }
+            });
+        });
+
+
+
+        $("#@Html.FieldIdFor(model => model.CityId)").change(function () {
+            var selectedItem = $(this).val();
+            var ddlStates = $("#@Html.FieldIdFor(model => model.LocalityId)");
+            var statesProgress = $("#locality-loading-progress");
+            statesProgress.show();
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "@(Url.RouteUrl("GetLocalitiesByCityId"))",
+                data: { "cityId": selectedItem, "addSelectStateItem": "true" },
+                success: function (data) {
+                    ddlStates.html('');
+                    $.each(data, function (id, option) {
+                        ddlStates.append($('<option></option>').val(option.id).html(option.name));
+                    });
+                    statesProgress.hide();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve localities.');
+                    statesProgress.hide();
+                }
+            });
+        });
         });
     </script>
 }
@@ -120,19 +173,26 @@
                 @Html.ValidationMessageFor(model => model.StateProvinceId)
             </td>
         </tr>
-    }
-    @if (Model.CityEnabled)
-    {
-        <tr>
+         <tr>
             <td class="adminTitle">
-                @Html.NopLabelFor(model => model.City):
+                @Html.NopLabelFor(model => model.CityId):
             </td>
             <td class="adminData">
-                @Html.EditorFor(model => model.City)
-                @Html.ValidationMessageFor(model => model.City)
+                @Html.DropDownListFor(model => model.CityId, Model.AvailableCities)
+                @Html.ValidationMessageFor(model => model.CityId)
+            </td>
+        </tr>
+         <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.LocalityId):
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.LocalityId, Model.AvailableLocalities)
+                @Html.ValidationMessageFor(model => model.LocalityId)
             </td>
         </tr>
     }
+    
     @if (Model.StreetAddressEnabled)
     {
         <tr>

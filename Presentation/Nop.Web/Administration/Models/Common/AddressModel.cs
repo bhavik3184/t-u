@@ -15,6 +15,8 @@ namespace Nop.Admin.Models.Common
         {
             AvailableCountries = new List<SelectListItem>();
             AvailableStates = new List<SelectListItem>();
+            AvailableCities = new List<SelectListItem>();
+            AvailableLocalities = new List<SelectListItem>();
             CustomAddressAttributes = new List<AddressAttributeModel>();
         }
 
@@ -48,9 +50,16 @@ namespace Nop.Admin.Models.Common
         [AllowHtml]
         public string StateProvinceName { get; set; }
 
+        public string CityName { get; set; }
+        public int? CityId { get; set; }
+        public IList<SelectListItem> AvailableCities { get; set; }
         [NopResourceDisplayName("Admin.Address.Fields.City")]
         [AllowHtml]
         public string City { get; set; }
+
+        public string LocalityName { get; set; }
+        public int? LocalityId { get; set; }
+        public IList<SelectListItem> AvailableLocalities { get; set; }
 
         [NopResourceDisplayName("Admin.Address.Fields.Address1")]
         [AllowHtml]

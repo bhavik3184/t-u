@@ -60,6 +60,8 @@ namespace Nop.Admin.Controllers
         private readonly RewardPointsSettings _rewardPointsSettings;
         private readonly ICountryService _countryService;
         private readonly IStateProvinceService _stateProvinceService;
+        private readonly ICityService _cityService;
+        private readonly ILocalityService _localityService;
         private readonly IAddressService _addressService;
         private readonly CustomerSettings _customerSettings;
         private readonly ITaxService _taxService;
@@ -105,7 +107,9 @@ namespace Nop.Admin.Controllers
             TaxSettings taxSettings, 
             RewardPointsSettings rewardPointsSettings,
             ICountryService countryService, 
-            IStateProvinceService stateProvinceService, 
+            IStateProvinceService stateProvinceService,
+            ICityService cityService,
+            ILocalityService localityService, 
             IAddressService addressService,
             CustomerSettings customerSettings,
             ITaxService taxService, 
@@ -148,6 +152,8 @@ namespace Nop.Admin.Controllers
             this._rewardPointsSettings = rewardPointsSettings;
             this._countryService = countryService;
             this._stateProvinceService = stateProvinceService;
+            this._cityService = cityService;
+            this._localityService = localityService;
             this._addressService = addressService;
             this._customerSettings = customerSettings;
             this._taxService = taxService;
@@ -543,6 +549,8 @@ namespace Nop.Admin.Controllers
                     model.City = customer.GetAttribute<string>(SystemCustomerAttributeNames.City);
                     model.CountryId = customer.GetAttribute<int>(SystemCustomerAttributeNames.CountryId);
                     model.StateProvinceId = customer.GetAttribute<int>(SystemCustomerAttributeNames.StateProvinceId);
+                    model.CityId = customer.GetAttribute<int>(SystemCustomerAttributeNames.CityId);
+                    model.LocalityId = customer.GetAttribute<int>(SystemCustomerAttributeNames.LocalityId);
                     model.Phone = customer.GetAttribute<string>(SystemCustomerAttributeNames.Phone);
                     model.Fax = customer.GetAttribute<string>(SystemCustomerAttributeNames.Fax);
                 }
@@ -621,6 +629,60 @@ namespace Nop.Admin.Controllers
                         model.AvailableStates.Add(new SelectListItem
                         {
                             Text = _localizationService.GetResource(anyCountrySelected ? "Admin.Address.OtherNonUS" : "Admin.Address.SelectState"),
+                            Value = "0"
+                        });
+                    }
+
+                    var cities = _cityService
+                        .GetCitysByStateProvinceId(model.StateProvinceId)
+                        .ToList();
+                    if (states.Count > 0)
+                    {
+                        model.AvailableCities.Add(new SelectListItem { Text = "Select City", Value = "0" });
+
+                        foreach (var s in cities)
+                        {
+                            model.AvailableCities.Add(new SelectListItem
+                            {
+                                Text = s.GetLocalized(x => x.Name),
+                                Value = s.Id.ToString(),
+                                Selected = (s.Id == model.CityId)
+                            });
+                        }
+                    }
+                    else
+                    {
+                        bool anyStateSelected = model.AvailableStates.Any(x => x.Selected);
+                        model.AvailableStates.Add(new SelectListItem
+                        {
+                            Text = _localizationService.GetResource(anyStateSelected ? "Address.OtherNonUS" : "Address.SelectState"),
+                            Value = "0"
+                        });
+                    }
+
+                    var localities = _localityService
+                        .GetLocalitysByCityId(model.CityId.HasValue ? model.CityId.Value : 0, 0,true)
+                        .ToList();
+                    if (states.Count > 0)
+                    {
+                        model.AvailableLocalities.Add(new SelectListItem { Text = "Select Locality", Value = "0" });
+
+                        foreach (var s in localities)
+                        {
+                            model.AvailableLocalities.Add(new SelectListItem
+                            {
+                                Text = s.GetLocalized(x => x.Name),
+                                Value = s.Id.ToString(),
+                                Selected = (s.Id == model.CityId)
+                            });
+                        }
+                    }
+                    else
+                    {
+                        bool anyCitySelected = model.AvailableCities.Any(x => x.Selected);
+                        model.AvailableCities.Add(new SelectListItem
+                        {
+                            Text = _localizationService.GetResource(anyCitySelected ? "Address.OtherNonUS" : "Address.SelectState"),
                             Value = "0"
                         });
                     }
@@ -727,6 +789,7 @@ namespace Nop.Admin.Controllers
             foreach (var c in _countryService.GetAllCountries(showHidden: true))
                 model.Address.AvailableCountries.Add(new SelectListItem { Text = c.Name, Value = c.Id.ToString(), Selected = (c.Id == model.Address.CountryId) });
             //states
+            model.Address.AvailableStates.Add(new SelectListItem { Text = "Select State", Value = "0" });
             var states = model.Address.CountryId.HasValue ? _stateProvinceService.GetStateProvincesByCountryId(model.Address.CountryId.Value, showHidden: true).ToList() : new List<StateProvince>();
             if (states.Count > 0)
             {
@@ -735,6 +798,27 @@ namespace Nop.Admin.Controllers
             }
             else
                 model.Address.AvailableStates.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Address.OtherNonUS"), Value = "0" });
+
+            model.Address.AvailableCities.Add(new SelectListItem { Text = "Select City", Value = "0" });
+            var cities = model.Address.StateProvinceId.HasValue ? _cityService.GetCitysByStateProvinceId(model.Address.StateProvinceId.Value, showHidden: true).ToList() : new List<City>();
+            if (cities.Count > 0)
+            {
+                foreach (var s in cities)
+                    model.Address.AvailableCities.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString(), Selected = (s.Id == model.Address.CityId) });
+            }
+            else
+                model.Address.AvailableCities.Add(new SelectListItem { Text = "Other City", Value = "0" });
+
+            model.Address.AvailableLocalities.Add(new SelectListItem { Text = "Select Locality", Value = "0" });
+            var localities = model.Address.CityId.HasValue ? _localityService.GetLocalitysByCityId(model.Address.CityId.Value, showHidden: true).ToList() : new List<Locality>();
+            if (localities.Count > 0)
+            {
+                foreach (var s in localities)
+                    model.Address.AvailableLocalities.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString(), Selected = (s.Id == model.Address.LocalityId) });
+            }
+            else
+                model.Address.AvailableLocalities.Add(new SelectListItem { Text = "Other Locality", Value = "0" });
+
             //customer attribute services
             model.Address.PrepareCustomAddressAttributes(address, _addressAttributeService, _addressAttributeParser);
         }
@@ -891,6 +975,10 @@ namespace Nop.Admin.Controllers
                     _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.CountryId, model.CountryId);
                 if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
                     _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.StateProvinceId, model.StateProvinceId);
+                if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
+                    _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.CityId, model.CityId);
+                if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
+                    _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.LocalityId, model.LocalityId);
                 if (_customerSettings.PhoneEnabled)
                     _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.Phone, model.Phone);
                 if (_customerSettings.FaxEnabled)
@@ -1115,6 +1203,10 @@ namespace Nop.Admin.Controllers
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.CountryId, model.CountryId);
                     if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.StateProvinceId, model.StateProvinceId);
+                    if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
+                        _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.CityId, model.CityId);
+                    if (_customerSettings.CountryEnabled && _customerSettings.StateProvinceEnabled)
+                        _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.LocalityId, model.LocalityId);
                     if (_customerSettings.PhoneEnabled)
                         _genericAttributeService.SaveAttribute(customer, SystemCustomerAttributeNames.Phone, model.Phone);
                     if (_customerSettings.FaxEnabled)
@@ -1546,6 +1638,10 @@ namespace Nop.Admin.Controllers
                         addressHtmlSb.AppendFormat("{0},", Server.HtmlEncode(model.City));
                     if (_addressSettings.StateProvinceEnabled && !String.IsNullOrEmpty(model.StateProvinceName))
                         addressHtmlSb.AppendFormat("{0},", Server.HtmlEncode(model.StateProvinceName));
+                    if (_addressSettings.StateProvinceEnabled && !String.IsNullOrEmpty(model.CityName))
+                        addressHtmlSb.AppendFormat("{0},", Server.HtmlEncode(model.CityName));
+                    if (_addressSettings.StateProvinceEnabled && !String.IsNullOrEmpty(model.LocalityName))
+                        addressHtmlSb.AppendFormat("{0},", Server.HtmlEncode(model.LocalityName));
                     if (_addressSettings.ZipPostalCodeEnabled && !String.IsNullOrEmpty(model.ZipPostalCode))
                         addressHtmlSb.AppendFormat("{0}<br />", Server.HtmlEncode(model.ZipPostalCode));
                     if (_addressSettings.CountryEnabled && !String.IsNullOrEmpty(model.CountryName))
@@ -1634,6 +1730,12 @@ namespace Nop.Admin.Controllers
                     address.CountryId = null;
                 if (address.StateProvinceId == 0)
                     address.StateProvinceId = null;
+                if (address.CityId == 0)
+                    address.CityId = null;
+                if (address.LocalityId == 0)
+                    address.LocalityId = null;
+
+                address.City = address.CityEntity.Name;
                 customer.Addresses.Add(address);
                 _customerService.UpdateCustomer(customer);
 
@@ -1694,6 +1796,7 @@ namespace Nop.Admin.Controllers
             if (ModelState.IsValid)
             {
                 address = model.Address.ToEntity(address);
+                address.City = address.CityEntity.Name;
                 address.CustomAttributes = customAttributes;
                 _addressService.UpdateAddress(address);
 

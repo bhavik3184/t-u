@@ -3,44 +3,41 @@
 }
 <style >
 
-    .home-page .product-grid .item-box, .product-details-page .product-grid .item-box, .borrow-cart-page .product-grid .item-box {
-        width: 19% !important;
-        margin: 0 0.5% 50px;
-        padding:0 8px;
-    }
-        .home-page .product-grid .item-box:nth-child(4n+1), .product-details-page .product-grid .item-box:nth-child(4n+1), .borrow-cart-page .product-grid .item-box:nth-child(4n+1) {
-            clear: none;
-        }
+   
 </style>
 <link href="http://best-wordpress-themes.com/t2/wp-content/themes/toddlers/library/unf/slider/idangerous.swiper.css" rel="stylesheet" />
 <div class="page home-page">
     @Html.Widget("home_page_top")
-    <div class="page-body article col-md-12">
+    <div class="page-body article col-md-12" style="padding: 60px;">
 
         @Html.Widget("home_page_before_categories")
         @*@Html.Action("HomepageCategories", "Catalog")*@
         @Html.Widget("home_page_before_products")
         @Html.Action("HomepageProducts", "Product")
-
+        <hr>
         @Html.Widget("home_page_before_best_sellers")
         @Html.Action("HomepageBestSellers", "Product")
         <hr>
         @Html.Action("HomepageNewProducts", "Product")
-        <hr>
+        @*<hr>*@
         @Html.Widget("home_page_before_news")
         @Html.Widget("home_page_before_poll")
         @Html.Widget("home_page_bottom")
-        @Html.Action("HomeBlogPost", "Blog")
-        
+       
+
     </div>
     <div id="sidebar" class="col-sm-12 column homesidebar nopadding" >
         <div class="col-sm-4">
             <div id="search-3" class="widget widget_search homepagewidget" style="margin-right: 20px; min-height: 400px;">
                 <div class="widgetnails"></div><h3 class="widget-title">Why toys &amp; us</h3>
                 <ul>
-                    <li>• It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</li>
-                    <li>• It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</li>
-                    <li>• It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</li>
+                    <li>• Having access to thousands of toys.</li>
+                    <li>• Having a resource to assist and guide you in appropriate toy selection.</li>
+                    <li>• Avoiding storage issues of multiple or bulky toys.</li>
+                    <li>• Helping the environment by borrowing rather than purchasing.</li>
+                    <li>• Meeting other young families.</li>
+                    <li>• Having an opportunity to try toys before you buy, therefore ensuring successful toy purchases.</li>
+                    <li>• Being a part of your community.</li>
                 </ul>
 
             </div>
@@ -135,5 +132,13 @@
                 <div class="widgetnails widgetnailsbottom"></div>
             </div>
         </div>
+    </div>
+    <div id="sidebar" class="col-sm-12 column homesidebar nopadding">
+        <div id="search-3" class="widget widget_opentimes_widget homepagewidget orange" style="margin-right: 20px; min-height: 400px;">
+            <div class="widgetnails"></div><h3 class="widget-title">Testimonials</h3>
+            @Html.Action("HomeBlogPost", "Blog")
+        </div>
+         
+         
     </div>
 </div>

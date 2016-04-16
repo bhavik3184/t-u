@@ -106,7 +106,7 @@
     </div>
 
     <div id="sidebar" class="col-md-4 column homesidebar">
-
+     
         <div id="contact_widget-2" class="widget widget_contact_widget homepagewidget purple" style="margin-top:20px;">
             <div class="widgetnails"></div><h3 class="widget-title">Contact Us</h3><a href="tel:1800 123 345" class="cw-phone-button"><img src="/Themes/DefaultClean/Content/images/callbutton.svg" data-no-retina="" class="contact-callicon"> +91 76666 36123 </a>
 
@@ -118,7 +118,9 @@
     </a>*@
 
             <div class="widgetnails widgetnailsbottom"></div>
-        </div><div id="opentimes_widget-2" class="widget contacus widget_opentimes_widget homepagewidget orange">
+        </div>
+        
+        <div id="opentimes_widget-2" class="widget contacus widget_opentimes_widget homepagewidget orange">
             <div class="widgetnails"></div><h3 class="widget-title">Open Times</h3><div class="opentimesbox">
 
                 <div class="opentimes-content">
@@ -131,6 +133,8 @@
             </div>
             <div class="widgetnails widgetnailsbottom"></div>
         </div>
+
+        @Html.Action("NewsletterBox", "Newsletter")
     </div>
 </div>
 

@@ -22,6 +22,8 @@ namespace Nop.Admin.Models.Customers
             this.AssociatedExternalAuthRecords = new List<AssociatedExternalAuthModel>();
             this.AvailableCountries = new List<SelectListItem>();
             this.AvailableStates = new List<SelectListItem>();
+            this.AvailableCities = new List<SelectListItem>();
+            this.AvailableLocalities = new List<SelectListItem>();
             this.AvailableVendors = new List<SelectListItem>();
             this.CustomerAttributes = new List<CustomerAttributeModel>();
             this.AvailableNewsletterSubscriptionOrderStores = new List<StoreModel>();
@@ -90,7 +92,14 @@ namespace Nop.Admin.Models.Customers
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.City")]
         [AllowHtml]
         public string City { get; set; }
+        public string CityName { get; set; }
+        public int? CityId { get; set; }
+        public IList<SelectListItem> AvailableCities { get; set; }
 
+
+        public string LocalityName { get; set; }
+        public int? LocalityId { get; set; }
+        public IList<SelectListItem> AvailableLocalities { get; set; }
         public bool CountryEnabled { get; set; }
         [NopResourceDisplayName("Admin.Customers.Customers.Fields.Country")]
         public int CountryId { get; set; }

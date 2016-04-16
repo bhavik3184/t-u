@@ -27,6 +27,55 @@
                     }
                 });
             });
+            $("#@Html.FieldIdFor(model => model.StateProvinceId)").change(function () {
+                var selectedItem = $(this).val();
+                var ddlStates = $("#@Html.FieldIdFor(model => model.CityId)");
+                var statesProgress = $("#city-loading-progress");
+                statesProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    url: "@(Url.RouteUrl("GetCitiesByStateProvinceId"))",
+                    data: { "stateProvinceId": selectedItem, "addSelectStateItem": "true" },
+                success: function (data) {
+                    ddlStates.html('');
+                    $.each(data, function (id, option) {
+                        ddlStates.append($('<option></option>').val(option.id).html(option.name));
+                    });
+                    statesProgress.hide();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve cities.');
+                    statesProgress.hide();
+                }
+            });
+        });
+
+        
+
+        $("#@Html.FieldIdFor(model => model.CityId)").change(function () {
+            var selectedItem = $(this).val();
+            var ddlStates = $("#@Html.FieldIdFor(model => model.LocalityId)");
+            var statesProgress = $("#locality-loading-progress");
+            statesProgress.show();
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "@(Url.RouteUrl("GetLocalitiesByCityId"))",
+                data: { "cityId": selectedItem, "addSelectStateItem": "true" },
+            success: function (data) {
+                ddlStates.html('');
+                $.each(data, function (id, option) {
+                    ddlStates.append($('<option></option>').val(option.id).html(option.name));
+                });
+                statesProgress.hide();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve localities.');
+                statesProgress.hide();
+            }
+        });
+        });
         });
     </script>
 }
@@ -82,19 +131,25 @@
             @Html.ValidationMessageFor(model => model.StateProvinceId)
         </div>
     }
-    @if (Model.CityEnabled)
-    {
+    
         <div class="inputs">
-            @Html.LabelFor(model => model.City, new { }, ":")
-                @Html.EditorFor(model => model.City)
-
-            @if (Model.CityRequired)
-            {
-                @Html.RequiredHint()
-            }
-            @Html.ValidationMessageFor(model => model.City)
+            <label for="CityId">City:</label>
+            @Html.DropDownListFor(model => model.CityId, Model.AvailableCities)
+           
+            @Html.RequiredHint()
+            @Html.ValidationMessageFor(model => model.CityId)
+            <span id="city-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
         </div>
-    }
+        <div class="inputs">
+            <label for="LocalityId">Locality:</label>
+            @Html.DropDownListFor(model => model.LocalityId, Model.AvailableLocalities)
+           
+            @Html.RequiredHint()
+            @Html.ValidationMessageFor(model => model.LocalityId)
+            <span id="locality-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
+        </div>
+    
+     
     @if (Model.StreetAddressEnabled)
     {
         <div class="inputs">

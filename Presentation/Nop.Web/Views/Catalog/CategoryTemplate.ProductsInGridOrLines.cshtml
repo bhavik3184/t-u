@@ -19,6 +19,8 @@
 @using Nop.Core.Infrastructure;
 @using Nop.Web.Models.Catalog;
 @*category breadcrumb*@
+
+
 @section Breadcrumb
 {
     @if (Model.DisplayCategoryBreadcrumb)
@@ -69,7 +71,7 @@
     cursor: pointer;">&nbsp;</span>
     <p style="line-height: 1em; margin: 0 0 0px;" class="content" ng-bind-html="successmessage"></p>
 </div>
-<div class="page category-page article" >
+<div class="page category-page article" style="background-color:white;">
     <div class="progresscaption" ng-show="displayprogress">
         <img style="top: 40%; left: 40%; position: absolute;" src="/Themes/DefaultClean/Content/images/progress.gif" />
     </div>
@@ -179,9 +181,9 @@
                                 <a ng-if="product.ProductVideoModel != null" ng-click="open(product.Name,product.ProductVideoModel.ValueRaw)" class="youtube" title="{{product.Name}}">
                                     <img src="/Content/Images/video.png" style="width:30px;position:absolute;top:0;right:0;" />
                                 </a>
-                                <a href="/{{product.SeName}}">{{product.Name}}</a>
+                                <a ng-click="openDefault(product.Id)">{{product.Name}}</a>
                             </h2>
-                            <div class="product-rating-box" style="width:50%;" title="0 review(s)">
+                            <div class="product-rating-box" style="width:100%;" title="0 review(s)">
                                 <div class="rating">
                                     <div ng-style="{'width' : (product.ReviewOverviewModel.TotalReviews != 0) ? '(product.ReviewOverviewModel.RatingSum * 100 / product.ReviewOverviewModel.TotalReviews / 5 )%' : '0%'};">
                                     </div>
@@ -367,7 +369,7 @@
                     ng-click="closeThisDialog()">
                 Close
             </button>
-            <a href="/{{product.SeName}}" class="ngdialog-button ngdialog-button-primary">More Details</a>
+           
         </div>
     </script>
 
@@ -385,25 +387,18 @@
                 $(this).find('.caption').hide();
             }
         );
-        $('.fade').hover(
-            function () {
-                $(this).find('.caption').fadeIn(250);
-            },
-            function () {
-                $(this).find('.caption').fadeOut(250);
-            }
-        );
-        $('.slide').hover(
-            function () {
-                $(this).find('.caption').slideDown(250);
-            },
-            function () {
-                $(this).find('.caption').slideUp(250);
-            }
-        );
+        $('.buttons').hover(
+          function () {
+              $(this).find('.caption').hide();
+          },
+          function () {
+              $(this).find('.caption').hide();
+          }
+      );
     });
      
 </script>
+
 
 
  

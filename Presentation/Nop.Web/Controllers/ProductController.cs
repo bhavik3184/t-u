@@ -952,51 +952,51 @@ namespace Nop.Web.Controllers
                 return InvokeHttp404();
 
             //availability dates
-            if (!product.IsAvailable())
+          //  if (!product.IsAvailable())
                 return InvokeHttp404();
             
             //visible individually?
-            if (!product.VisibleIndividually)
-            {
-                //is this one an associated products?
-                var parentGroupedProduct = _productService.GetProductById(product.ParentGroupedProductId);
-                if (parentGroupedProduct == null)
-                    return RedirectToRoute("HomePage");
+            //if (!product.VisibleIndividually)
+            //{
+            //    //is this one an associated products?
+            //    var parentGroupedProduct = _productService.GetProductById(product.ParentGroupedProductId);
+            //    if (parentGroupedProduct == null)
+            //        return RedirectToRoute("HomePage");
 
-                return RedirectToRoute("Product", new { SeName = parentGroupedProduct.GetSeName() });
-            }
+            //    return RedirectToRoute("Product", new { SeName = parentGroupedProduct.GetSeName() });
+            //}
 
-            //update existing shopping cart item?
-            BorrowCartItem updatecartitem = null;
-            if (_borrowCartSettings.AllowCartItemEditing && updatecartitemid > 0)
-            {
-                var cart = _workContext.CurrentCustomer.BorrowCartItems
-                    .Where(x => x.BorrowCartType == BorrowCartType.BorrowCart)
-                    .LimitPerStore(_storeContext.CurrentStore.Id)
-                    .ToList();
-                updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
-                //not found?
-                if (updatecartitem == null)
-                {
-                    return RedirectToRoute("Product", new { SeName = product.GetSeName() });
-                }
-                //is it this product?
-                if (product.Id != updatecartitem.ProductId)
-                {
-                    return RedirectToRoute("Product", new { SeName = product.GetSeName() });
-                }
-            }
+            ////update existing shopping cart item?
+            //BorrowCartItem updatecartitem = null;
+            //if (_borrowCartSettings.AllowCartItemEditing && updatecartitemid > 0)
+            //{
+            //    var cart = _workContext.CurrentCustomer.BorrowCartItems
+            //        .Where(x => x.BorrowCartType == BorrowCartType.BorrowCart)
+            //        .LimitPerStore(_storeContext.CurrentStore.Id)
+            //        .ToList();
+            //    updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
+            //    //not found?
+            //    if (updatecartitem == null)
+            //    {
+            //        return RedirectToRoute("Product", new { SeName = product.GetSeName() });
+            //    }
+            //    //is it this product?
+            //    if (product.Id != updatecartitem.ProductId)
+            //    {
+            //        return RedirectToRoute("Product", new { SeName = product.GetSeName() });
+            //    }
+            //}
 
-            //prepare the model
-            var model = PrepareProductDetailsPageModel(product, updatecartitem, false);
+            ////prepare the model
+            //var model = PrepareProductDetailsPageModel(product, updatecartitem, false);
 
-            //save as recently viewed
-            _recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
+            ////save as recently viewed
+            //_recentlyViewedProductsService.AddProductToRecentlyViewedList(product.Id);
 
-            //activity log
-            _customerActivityService.InsertActivity("PublicStore.ViewProduct", _localizationService.GetResource("ActivityLog.PublicStore.ViewProduct"), product.Name);
+            ////activity log
+            //_customerActivityService.InsertActivity("PublicStore.ViewProduct", _localizationService.GetResource("ActivityLog.PublicStore.ViewProduct"), product.Name);
 
-            return View(model.ProductTemplateViewPath, model);
+            //return View(model.ProductTemplateViewPath, model);
         }
 
         public JsonResult ProductDetailsById(int productId)

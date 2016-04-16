@@ -1173,7 +1173,7 @@ html {
 }
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.42857143;
   color: #798388;
   background-color: #fff;
@@ -11563,6 +11563,21 @@ body {
   #header .grass {
     position: absolute;
     bottom: 155px;
+    
+  }
+}
+@media (min-width: 1024px) {
+  #header .headimg-left,
+  #header .headimg-right,
+  #header .grass {
+    visibility: visible;
+  }
+}
+@media (max-width: 1024px) {
+  #header .headimg-left,
+  #header .headimg-right,
+  #header .grass {
+    visibility: hidden;
   }
 }
 @media (max-width: 767px) {
@@ -11571,6 +11586,7 @@ body {
   #header .grass {
     position: absolute;
     bottom: 0px;
+    visibility: hidden;
   }
 }
 #header .headimg-left {

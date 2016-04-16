@@ -1783,6 +1783,8 @@ namespace Nop.Web.Controllers
                     addressSettings: _addressSettings,
                     localizationService: _localizationService,
                     stateProvinceService: _stateProvinceService,
+                    cityService: _cityService,
+                    localityService: _localityService,
                     addressAttributeFormatter: _addressAttributeFormatter,
                     loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
                 model.Addresses.Add(addressModel);
@@ -1824,6 +1826,8 @@ namespace Nop.Web.Controllers
                 addressSettings:_addressSettings,
                 localizationService:_localizationService,
                 stateProvinceService: _stateProvinceService,
+                cityService: _cityService,
+                localityService: _localityService,
                 addressAttributeService: _addressAttributeService,
                 addressAttributeParser: _addressAttributeParser,
                 loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
@@ -1859,7 +1863,14 @@ namespace Nop.Web.Controllers
                     address.CountryId = null;
                 if (address.StateProvinceId == 0)
                     address.StateProvinceId = null;
+                if (address.CityId == 0)
+                    address.CityId = null;
+                if (address.LocalityId == 0)
+                    address.LocalityId = null;
+
+                address.City = address.CityEntity.Name;
                 customer.Addresses.Add(address);
+               
                 _customerService.UpdateCustomer(customer);
 
                 return RedirectToRoute("CustomerAddresses");
@@ -1872,6 +1883,8 @@ namespace Nop.Web.Controllers
                 addressSettings:_addressSettings,
                 localizationService:_localizationService,
                 stateProvinceService: _stateProvinceService,
+                cityService: _cityService,
+                localityService: _localityService,
                 addressAttributeService: _addressAttributeService,
                 addressAttributeParser: _addressAttributeParser,
                 loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id),
@@ -1899,6 +1912,8 @@ namespace Nop.Web.Controllers
                 addressSettings: _addressSettings,
                 localizationService: _localizationService,
                 stateProvinceService: _stateProvinceService,
+                cityService: _cityService,
+                localityService: _localityService,
                 addressAttributeService: _addressAttributeService,
                 addressAttributeParser: _addressAttributeParser,
                 loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id));
@@ -1932,6 +1947,7 @@ namespace Nop.Web.Controllers
             if (ModelState.IsValid)
             {
                 address = model.Address.ToEntity(address);
+                address.City = address.CityEntity.Name;
                 address.CustomAttributes = customAttributes;
                 _addressService.UpdateAddress(address);
 
@@ -1945,6 +1961,8 @@ namespace Nop.Web.Controllers
                 addressSettings: _addressSettings,
                 localizationService: _localizationService,
                 stateProvinceService: _stateProvinceService,
+                 cityService: _cityService,
+                localityService: _localityService,
                 addressAttributeService: _addressAttributeService,
                 addressAttributeParser: _addressAttributeParser,
                 loadCountries: () => _countryService.GetAllCountries(_workContext.WorkingLanguage.Id),
