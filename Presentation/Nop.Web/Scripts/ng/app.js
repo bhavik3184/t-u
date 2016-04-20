@@ -1,5 +1,5 @@
 ﻿
-var mainApp = angular.module("mainApp", ["checklist-model", 'ui.bootstrap', 'infinite-scroll', 'mega-menu','ngDialog']);
+var mainApp = angular.module("mainApp", ["checklist-model", 'ui.bootstrap', 'infinite-scroll', 'mega-menu','ngDialog','jkuri.gallery']);
 
 
 

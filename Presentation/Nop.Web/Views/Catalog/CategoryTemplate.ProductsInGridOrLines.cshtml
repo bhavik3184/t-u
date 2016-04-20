@@ -14,12 +14,17 @@
 
     var breadcrumbDelimiter = EngineContext.Current.Resolve<CommonSettings>().BreadcrumbDelimiter;
 }
+
 @using Nop.Core.Domain.Common;
 @using Nop.Core.Domain.Seo;
 @using Nop.Core.Infrastructure;
 @using Nop.Web.Models.Catalog;
 @*category breadcrumb*@
-
+@{
+    Html.AddScriptParts("~/Scripts/jquery.magnific-popup.min.js");
+    Html.AddCssFileParts("~/Content/magnific-popup/magnific-popup.css");
+}
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 
 @section Breadcrumb
 {
@@ -235,7 +240,8 @@
         }
         @Html.Widget("categorydetails_bottom", Model.Id)
     </div>
-
+    <script type="text/javascript" src="/Scripts/ng/ngGallery.js"></script>
+    <link rel="stylesheet" type="text/css" href="/Themes/DefaultClean/Content/css/ngGallery.css">
     <script type="text/ng-template" id="firstDialogId">
         <div class="progresscaption" ng-show="displayprogress">
             <img style="top: 40%; left: 40%; position: absolute;" src="/Themes/DefaultClean/Content/images/progress.gif" />
@@ -268,13 +274,15 @@
                             <!--product pictures-->
                             <div class="gallery" >
                                 <div class="picture">
-                                    <img alt="{{product.DefaultPictureModel.AlternateText}}" src="{{product.DefaultPictureModel.ImageUrl}}" title="{{product.DefaultPictureModel.Title}}" itemprop="image" id="main-product-img-68">
+                                    <img class="thumb-popup-link" alt="{{product.DefaultPictureModel.AlternateText}}" src="{{product.DefaultPictureModel.ImageUrl}}" title="{{product.DefaultPictureModel.Title}}" itemprop="image" id="main-product-img-68">
                                 </div>
-                                <div class="picture-thumbs">
+                                <ng-gallery images="product.PictureModels">
+                                </ng-gallery>
+                                @*<div class="picture-thumbs">
                                     <a ng-repeat="pic in product.PictureModels" class="thumb-popup-link" ng-click="SetDefaultImage(product,pic.FullSizeImageUrl)"  title="{{pic.Title}}">
-                                        <img src="{{pic.ImageUrl}}" alt="{{pic.AlternateText}}" title="Picture of DCM Mobile Bank">
+                                        <img class="thumb-popup-link" src="{{pic.ImageUrl}}" alt="{{pic.AlternateText}}" title="Picture of DCM Mobile Bank">
                                     </a>
-                                </div>
+                                </div>*@
                             </div>
 
                             <div class="overview">
@@ -401,4 +409,20 @@
 
 
 
- 
+ <script type="text/javascript">
+    $(document).ready(function () {
+        $('.thumb-popup-link').magnificPopup(
+        {
+            type: 'image',
+            removalDelay: 300,
+            gallery: {
+                enabled: true,
+                tPrev: '@T("Media.MagnificPopup.Previous")',
+                tNext: '@T("Media.MagnificPopup.Next")',
+                tCounter: '@T("Media.MagnificPopup.Counter")'
+            },
+            tClose: '@T("Media.MagnificPopup.Close")',
+            tLoading: '@T("Media.MagnificPopup.Loading")'
+        });
+    });
+</script>
