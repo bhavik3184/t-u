@@ -40,6 +40,7 @@ using Nop.Web.Models.Common;
 using Nop.Web.Models.Customer;
 using WebGrease.Css.Extensions;
 using Nop.Services.Catalog;
+using Nop.Core.Domain.Payments;
 
 namespace Nop.Web.Controllers
 {
@@ -744,12 +745,12 @@ namespace Nop.Web.Controllers
                 model.RegistrationFees = _priceFormatter.FormatPrice(order.Customer.RegistrationChargeBalance);
                 model.MembershipPlanValidity = subsorderitem.Plan.RentalPriceLength.ToString() + " " +  (RentalPricePeriod)subsorderitem.Plan.RentalPricePeriodId;
                 model.SubscriptionFees = _priceFormatter.FormatPrice(subsorderitem.PriceExclTax);
-
+                    
                 DateTime from = subsorderitem.RentalEndDateUtc ?? DateTime.Now;
                 DateTime to = DateTime.Now.Date;
 
                 model.RemainingDays = Math.Round((from-to).TotalDays).ToString();
-
+                model.PaymentStatus = order.PaymentStatus.GetLocalizedEnum(_localizationService, _workContext);
                 }
             }
 
@@ -812,8 +813,21 @@ namespace Nop.Web.Controllers
                             //activity log
                             _customerActivityService.InsertActivity("PublicStore.Login", _localizationService.GetResource("ActivityLog.PublicStore.Login"), customer);
 
-                            if (String.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
-                                return RedirectToRoute("HomePage");
+                            if (String.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl)) {
+                                var currentorder = _subscriptionOrderService.GetCurrentSubscribedOrder(customer.Id);
+                                 if (currentorder != null)
+                                 {
+                                     if(currentorder.PaymentStatus ==PaymentStatus.Paid)
+                                         return RedirectToRoute("Dashboard"); 
+                                     else
+                                         return RedirectToRoute("subscriptioncart");
+                                 }
+                                 else
+                                 {
+                                     return RedirectToRoute("subscriptioncart");
+                                 }
+                                
+                            }
                             
                             return Redirect(returnUrl);
                         }
@@ -1444,14 +1458,15 @@ namespace Nop.Web.Controllers
                                 //send customer welcome message
                                 _workflowMessageService.SendCustomerWelcomeMessage(customer, _workContext.WorkingLanguage.Id);
 
-                                var redirectUrl = Url.RouteUrl("RegisterResult", new { resultId = (int)UserRegistrationType.Standard });
-                                if (!String.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                                    redirectUrl = _webHelper.ModifyQueryString(redirectUrl, "returnurl=" + HttpUtility.UrlEncode(returnUrl), null);
-                                return Redirect(redirectUrl);
+                                //var redirectUrl = Url.RouteUrl("RegisterResult", new { resultId = (int)UserRegistrationType.Standard });
+                                //if (!String.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                                //    redirectUrl = _webHelper.ModifyQueryString(redirectUrl, "returnurl=" + HttpUtility.UrlEncode(returnUrl), null);
+                                //return Redirect(redirectUrl);
+                                return RedirectToRoute("subscriptioncart");
                             }
                         default:
                             {
-                                return RedirectToRoute("HomePage");
+                                return RedirectToRoute("subscriptioncart");
                             }
                     }
                 }

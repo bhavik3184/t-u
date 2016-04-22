@@ -233,23 +233,23 @@ label, label + * {
 	
 }
 .caption {
-	display: none;
-	position: absolute;
-	top: 0;
-	left: 0;
-     margin: 0 0 20px;
-	background: url(../images/trans-black-50.png);
-	width: 100%;
-    height: 250px;
-    cursor:pointer;
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    margin: 0 0 20px;
+    /* background: url(../images/trans-black-50.png); */
+    width: 100%;
+    /* height: 250px; */
+    cursor: pointer;
 	
 }
 
 .caption h3 {
     padding: 5px 10px;
-    border:3px solid #aaa;
+    border:2px solid #aaa;
     background: transparent;
-    color: #fff;
+    color: #000;
     border-radius: 2px;
     -moz-border-radius: 2px;
     font-weight: bold;
@@ -1706,7 +1706,7 @@ h2, .h2 {
 }
 .product-essential {
 	margin: 0 0 40px;
-	border-bottom: 1px solid #ddd;
+	border-bottom: 0px solid #ddd;
 	padding: 0 0 10px;
 }
 .product-essential:after {
@@ -1736,7 +1736,6 @@ h2, .h2 {
 .variant-picture img {
 	position: absolute;
 	top: 0;
-	right: 0;
 	bottom: 0;
 	left: 0;
 	max-width: 100%;
@@ -1785,7 +1784,11 @@ h2, .h2 {
 	line-height: 22px;
 	color: #666;
 }
-
+.detail-price {
+    margin: 0 5px 0 0;
+    font-size: 16px;
+    color: #77a464;
+}
 .product-no-reviews,
 .product-reviews-overview {
 	margin: 0 0 25px;
@@ -1862,8 +1865,9 @@ h2, .h2 {
 }
 .overview .availability,
 .variant-overview .availability {
-	margin: 0 0 20px;
+	margin: 0 0 10px;
 	overflow: hidden;
+    font-size: 80%;
 }
 .overview .availability .stock,
 .variant-overview .availability .stock {
@@ -2042,7 +2046,17 @@ h2, .h2 {
 	clear: both;
 	line-height: 24px;
 }
-
+.loader:before{height:2em;width:2em;
+               position:absolute;top:50%;
+               left:50%;margin-left:-.5em;
+               margin-top:-.5em;display:block;
+               content:"";-webkit-animation:spin 1s ease-in-out infinite;
+               -moz-animation:spin 1s ease-in-out infinite;animation:spin 1s ease-in-out infinite;
+               background:url(../images/progress.gif) center center;
+               background-size:cover;
+               line-height:1;text-align:center;
+               font-size:2em;
+               color:rgba(0,0,0,.75)}
 .product-collateral {
 	margin: 0 0 75px;
 }
@@ -2096,13 +2110,53 @@ h2, .h2 {
 .variant-overview .add-to-cart {
 	margin: 0 0 10px;
 }
+.CSSTableGenerator {
+	margin:0px;padding:0px;
+	width:100%;
+	
+	-moz-border-radius-bottomleft:0px;
+	-webkit-border-bottom-left-radius:0px;
+	border-bottom-left-radius:0px;
+	
+	-moz-border-radius-bottomright:0px;
+	-webkit-border-bottom-right-radius:0px;
+	border-bottom-right-radius:0px;
+	
+	-moz-border-radius-topright:0px;
+	-webkit-border-top-right-radius:0px;
+	border-top-right-radius:0px;
+	
+	-moz-border-radius-topleft:0px;
+	-webkit-border-top-left-radius:0px;
+	border-top-left-radius:0px;
+}.CSSTableGenerator table{
+    border-collapse: collapse;
+        border-spacing: 0;
+	width:100%;
+	height:100%;
+	margin:0px;padding:0px;
+} 
+ 
+.CSSTableGenerator tr:nth-child(odd){ background-color:#e5e5e5; }
+.CSSTableGenerator tr:nth-child(even)    { background-color:#ffffff; }
 
+.CSSTableGenerator td{
+	vertical-align:middle;
+	border:0px solid #000000;
+	border-width:0px 0px 0px 0px;
+	text-align:left;
+	padding:7px;
+} 
+ 
 .product-specs-box {
-	margin: 0 0 40px;
+	margin: 20px 0 40px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
 }
 .product-specs-box td {
-	border: 1px solid #ddd;
-	padding: 10px;
+	border: 0px solid #ddd;
+    width: 50%;
 }
 
 .product-tags-list {
@@ -5126,14 +5180,8 @@ pre {
 	margin: 0;
 }
 
-.item-box {
-	width: 49%;
-	margin: 0 0.5% 50px;
-}
-.item-box:nth-child(2n+1) {
-	clear: both;
-}
-.item-box .product-rating-box {
+ 
+ .item-box .product-rating-box {
     margin: 0 0 15px;
 }
 .item-box .prices {
@@ -5318,16 +5366,10 @@ pre {
 	opacity: 1;
 }
 
-.item-box {
-	width: 32.33333%;
-	margin: 0 0.5% 50px;
-}
-.item-box:nth-child(2n+1) {
-	clear: none;
-}
-.item-box:nth-child(3n+1) {
+ 
+/*.item-box:nth-child(5n+1) {
 	clear: both;
-}
+}*/
 
 .product-list .item-box {
 	float: none;
@@ -6240,10 +6282,10 @@ pre {
 .borrow-cart-page .product-grid .item-box:nth-child(3n+1) {
 	clear: none;
 }
-.home-page .product-grid .item-box:nth-child(4n+1),
+.home-page .product-grid .item-box:nth-child(5n+1),
 .product-details-page .product-grid .item-box:nth-child(4n+1),
 .borrow-cart-page .product-grid .item-box:nth-child(4n+1) {
-	clear: both;
+	clear: both !important;
 }
 
 

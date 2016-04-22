@@ -4,20 +4,70 @@
 
 @if (Model.Count > 0)
 {
-    <div class="product-grid home-page-product-grid tab_wrap">
+    <div class="product-grid home-page-product-grid tab_wrap" >
         <ul class="nav nav-tabs">
             <li class="active" style="float: none; text-align: center;">
                 <a data-toggle="tab" href="#bs_first_tab64"> <h2>@T("HomePage.Products")</h2></a>
             </li>
         </ul>
-        
-        <div class="item-grid tab-content">
-            @foreach (var item in Model)
-{
-    <div class="item-box col-sm-12 ">
-        @Html.Partial("_ProductBox", item)
-    </div>
-}
+        <div class="item-grid  tab-content" >
+            <div class="item-box" ng-repeat="product in list.FeaturedProducts">
+                <div class="product-item" data-productid="{{product.Id}}">
+                    <div class="picture" showonhoverparent>
+                        <a ng-click="openDefault(product.Id)" title="{{product.DefaultPictureModel.Title}}">
+                            <img alt="{{product.DefaultPictureModel.AlternateText}}" src="{{product.DefaultPictureModel.ImageUrl}}" title="{{product.DefaultPictureModel.Title}}" />
+                        </a>
+                        @*<div class="caption">
+                            <h3 ng-click="openDefault(product.Id)" style="vertical-align: middle; font-weight:normal; /* position: absolute; */ /* left: 30%; */ margin: 0px auto 0; text-align: center; width: 60%; ">Quick View</h3>
+                        </div>*@
+                    </div>
+                    <div class="details">
+                        <script type="text/ng-template" id="myModalContent.html">
+                            <div class="modal-header">
+                                <h3 class="modal-title">{{items[0]}}</h3>
+                            </div>
+                            <div class="modal-body">
+                                <iframe width="565" height="350" src="{{items[1]}}" frameborder="0"></iframe>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-warning" type="button" ng-click="cancel()">Close</button>
+                            </div>
+                        </script>
+
+                        <h2 class="product-title">
+                            <a ng-if="product.ProductVideoModel != null" ng-click="open(product.Name,product.ProductVideoModel.ValueRaw)" class="youtube" title="{{product.Name}}">
+                                <img src="/Content/Images/video.png" style="width:30px;position:absolute;top:0;right:0;" />
+                            </a>
+                            <a ng-click="openDefault(product.Id)">{{product.Name}}</a>
+                        </h2>
+                        <div class="product-rating-box" style="width:100%;" title="0 review(s)">
+                            <div class="rating">
+                                <div ng-style="{'width' : (product.ReviewOverviewModel.TotalReviews != 0) ? '(product.ReviewOverviewModel.RatingSum * 100 / product.ReviewOverviewModel.TotalReviews / 5 )%' : '0%'};">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="description">
+                            {{product.shortdescription}}>
+                        </div>
+                        <div class="add-info">
+                            <div class="prices">
+                                <span ng-if="product.ProductPrice.OldPrice" class="price old-price">{{product.ProductPrice.OldPrice}}</span>
+                                <span class="price actual-price">{{product.ProductPrice.Price}}</span>
+                            </div>
+                        </div>
+                        <div class="description">
+
+                        </div>
+                        <div class="buttons">
+                            <input type="button" value="Add to MyToyBox" class=" button-2 add-to-mytoybox-button" ng-click="AddToBorrowCart(product.Id,2)">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+         
+        
     </div>
 }

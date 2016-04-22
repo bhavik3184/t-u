@@ -459,6 +459,196 @@ mainApp.controller("CategoryFilterCtrl", ['$scope', '$rootScope', '$http', 'ngDi
 }]);
 
 
+mainApp.controller("HomeCtrl", ['$scope', '$rootScope', '$http', 'ngDialog', '$location', '$window', '$uibModal', '$sce', function ($scope, $rootScope, $http, ngDialog, $location, $window, $uibModal, $sce) {
+
+
+    $scope.displaycaption = function (name, disp) {
+
+        if (disp == 1) {
+            console.log('#cap' + name + " show");
+            document.getElementById('#cap' + name).style.display = "block";
+        } else {
+            document.getElementById('#cap' + name).style.display = "none";
+        }
+
+    }
+    $scope.status = {
+        isopen: false
+    };
+
+    $scope.items = [];
+
+    $scope.animationsEnabled = true;
+
+
+    $scope.open = function (name, yt) {
+
+        //console.log(yt);
+        $scope.items.length = 0;
+        $scope.items.push(name);
+        $scope.items.push($sce.trustAsResourceUrl(yt.replace("watch?v=", "v/") + '&output=embed'));
+
+        var modalInstance = $uibModal.open({
+            animation: $scope.animationsEnabled,
+            templateUrl: 'myModalContent.html',
+            controller: 'ModalInstanceCtrl',
+
+            resolve: {
+                items: function () {
+                    return $scope.items;
+                }
+            }
+        });
+
+        modalInstance.result.then(function (selectedItem) {
+            $scope.selected = selectedItem;
+        }, function () {
+            // console.info('Modal dismissed at: ' + new Date());
+        });
+    };
+
+    $scope.toggleAnimation = function () {
+        $scope.animationsEnabled = !$scope.animationsEnabled;
+    };
+
+    
+    $scope.Reddit = {
+        items: [],
+        busy: false,
+        after: '',
+    };
+
+    
+    $scope.Reddit.busy = true;
+    var res = $http.get("/product/HomeProducts")
+           .success(function (data, status, headers, config) {
+               console.log(data);
+               $scope.list = data;
+               
+                
+           })
+           .error(function (data) {
+               console.log("Error !" + data);
+           });
+
+
+
+    $scope.user1 = {
+        roles1: []
+    };
+
+
+    $scope.list = {
+        Products: [],
+    };
+
+
+    $scope.clearmapsearch = function () {
+        $scope.addRowAsyncAsJSON();
+    };
+
+    $scope.clearfilters = function () {
+        $scope.user.roles.length = 0;
+        $scope.addRowAsyncAsJSON();
+    }
+
+    $scope.clearweight = function () {
+        $scope.addRowAsyncAsJSON();
+    }
+
+    $scope.user = {
+        roles: []
+    };
+
+    $scope.clearprice = function () {
+        $scope.addRowAsyncAsJSON();
+    }
+
+    $scope.clearcategories = function () {
+        //$scope.vehicleTypes.length = 0;
+        $scope.user.roles.length = 0;
+        $scope.user.roles.length = 0;
+        $scope.addRowAsyncAsJSON();
+
+    }
+
+    $scope.AddToBorrowCart = function (value, carttype) {
+        $scope.displayprogress = true;
+        console.log(1);
+        var res = $http.post("addproducttocart/catalog/" + value + "/" + carttype + "/1")
+        .success(function (data, status, headers, config) {
+
+            $scope.borrowcart = data;
+            console.log(data);
+            console.log($scope.borrowcart);
+            $scope.displaynotification = false;
+            console.log($scope.borrowcart);
+            $scope.displayprogress = true;
+
+            if ($scope.borrowcart.success) {
+                $scope.color = "#4bb07a";
+                $scope.displaynote = "block";
+                $scope.displaynotification = true;
+                $scope.successmessage = $sce.trustAsHtml($scope.borrowcart.message);
+            } else {
+                $scope.displaynote = "block";
+                $scope.color = "#e4444c";
+                $scope.displaynotification = true;
+                $scope.successmessage = $sce.trustAsHtml($scope.borrowcart.message);
+            };
+            $scope.displayprogress = false;
+
+        })
+        .error(function (data) {
+            $scope.displayprogress = false;
+            console.log("Error !" + data);
+        });
+    }
+
+    $scope.closenote = function () {
+        $scope.displaynotification = false;
+    }
+    $rootScope.jsonData = '{"foo": "bar"}';
+    $rootScope.theme = 'ngdialog-theme-default';
+
+    $scope.openDefault = function (value) {
+        ngDialog.open({
+            template: 'firstDialogId',
+            controller: 'InsideCtrl',
+            resolve: {
+                productId: function () {
+                    return value
+                }
+            },
+            className: 'ngdialog-theme-default',
+
+        });
+    };
+
+    $rootScope.$on('ngDialog.opened', function (e, $dialog) {
+        console.log('ngDialog opened: ' + $dialog.attr('id'));
+    });
+
+    $rootScope.$on('ngDialog.closed', function (e, $dialog) {
+        console.log('ngDialog closed: ' + $dialog.attr('id'));
+    });
+
+    $rootScope.$on('ngDialog.closing', function (e, $dialog) {
+        console.log('ngDialog closing: ' + $dialog.attr('id'));
+    });
+
+    $rootScope.$on('ngDialog.templateLoading', function (e, template) {
+        console.log('ngDialog template is loading: ' + template);
+    });
+
+    $rootScope.$on('ngDialog.templateLoaded', function (e, template) {
+        console.log('ngDialog template loaded: ' + template);
+    });
+
+
+}]);
+
+
 mainApp.controller("SearchFilterController", ['$scope', '$http', '$location', '$window', function ($scope, $http, $location, $window) {
 
 

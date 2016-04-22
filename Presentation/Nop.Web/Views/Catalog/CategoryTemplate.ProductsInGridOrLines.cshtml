@@ -77,8 +77,8 @@
     <p style="line-height: 1em; margin: 0 0 0px;" class="content" ng-bind-html="successmessage"></p>
 </div>
 <div class="page category-page article" style="background-color:white;">
-    <div class="progresscaption" ng-show="displayprogress">
-        <img style="top: 40%; left: 40%; position: absolute;" src="/Themes/DefaultClean/Content/images/progress.gif" />
+    <div class="progresscaption loader" id="loader" ng-show="displayprogress" style="background-image: url('/themes/defaultClean/Content/images/progress.gif');">
+        <img style="top: 40%; left: 40%; position: absolute;"   />
     </div>
     <div class="page-title">
         <h1>@Model.Name</h1>
@@ -157,17 +157,17 @@
         <input type="text" ng-hide="true" value="@Model.ViewMode" ng-model="ViewMode" id="viewmode" ng-change="addRowAsyncAsJSON()" />
         <input type="text" ng-hide="true" value="@Model.PageNumber" ng-model="PageNumber" id="pagenumber" ng-change="addRowAsyncAsJSON()" />
         <div class="product-grid">
-            <div class="item-grid" infinite-scroll='nextPage()' infinite-scroll-disabled='Reddit.busy' infinite-scroll-distance='0'>
-                <div class="item-box" ng-repeat="product in list.Products">
+            <div class="item-grid col-sm-12 nopadding" infinite-scroll='nextPage()' infinite-scroll-disabled='Reddit.busy' infinite-scroll-distance='0'>
+                <div class="item-box col-sm-6 col-md-3 col-lg-3 " ng-repeat="product in list.Products">
                     <div class="product-item" data-productid="{{product.Id}}">
 
                         <div class="picture" showonhoverparent>
-                            <a href="/{{product.SeName}}" title="{{product.DefaultPictureModel.Title}}">
+                            <a ng-click="openDefault(product.Id)" title="{{product.DefaultPictureModel.Title}}">
                                 <img alt="{{product.DefaultPictureModel.AlternateText}}" src="{{product.DefaultPictureModel.ImageUrl}}" title="{{product.DefaultPictureModel.Title}}" />
                             </a>
-                            <div class="caption" >
-                                <h3 ng-click="openDefault(product.Id)" style="vertical-align: middle; font-weight:normal; /* position: absolute; */ /* left: 30%; */ margin: 100px auto 0; text-align: center; width: 60%; ">Quick View</h3>
-                            </div>
+                            @*<div class="caption" >
+                        <h3 ng-click="openDefault(product.Id)" style="vertical-align: middle; font-weight:normal; /* position: absolute; */ /* left: 30%; */ margin: 100px auto 0; text-align: center; width: 60%; ">Quick View</h3>
+                    </div>*@
                         </div>
                         <div class="details">
                             <script type="text/ng-template" id="myModalContent.html">
@@ -194,7 +194,7 @@
                                     </div>
                                 </div>
                             </div>
-                             
+
                             <div class="description">
                                 {{product.shortdescription}}>
                             </div>
@@ -244,7 +244,7 @@
     <link rel="stylesheet" type="text/css" href="/Themes/DefaultClean/Content/css/ngGallery.css">
     <script type="text/ng-template" id="firstDialogId">
         <div class="progresscaption" ng-show="displayprogress">
-            <img style="top: 40%; left: 40%; position: absolute;" src="/Themes/DefaultClean/Content/images/progress.gif" />
+            <img style="top: 40%; left: 40%; position: absolute;"   />
         </div>
         <div style="position: fixed;
     top: 0;
@@ -269,39 +269,43 @@
 
             <form action="/dcm-mobile-bank" id="product-details-form" method="post" novalidate="novalidate">
                 <div itemscope="" itemtype="http://schema.org/Product" data-productid="68">
-                    <div class="col-sm-12 nopadding">
+                    <div class="col-sm-12" style="padding: 0 15px 15px; ">
                         <div class="product-essential col-sm-8 nopadding">
                             <!--product pictures-->
-                            <div class="gallery" >
+                            <div class="gallery">
                                 <div class="picture">
                                     <img class="thumb-popup-link" alt="{{product.DefaultPictureModel.AlternateText}}" src="{{product.DefaultPictureModel.ImageUrl}}" title="{{product.DefaultPictureModel.Title}}" itemprop="image" id="main-product-img-68">
                                 </div>
                                 <ng-gallery images="product.PictureModels">
                                 </ng-gallery>
                                 @*<div class="picture-thumbs">
-                                    <a ng-repeat="pic in product.PictureModels" class="thumb-popup-link" ng-click="SetDefaultImage(product,pic.FullSizeImageUrl)"  title="{{pic.Title}}">
-                                        <img class="thumb-popup-link" src="{{pic.ImageUrl}}" alt="{{pic.AlternateText}}" title="Picture of DCM Mobile Bank">
-                                    </a>
-                                </div>*@
+                        <a ng-repeat="pic in product.PictureModels" class="thumb-popup-link" ng-click="SetDefaultImage(product,pic.FullSizeImageUrl)"  title="{{pic.Title}}">
+                            <img class="thumb-popup-link" src="{{pic.ImageUrl}}" alt="{{pic.AlternateText}}" title="Picture of DCM Mobile Bank">
+                        </a>
+                    </div>*@
                             </div>
 
                             <div class="overview">
                                 <div class="product-name">
-                                    <h1 itemprop="name">
+                                    <h3 itemprop="name">
                                         {{product.Name}}
-                                    </h1>
+                                    </h3>
                                     <div class="prices" itemprop="offers" itemscope="" itemtype="http://schema.org/Offer">
                                         <div class="product-price">
-                                            <span itemprop="price" class="price-value-68">
+                                            <span itemprop="price" class="detail-price">
                                                 {{product.ProductPrice.Price}}
                                             </span>
                                         </div>
                                         <meta itemprop="priceCurrency" content="{{product.ProductPrice.CurrencyCode}}">
                                     </div>
+                                    <div class="availability nopadding" ng-show="product.StockAvailability.length >0">
+                                        <div class="stock">
+                                            <span class="label nopadding">Availability:</span>
+                                            <span class="value" id="stock-availability-value-{{product.Id}}">{{product.StockAvailability}} </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="short-description">
-                                    {{product.ShortDescription}}
-                                </div>
+
 
                                 <!--SKU, MAN, GTIN, vendor-->
                                 <div class="additional-details">
@@ -327,16 +331,18 @@
                                 <!--mytoybox, compare, email a friend-->
                                 <div class="overview-buttons">
                                 </div>
+
                             </div>
+
                         </div>
 
-                        <div class="product-collateral  col-sm-4">
+                        <div class="product-collateral  col-sm-4" style="padding-right:0px !important;">
                             <div class="product-specs-box">
                                 <div class="title">
-                                    <strong>Products specifications</strong>
+                                    <strong style="color: #d36917;">Products specifications</strong>
                                 </div>
                                 <div class="table-wrapper">
-                                    <table class="data-table">
+                                    <table class="CSSTableGenerator">
                                         <colgroup>
                                             <col width="25%">
                                             <col>
@@ -346,9 +352,7 @@
                                                 <td class="spec-name">
                                                     {{spec.SpecificationAttributeName}}
                                                 </td>
-                                                <td class="spec-value">
-                                                    {{spec.ValueRaw}}
-                                                </td>
+                                                <td class="spec-value" ng-bind-html="spec.ValueRaw  | unsafe"></td>
                                             </tr>
 
                                         </tbody>
@@ -357,13 +361,10 @@
                             </div>
 
                             <!--availability-->
-                            <div class="availability" ng-show="product.StockAvailability.length >0" >
-                                <div class="stock">
-                                    <span class="label">Availability:</span>
-                                    <span class="value" id="stock-availability-value-{{product.Id}}">{{product.StockAvailability}} </span>
-                                </div>
-                            </div>
                             <!--manufacturers-->
+                        </div>
+                        <div class="short-description col-sm-12 nopadding" style="border-top: 1px solid #ddd; padding: 15px 0 ">
+                            {{product.FullDescription}}
                         </div>
                     </div>
                     <div class="col-sm-12">
@@ -386,31 +387,17 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function () {
-        $('.picture').hover(
-            function () {
-                $(this).find('.caption').show();
-            },
-            function () {
-                $(this).find('.caption').hide();
-            }
-        );
-        $('.buttons').hover(
-          function () {
-              $(this).find('.caption').hide();
-          },
-          function () {
-              $(this).find('.caption').hide();
-          }
-      );
-    });
+    
      
 </script>
 
 
 
  <script type="text/javascript">
-    $(document).ready(function () {
+     $(document).ready(function () {
+        
+         
+
         $('.thumb-popup-link').magnificPopup(
         {
             type: 'image',

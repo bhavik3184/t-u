@@ -54,7 +54,7 @@
         {
             @Html.Widget("left_side_column_before")
             @Html.Action("CategoryNavigation", "Catalog", new { currentCategoryId = currentCategoryId, currentProductId = currentProductId })
-            <div id="contact_widget-2" class="widget widget_contact_widget homepagewidget purple" style="padding: 40px; border-radius: 10px; margin-bottom: 40px; ">
+            <div id="contact_widget-2" class="widget widget_contact_widget homepagewidget purple" style="padding: 40px; border-radius: 10px; margin-bottom: 40px; background-color: white !important; background-image: none !important;">
             <div class="widgetnails"></div>
 
                 <h3 class="widget-title">Filter Products by</h3>
@@ -63,7 +63,8 @@
                         <div class="available-items">
                             <div class="block block-manufacturer-navigation" ng-repeat="filter in list.PSMainModel">
                                 <div class="title">
-                                    <strong style="color:white;">{{filter.SpecificationAttributeName}}</strong>
+                                    <strong style="color: #d36917; font-family: Rancho; font-weight: 400; color: #d36917; font-size: 28px; margin-top: 20px; margin-bottom: 10px; ">
+                                    {{filter.SpecificationAttributeName}}</strong>
                                     <a ng-click="clearfilters()" style="font-size:13px;float:right;">Clear</a>
                                 </div>
                                 <div class="listbox">
@@ -71,7 +72,7 @@
                                         <li class="item" ng-repeat="cfilter in filter.PSModel">
                                             <label style="font-weight:300;">
                                                 <input type="checkbox" ng-click="addRowAsyncAsJSON()" class="css-checkbox" checklist-model="user.roles" checklist-value="cfilter.SpecificationAttributeId">
-                                                <span style="color:white;" class="css-label">{{cfilter.ValueRaw}}</span>
+                                                <span  class="css-label">{{cfilter.ValueRaw}}</span>
                                             </label>
                                         </li>
                                     </ul>

@@ -5,28 +5,200 @@
 
    
 </style>
-<link href="http://best-wordpress-themes.com/t2/wp-content/themes/toddlers/library/unf/slider/idangerous.swiper.css" rel="stylesheet" />
-<div class="page home-page">
-    @Html.Widget("home_page_top")
-    <div class="page-body article col-md-12" style="padding: 60px;">
 
+<link rel="stylesheet" href="/Themes/DefaultClean/Content/css/ngDialog.css">
+<link rel="stylesheet" href="/Themes/DefaultClean/Content/css/ngDialog-theme-default.css">
+<link href="http://best-wordpress-themes.com/t2/wp-content/themes/toddlers/library/unf/slider/idangerous.swiper.css" rel="stylesheet" />
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+<script src="/Scripts/jquery.magnific-popup.min.js" type="text/javascript"></script>
+<link href="/Content/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="http://vitalets.github.io/checklist-model/checklist-model.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.js"></script>
+<script type="text/javascript" src="~/Scripts/ng/ng-infinite-scroll.js"></script>
+<script src="/Scripts/ng/angular-mega-menu.js"></script>
+<script type="text/javascript" src="~/Scripts/ng/app.js"></script>
+<div class="page home-page" >
+    
+    @Html.Widget("home_page_top")
+    <div class="page-body article col-md-12" style="padding: 60px;" ng-app="mainApp" ng-controller="HomeCtrl">
+        <div style="position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    padding: 15px 25px 15px 10px;
+    line-height: 16px;
+    color: #fff;
+    opacity: 0.95;" ng-show="displaynotification" ng-style="{'background-color': color}">
+            <span class="close" title="Close" ng-click="closenote()" style="    position: absolute;
+    top: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    margin: 7px;
+    background: #fff url('/Themes/DefaultClean/Content/images/close.png') center no-repeat;
+    cursor: pointer;">&nbsp;</span>
+            <p style="line-height: 1em; margin: 0 0 0px;" class="content" ng-bind-html="successmessage"></p>
+        </div>
+        <div class="progresscaption loader" id="loader" ng-show="displayprogress">
+            <img style="top: 40%; left: 40%; position: absolute;"/>
+        </div>
         @Html.Widget("home_page_before_categories")
         @*@Html.Action("HomepageCategories", "Catalog")*@
         @Html.Widget("home_page_before_products")
         @Html.Action("HomepageProducts", "Product")
         <hr>
         @Html.Widget("home_page_before_best_sellers")
-        @Html.Action("HomepageBestSellers", "Product")
-        <hr>
+        @*@Html.Action("HomepageBestSellers", "Product")
+            <hr>*@
         @Html.Action("HomepageNewProducts", "Product")
         @*<hr>*@
         @Html.Widget("home_page_before_news")
         @Html.Widget("home_page_before_poll")
         @Html.Widget("home_page_bottom")
-       
 
+        <script type="text/ng-template" id="firstDialogId">
+            <div class="progresscaption loader" ng-show="displayprogress">
+                <img style="top: 40%; left: 40%; position: absolute;"  />
+            </div>
+            <div style="position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    padding: 15px 25px 15px 10px;
+    line-height: 16px;
+    color: #fff;
+    opacity: 0.95;" ng-show="displaynotification" ng-style="{'background-color': color}">
+                <span class="close" title="Close" ng-click="closenote()" style="    position: absolute;
+    top: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    margin: 7px;
+    background: #fff url('/Themes/DefaultClean/Content/images/close.png') center no-repeat;
+    cursor: pointer;">&nbsp;</span>
+                <p style="line-height: 1em; margin: 0 0 0px;" class="content" ng-bind-html="successmessage"></p>
+            </div>
+            <div class="page-body" style="background-color:#fff;">
+
+                <form action="/dcm-mobile-bank" id="product-details-form" method="post" novalidate="novalidate">
+                    <div itemscope="" itemtype="http://schema.org/Product" data-productid="68">
+                        <div class="col-sm-12" style="padding: 0 15px 15px; " >
+                            <div class="product-essential col-sm-8 nopadding">
+                                <!--product pictures-->
+                                <div class="gallery">
+                                    <div class="picture">
+                                        <img class="thumb-popup-link" alt="{{product.DefaultPictureModel.AlternateText}}" src="{{product.DefaultPictureModel.ImageUrl}}" title="{{product.DefaultPictureModel.Title}}" itemprop="image" id="main-product-img-68">
+                                    </div>
+                                    <ng-gallery images="product.PictureModels">
+                                    </ng-gallery>
+                                    @*<div class="picture-thumbs">
+                                        <a ng-repeat="pic in product.PictureModels" class="thumb-popup-link" ng-click="SetDefaultImage(product,pic.FullSizeImageUrl)"  title="{{pic.Title}}">
+                                            <img class="thumb-popup-link" src="{{pic.ImageUrl}}" alt="{{pic.AlternateText}}" title="Picture of DCM Mobile Bank">
+                                        </a>
+                                    </div>*@
+                                </div>
+
+                                <div class="overview">
+                                    <div class="product-name">
+                                        <h3 itemprop="name">
+                                            {{product.Name}}
+                                        </h3>
+                                        <div class="prices" itemprop="offers" itemscope="" itemtype="http://schema.org/Offer">
+                                            <div class="product-price">
+                                                <span itemprop="price" class="detail-price">
+                                                    {{product.ProductPrice.Price}}
+                                                </span>
+                                            </div>
+                                            <meta itemprop="priceCurrency" content="{{product.ProductPrice.CurrencyCode}}">
+                                        </div>
+                                        <div class="availability nopadding" ng-show="product.StockAvailability.length >0">
+                                            <div class="stock">
+                                                <span class="label nopadding">Availability:</span>
+                                                <span class="value" id="stock-availability-value-{{product.Id}}">{{product.StockAvailability}} </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+
+                                    <!--SKU, MAN, GTIN, vendor-->
+                                    <div class="additional-details">
+                                    </div>
+
+                                    <!--attributes-->
+                                    <!--gift card-->
+                                    <!--rental info-->
+                                    <!--price & add to cart-->
+                                    <div class="col-sm-6" style="padding:0;">
+                                        <div class="add-to-cart">
+                                            <div class="add-to-cart-panel">
+                                                <label class="qty-label" for="addtocart_68_EnteredQuantity">Qty:</label>
+                                                <input class="qty-input valid" data-val="true" data-val-number="The field Qty must be a number." id="addtocart_4_EnteredQuantity" name="addtocart_4.EnteredQuantity" type="hidden" value="1">
+                                                <input type="button" id="add-to-cart-button" style="padding:10px 10px" class=" product-box-add-to-cart-button" ng-click="AddToBorrowCart(product.Id,1)" value="Add to Borrow Cart">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-6" style="padding:0;">
+                                        <input type="button" id="add-to-mytoybox-button" style="padding:10px 10px;" class="button-1 add-to-mytoybox-button" ng-click="AddToBorrowCart(product.Id,2)" value="Add to MyToyBox">
+                                    </div>
+                                    <!--mytoybox, compare, email a friend-->
+                                    <div class="overview-buttons">
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            <div class="product-collateral  col-sm-4" style="padding-right:0px !important;">
+                                <div class="product-specs-box">
+                                    <div class="title">
+                                        <strong style="color: #d36917;">Products specifications</strong>
+                                    </div>
+                                    <div class="table-wrapper">
+                                        <table class="CSSTableGenerator">
+                                            <colgroup>
+                                                <col width="25%">
+                                                <col>
+                                            </colgroup>
+                                            <tbody>
+                                                <tr ng-repeat="spec in product.ProductSpecifications">
+                                                    <td class="spec-name">
+                                                        {{spec.SpecificationAttributeName}}
+                                                    </td>
+                                                    <td class="spec-value" ng-bind-html="spec.ValueRaw  | unsafe"></td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!--availability-->
+                                <!--manufacturers-->
+                            </div>
+                            <div class="short-description col-sm-12 nopadding" style="border-top:1px solid #ddd;padding: 15px 0 ">
+                                {{product.FullDescription}}
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                           
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="ngdialog-buttons">
+                <button type="button" class="ngdialog-button ngdialog-button-secondary"
+                        ng-click="closeThisDialog()">
+                    Close
+                </button>
+
+            </div>
+        </script>
     </div>
-    <div id="sidebar" class="col-sm-12 column homesidebar nopadding" >
+    <div id="sidebar" class="col-sm-12 column homesidebar nopadding">
         <div class="col-sm-4">
             <div id="search-3" class="widget widget_search homepagewidget" style="margin-right: 20px; min-height: 400px;">
                 <div class="widgetnails"></div><h3 class="widget-title">Why toys &amp; us</h3>
@@ -64,21 +236,21 @@
                                         </div>
                                     </div>
                                     <!--
-                            <div class="col-sm-12 column">
-                                            <h4><a href="2014/09/16/hello-world/">New Toddlers Playground!</a></h4>
+                                    <div class="col-sm-12 column">
+                                                    <h4><a href="2014/09/16/hello-world/">New Toddlers Playground!</a></h4>
 
-                                            <p class="byline vcard post-meta">
-                                                <time class="updated" datetime="2014-09-16">September 16, 2014
-                                                </time>
+                                                    <p class="byline vcard post-meta">
+                                                        <time class="updated" datetime="2014-09-16">September 16, 2014
+                                                        </time>
 
-                                                <i class="icon icon-star"></i>
-                                                <span class="cats"><a href="category/toddlers-news/" rel="category tag">News</a>
-                                                </span>
-                                                <span class="sticky-ind pull-right">
-                                                    <i class="icon icon-pin"></i>
-                                                </span>
-                                            </p><span class="post-exc">Kitsch hoodie beard four loko polaroid, heirloom narwhal chambray brunch Odd Future. Nulla qui whatever raw denim, excepteur trust...</span></div>
-                                            -->
+                                                        <i class="icon icon-star"></i>
+                                                        <span class="cats"><a href="category/toddlers-news/" rel="category tag">News</a>
+                                                        </span>
+                                                        <span class="sticky-ind pull-right">
+                                                            <i class="icon icon-pin"></i>
+                                                        </span>
+                                                    </p><span class="post-exc">Kitsch hoodie beard four loko polaroid, heirloom narwhal chambray brunch Odd Future. Nulla qui whatever raw denim, excepteur trust...</span></div>
+                                                    -->
                                 </div>
                             </div>
                             <div class="swiper-slide" data-swiper-slide-index="0" style="width: 280px;">
@@ -138,7 +310,30 @@
             <div class="widgetnails"></div><h3 class="widget-title">Testimonials</h3>
             @Html.Action("HomeBlogPost", "Blog")
         </div>
-         
-         
+
+
     </div>
+   
+    <script type="text/javascript" src="/Scripts/ng/ngGallery.js"></script>
+    <link rel="stylesheet" type="text/css" href="/Themes/DefaultClean/Content/css/ngGallery.css">
+    
 </div>
+<script type="text/javascript">
+     $(document).ready(function () {
+
+
+        $('.thumb-popup-link').magnificPopup(
+        {
+            type: 'image',
+            removalDelay: 300,
+            gallery: {
+                enabled: true,
+                tPrev: '@T("Media.MagnificPopup.Previous")',
+                tNext: '@T("Media.MagnificPopup.Next")',
+                tCounter: '@T("Media.MagnificPopup.Counter")'
+            },
+            tClose: '@T("Media.MagnificPopup.Close")',
+            tLoading: '@T("Media.MagnificPopup.Loading")'
+        });
+    });
+</script>

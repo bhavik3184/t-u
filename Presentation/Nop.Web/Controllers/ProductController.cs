@@ -1268,6 +1268,36 @@ namespace Nop.Web.Controllers
             return PartialView(model);
         }
 
+        public JsonResult HomeProducts()
+        {
+            HomeProductModel model = new HomeProductModel();
+
+            var products1 = _productService.GetAllProductsDisplayedOnHomePage();
+            //ACL and store mapping
+            products1 = products1.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
+            //availability dates
+            products1 = products1.Where(p => p.IsAvailable()).ToList();
+
+            if (products1.Count > 0)
+            {
+                var model1 = PrepareProductOverviewModels(products1, true, true,  null).ToList();
+                model.FeaturedProducts = model1;
+            }
+
+            var products2= _productService.GetAllProductsNewOnHomePage();
+            //ACL and store mapping
+            products2 = products2.Where(p => _aclService.Authorize(p) && _storeMappingService.Authorize(p)).ToList();
+            //availability dates
+            products2 = products2.Where(p => p.IsAvailable()).ToList();
+
+            if (products2.Count > 0) {
+                var model2 = PrepareProductOverviewModels(products2, true, true, null).ToList();
+                model.NewProducts = model2;
+            }
+            return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+
         #endregion
 
         #region Product reviews

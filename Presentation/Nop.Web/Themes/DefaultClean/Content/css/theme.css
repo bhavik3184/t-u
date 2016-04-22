@@ -13317,12 +13317,12 @@ Contact Widget
   text-align: center;
   border-radius: 5px;
   font-weight: bold;
-  color: #FFFFFF;
+  color: #777;
   line-height: 34px;
   font-size: 22px;
   text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
   display: block;
-  padding: 0px 0px;
+  padding: 5px 0px;
 }
 .widget_contact_widget a:hover {
   text-decoration: none;
@@ -14657,6 +14657,11 @@ h3,
 .h3 {
   color: #d36917;
 }
+.table-striped>tbody>tr:nth-child(odd)>td,
+.table-striped>tbody>tr:nth-child(odd)>th {
+	background-color: #f97777;
+}
+
 /*------------------------------------------------------------------
 
 ImageGallery / #imagegallery
@@ -14679,7 +14684,7 @@ ImageGallery / #imagegallery
 }
 /* end .gallery */
 .gallery {
-  margin: 0 auto 18px;
+  margin: 20px auto 18px;
 }
 .gallery .gallery-item {
   float: left;
@@ -14717,7 +14722,7 @@ ImageGallery / #imagegallery
   background: #f2f2f2;
 }
 .gallery img:hover {
-  background: white;
+  background: #eee;
 }
 .gallery-columns-2 .attachment-medium {
   max-width: 92%;
