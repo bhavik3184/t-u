@@ -273,28 +273,7 @@
                             </li>
                         }
                     }
-                    <li class="title">
-                        @T("SubscriptionOrder.Shipping")
-                    </li>
-                    <li class="shipping-method">
-                        <span class="label">
-                            @T("SubscriptionOrder.Shipping.Name"):
-                        </span>
-                        <span class="value">
-                            @Model.ShippingMethod
-                        </span>
-                    </li>
-                    @if (!Model.PrintMode && !Model.PickUpInStore)
-                    {
-                        <li class="shipping-status">
-                            <span class="label">
-                                @T("SubscriptionOrder.Shipping.Status"):
-                            </span>
-                            <span class="value">
-                                @Model.ShippingStatus
-                            </span>
-                        </li>
-                    }
+                     
                 </ul>
             }
         </div>
@@ -456,6 +435,17 @@
                                     <span>@Model.SubscriptionOrderSubtotal</span>
                                 </td>
                             </tr>
+                            @if (Model.PreviousRentalBalanceValue > 0)
+                            {
+                                <tr>
+                                    <td class="cart-total-left">
+                                        <label>Previous Membership Balance:</label>
+                                    </td>
+                                    <td class="cart-total-right">
+                                        <span>-  @Model.PreviousRentalBalance</span>
+                                    </td>
+                                </tr>
+                            }
                             @if (!string.IsNullOrEmpty(Model.SubscriptionOrderSubTotalDiscount))
                             {
                                 <tr>
@@ -467,33 +457,29 @@
                                     </td>
                                 </tr>
                             }
-                            <tr>
-                                <td class="cart-total-left">
-                                    <label>Registration Charges:</label>
-                                </td>
-                                <td class="cart-total-right">
-                                    <span>@Model.RegistrationCharge</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cart-total-left">
-                                    <label>Security Deposit:</label>
-                                </td>
-                                <td class="cart-total-right">
-                                    <span>@Model.SecurityDeposit</span>
-                                </td>
-                            </tr>
-                            @if (Model.IsShippable)
+                            @if (!string.IsNullOrEmpty(Model.RegistrationCharge))
                             {
                                 <tr>
                                     <td class="cart-total-left">
-                                        <label>@T("SubscriptionOrder.Shipping"):</label>
+                                        <label>Registration Charges:</label>
                                     </td>
                                     <td class="cart-total-right">
-                                        <span>@Model.SubscriptionOrderShipping</span>
+                                        <span>@Model.RegistrationCharge</span>
                                     </td>
                                 </tr>
                             }
+                            @if (!string.IsNullOrEmpty(Model.SecurityDeposit))
+                            {
+                                <tr>
+                                    <td class="cart-total-left">
+                                        <label>Security Deposit:</label>
+                                    </td>
+                                    <td class="cart-total-right">
+                                        <span>@Model.SecurityDeposit</span>
+                                    </td>
+                                </tr>
+                            }
+                            
                             @if (!string.IsNullOrEmpty(Model.PaymentMethodAdditionalFee))
                             {
                                 <tr>
@@ -568,7 +554,7 @@
                             }
                             <tr>
                                 <td class="cart-total-left">
-                                    <label>@T("SubscriptionOrder.SubscriptionOrderTotal"):</label>
+                                    <label>Net Payable:</label>
                                 </td>
                                 <td class="cart-total-right">
                                     <span><strong>@Model.SubscriptionOrderTotal</strong></span>

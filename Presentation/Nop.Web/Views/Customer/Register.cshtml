@@ -9,53 +9,65 @@
 <link href="/Themes/DefaultClean/Content/css/bootstrap-datetimepicker.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.js"></script>
 <script src="/Scripts/bootstrap-datetimepicker.js"></script>
-
+<style>
+    #BirthDate1, #BirthDate2, #BirthDate3, #BirthDate4, #BirthDate5 {
+        background: #fff9eb;
+        font-size: 1em;
+        border: 1px dashed #EAD4A0;
+        color: #665746;
+        -webkit-border-radius: 10px;
+        -webkit-background-clip: padding-box;
+        -moz-border-radius: 10px;
+        -moz-background-clip: padding;
+        border-radius: 10px;
+        background-clip: padding-box;
+        box-shadow: none;
+        width: 400px;
+        max-width: 100%;
+        height: 36px;
+    }
+</style>
 @if (Model.CountryEnabled && Model.StateProvinceEnabled)
 {
     <script type="text/javascript">
         $(function () {
 
             var selectedItem = 1;
-            var ddlStates1 = $("#@Html.FieldIdFor(model => model.LocalityId)");
+            
             var statesProgress = $("#states-loading-progress");
+            
+            $('#BirthDate1').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+            $('#BirthDate2').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+            $('#BirthDate3').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+            $('#BirthDate4').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+            $('#BirthDate5').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            var selectedItem = $("#@Html.FieldIdFor(model => model.NoOfChildren)").val();
+           
+            var statesProgress = $("#state-loading-progress");
             var neg = 5 - selectedItem;
             for (var i = selectedItem; i <= selectedItem + neg; i++) {
-                if ($('#ChildDiv' + i).length) {
-                    $('#ChildDiv' + i).remove();
+                if ($('#divID' + i).length) {
+                    $('#divID' + i).hide();
                 }
             }
 
             for (var i = 1; i <= selectedItem; i++) {
 
-                if ($('#ChildDiv' + i).length) {
-
+                if ($('#divID' + i).length) {
+                    $('#divID' + i).show("fast");
                 }
-                else {
-                   
-                   
 
-                    var data = '<div class="col-sm-12" id="ChildDiv' + i + '">'
-                               + '<div class="inputs  col-sm-6 nopadding" id="Name' + i + '">'
-                               + '<label>Child Name :</label>'
-                               + '<input type="text"  class="text-box form-control" name="Name' + i + '"  />'
-                               + '</div>'
-                               + '<div class="inputs  col-sm-6 nopadding">'
-                               + '<label>BirthDate :</label>'
-                            + '<div class="input-group date" id="datetimepicker1">'
-                            + '<input type="text" class="BirthDate text-box form-control" id="BirthDate' + i + '"  name="BirthDate' + i + '" />'
-                            + '<span class="input-group-addon">'
-                            + '<span class="glyphicon glyphicon-calendar"></span>'
-                            + '</span> '
-                            + '</div>'
-                            + ''
-                            + '</div>'
-                            + '</div>'
-                    
-                    $("#divID").append(data);
-                    $('.BirthDate').datetimepicker({
-                        format: 'DD/MM/YYYY'
-                    });
-                }
             }
 
 
@@ -271,40 +283,17 @@
                 var statesProgress = $("#state-loading-progress");
                 var neg = 5 - selectedItem;
                 for (var i = selectedItem; i <= selectedItem + neg; i++) {
-                    if ($('#ChildDiv' + i).length) {
-                        $('#ChildDiv' + i).remove();
+                    if ($('#divID' + i).length) {
+                        $('#divID' + i).hide();
                     }
                 }
 
                 for (var i = 1; i <= selectedItem; i++) {
 
-                    if ($('#ChildDiv' + i).length) {
-
+                    if ($('#divID' + i).length) {
+                        $('#divID' + i).show("fast");
                     }
-                    else {
-                       
-                        var data = '<div class="col-sm-12" id="ChildDiv' + i + '">'
-                                   + '<div class="inputs col-sm-6 nopadding" id="Name' + i + '">'
-                                   + '<label>Child Name :</label>'
-                                   + '<input type="text" class="text-box form-control" name="Name' + i + '"    />'
-                                   + '</div>'
-                                   + '<div class="inputs col-sm-6 nopadding">'
-                                   + '<label>BirthDate :</label>'
-                                   + '<div class="input-group date" id="datetimepicker1">'
-                                   + '<input type="text" class="BirthDate text-box form-control" id="BirthDate' + i + '"  name="BirthDate' + i + '" />'
-                                   + '<span class="input-group-addon">'
-                                   + '<span class="glyphicon glyphicon-calendar"></span>'
-                                   + '</span> '
-                                   + '</div>'
-                                   + ''
-                                   + '</div>'
-                                   + '</div>'
-                       
-                        $("#divID").append(data);
-                        $('.BirthDate').datetimepicker({
-                            format: 'DD/MM/YYYY'
-                        });
-                    }
+                    
                 }
             });
         });
@@ -564,10 +553,80 @@
                         @Html.ValidationMessageFor(model => model.NoOfChildren)
                         <span id="states-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
                     </div>
-                    <div id="divID">
+                    <div id="divID1" class="col-sm-12">
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.Name1, new { }, ":")
+                            @Html.EditorFor(model => model.Name1)
 
+                            @Html.ValidationMessageFor(model => model.Name1)
+                        </div>
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.BirthDate1, new { }, ":")
+                            @Html.EditorFor(model => model.BirthDate1, new { @class = "BirthDate text-box form-control" })
+
+                            @Html.ValidationMessageFor(model => model.BirthDate1)
+                        </div>
+                    </div>
+                    <div id="divID2" class="col-sm-12">
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.Name2, new { }, ":")
+                            @Html.EditorFor(model => model.Name2)
+
+                            @Html.ValidationMessageFor(model => model.Name2)
+                        </div>
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.BirthDate2, new { }, ":")
+                            <div class="input-group date" id="datetimepicker1">
+                                @Html.EditorFor(model => model.BirthDate2, new { htmlAttributes = new { @class = "BirthDate" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.BirthDate2)
+                        </div>
+                    </div>
+                    <div id="divID3" class="col-sm-12">
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.Name3, new { }, ":")
+                            @Html.EditorFor(model => model.Name3)
+
+                            @Html.ValidationMessageFor(model => model.Name3)
+                        </div>
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.BirthDate3, new { }, ":")
+                            @Html.EditorFor(model => model.BirthDate3)
+
+                            @Html.ValidationMessageFor(model => model.BirthDate3)
+                        </div>
+                    </div>
+                    <div id="divID4" class="col-sm-12">
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.Name4, new { }, ":")
+                            @Html.EditorFor(model => model.Name4)
+
+                            @Html.ValidationMessageFor(model => model.Name4)
+                        </div>
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.BirthDate4, new { }, ":")
+                            @Html.EditorFor(model => model.BirthDate4)
+
+                            @Html.ValidationMessageFor(model => model.BirthDate4)
+                        </div>
+                    </div>
+                    <div id="divID5" class="col-sm-12">
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.Name5, new { }, ":")
+                            @Html.EditorFor(model => model.Name5)
+
+                            @Html.ValidationMessageFor(model => model.Name5)
+                        </div>
+                        <div class="inputs col-sm-6">
+                            @Html.LabelFor(model => model.BirthDate5, new { }, ":")
+                            @Html.EditorFor(model => model.BirthDate5)
+
+                            @Html.ValidationMessageFor(model => model.BirthDate5)
+                        </div>
                     </div>
                 </div>
+
+                
             </div>
 
 
@@ -630,4 +689,10 @@
         </div>
 
     </div>
+    <script type="text/javascript">
+        $(function () {
+              
+            $("#BirthDate2").addClass("BirthDate")
+        });
+    </script>
 }

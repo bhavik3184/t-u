@@ -1,6 +1,8 @@
 ﻿@model CategoryNavigationModel
 @using Nop.Web.Models.Catalog;
-
+<link rel="stylesheet" type="text/css" href="/Themes/DefaultClean/Content/css/yamm.css">
+<link href="http://geedmo.github.io/yamm3/demo/components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="http://geedmo.github.io/yamm3/demo/components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
 @functions{
     public bool BreadCrumbContainsCurrentCategoryId(CategorySimpleModel category)
     {
@@ -21,6 +23,8 @@
         return false;
     }
 }
+ 
+
 @helper RenderCategoryLine(CategorySimpleModel category)
 {
     bool active = category.Id == Model.CurrentCategoryId || category.SubCategories.Count(BreadCrumbContainsCurrentCategoryId) > 0;
@@ -30,8 +34,8 @@
     {
         liClass += " last";
     }
-    <li class="dropdown">
-        <a data-hover="dropdown" class="dropdown-toggle" data-toggle="dropdown" href="@Url.RouteUrl("Category", new { SeName = category.SeName })">
+    <li class="dropdown" style="width:100%;">
+        <a data-hover="dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="@Url.RouteUrl("Category", new { SeName = category.SeName })">
             @category.Name
             @if (category.NumberOfProducts.HasValue)
             {
@@ -43,14 +47,25 @@
                 category.SubCategories.Count(BreadCrumbContainsCurrentCategoryId) > 0)
             {
                 if (category.SubCategories.Count > 0)
-                { <div class="sublist-toggle"></div>
-                <ul class="sublist dropdown-menu dropdownhover-bottom ">
-                    @foreach (var subCategory in category.SubCategories)
-                    {
-                        @RenderCategoryLine(subCategory)
-                    }
-                </ul>
-                }
+                {
+                    int i = 1;
+                    <div class="sublist-toggle"></div>
+                    <ul class="sublist dropdown-menu dropdownhover-bottom col-sm-12">
+                        <li>
+                            <div class="yamm-content">
+                                <div class="row">
+                                    @for (int k = 1; k < category.SubCategories.Count; k = k + 5)
+                                    {
+                                        <ul class="col-sm-2 list-unstyled">
+                                            
+                                        </ul>
+                                    }
+
+                                </div>
+                             </div>
+            </li>
+                    </ul>
+            }
             }
         }
     </li>
@@ -58,13 +73,15 @@
 }
 @if (Model.Categories.Count > 0)
 {
-    <div class="block block-category-navigation widget woocommerce widget_shopping_cart shoppagewidget orange" style="padding: 40px; border-radius: 10px; margin-bottom: 40px;">
+    <div class="block block-category-navigation widget woocommerce widget_shopping_cart shoppagewidget orange" style="padding: 40px; border-radius: 10px; margin-bottom: 40px; min-height: 250px;">
+         
         <div class="widgetnails"></div>
         <h3 class="widget-title">
             <strong>@T("Categories")</strong>
         </h3>
         <div class="listbox">
-            <ul class="top-menu  list">
+            
+            <ul class="nav navbar-nav top-menu  list">
                 @foreach (var category in Model.Categories)
                 {
                     @RenderCategoryLine(category)
@@ -74,6 +91,16 @@
         </div>
     </div>
 }
+ 
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css"></script>
+<script>
+    $(function () {
+        window.prettyPrint && prettyPrint()
+        $(document).on('click', '.yamm .dropdown-menu', function (e) {
+            e.stopPropagation()
+        })
+    })
+</script>
 <script type="text/javascript">
     $(document).ready(function () {
         $('.menu-toggle').click(function () {
